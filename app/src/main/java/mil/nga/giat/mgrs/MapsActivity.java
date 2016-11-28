@@ -43,8 +43,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map = googleMap;
 
 //        // Add a marker in Sy
-        TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
         TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new ThousandKMTileProvider(getApplicationContext())));
+        TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
 
 //        LatLng sydney = new LatLng(-34, 151);
 //        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));

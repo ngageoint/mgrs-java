@@ -17,8 +17,6 @@ import com.google.android.gms.maps.model.TileProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +29,7 @@ import mil.nga.giat.mgrs.TileBoundingBoxUtils;
  */
 public class ThousandKMTileProvider implements TileProvider {
 
-    private static int TEXT_SIZE = 12;
+    private static int TEXT_SIZE = 8;
 
     /**
      * Half the world distance in either direction
@@ -87,34 +85,24 @@ public class ThousandKMTileProvider implements TileProvider {
 
         for (Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone : latitudeZones.entrySet()) {
 
-            if (!latitiudeGZDZone.getKey().equals('J')) {
-                continue;
-            }
+//            if (!latitiudeGZDZone.getKey().equals('K')) {
+//                continue;
+//            }
 
             for (Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone : longitudeZones.entrySet()) {
 
-                if (!longitudeGZDZone.getKey().equals(34)) {
-                    continue;
-                }
+//                if (!longitudeGZDZone.getKey().equals(34)) {
+//                    continue;
+//                }
 
-
-                Collection<Pair<LatLng, String>> ids = new ArrayList<>();
-                Collection<PolylineOptions> lines = linesForGZDZone(latitiudeGZDZone, longitudeGZDZone, ids);
-                for (PolylineOptions line : lines) {
-                    drawLine(webMercatorBoundingBox, canvas, line);
-                }
-
-                for (Pair<LatLng, String> id : ids) {
-                    drawId(id.second, id.first, webMercatorBoundingBox, canvas);
-                }
+                linesForGZDZone(latitiudeGZDZone, longitudeGZDZone, webMercatorBoundingBox, canvas);
             }
         }
 
         return bitmap;
     }
 
-    private Collection<PolylineOptions> linesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, Collection<Pair<LatLng, String>> ids) {
-        Collection<PolylineOptions> lines = new ArrayList<>();
+    private void linesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
 
         Double minLat = latitiudeGZDZone.getValue().first;
         Double maxLat = latitiudeGZDZone.getValue().second;
@@ -124,22 +112,15 @@ public class ThousandKMTileProvider implements TileProvider {
 
         // Draw northing lines within GZD
         if (maxLat > 0) {
-            Collection<PolylineOptions> longitudeLines = longitudeLinesForGZDZone(latitiudeGZDZone.getKey(), longitudeGZDZone.getKey(), minLat, maxLat, minLon, maxLon);
-            lines.addAll(longitudeLines);
+            longitudeLinesForGZDZone(latitiudeGZDZone.getKey(), longitudeGZDZone.getKey(), minLat, maxLat, minLon, maxLon, bbox, canvas);
         } else {
-            Collection<PolylineOptions> longitudeLines = longitudeLinesForGZDZone(latitiudeGZDZone.getKey(), longitudeGZDZone.getKey(), maxLat, minLat, minLon, maxLon);
-            lines.addAll(longitudeLines);
+            longitudeLinesForGZDZone(latitiudeGZDZone.getKey(), longitudeGZDZone.getKey(), maxLat, minLat, minLon, maxLon, bbox, canvas);
         }
 
-        Collection<PolylineOptions> latitudeLines = latitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, ids);
-        lines.addAll(latitudeLines);
-
-        return lines;
+        latitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, canvas);
     }
 
-    private Collection<PolylineOptions> longitudeLinesForGZDZone(Character zoneLetter, Integer zoneNumber, double startLat, double endLat, double startLon, double endLon) {
-
-        Collection<PolylineOptions> lines = new ArrayList<>();
+    private void longitudeLinesForGZDZone(Character zoneLetter, Integer zoneNumber, double startLat, double endLat, double startLon, double endLon, double[] bbox, Canvas canvas) {
 
         Double centerLongitude = Math.abs((startLon - endLon) / 2) + startLon;
         double startNorthing = GeoUtility.latLngToUtm(startLat, centerLongitude).northing;
@@ -168,7 +149,7 @@ public class ThousandKMTileProvider implements TileProvider {
             }
 
             line = horizontalIntersection(new PolylineOptions().add(p1).add(p2), startLon, endLon);
-            lines.add(line);
+            drawLine(bbox, canvas, line);
 
             easting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
         } while (easting > minEasting);
@@ -193,17 +174,13 @@ public class ThousandKMTileProvider implements TileProvider {
             }
 
             line = horizontalIntersection(new PolylineOptions().add(p1).add(p2), startLon, endLon);
-            lines.add(line);
+            drawLine(bbox, canvas, line);
 
             easting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
         }
-
-        return lines;
     }
 
-    private Collection<PolylineOptions> latitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, Collection<Pair<LatLng, String>> ids) {
-
-        Collection<PolylineOptions> lines = new ArrayList<>();
+    private void latitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
 
         Character zoneLetter = latitiudeGZDZone.getKey();
         Integer zoneNumber = longitudeGZDZone.getKey();
@@ -236,14 +213,16 @@ public class ThousandKMTileProvider implements TileProvider {
                 LatLng p1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
                 LatLng p2 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
                 PolylineOptions line = new PolylineOptions().add(p1).add(p2);
-                lines.add(line);
+                drawLine(bbox, canvas, line);
 
                 // Draw cell name
-                double centerEasting = ((easting - (easting - ONE_HUNDRED_THOUSAND_METERS)) / 2) + easting;
+                double centerEasting = easting - ((easting - newEasting) / 2);
                 double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
                 LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+                double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+                double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
                 String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
-                ids.add(new Pair(centerLatLng, id));
+                drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
 
                 easting = newEasting;
             } while (easting > minEasting);
@@ -257,7 +236,16 @@ public class ThousandKMTileProvider implements TileProvider {
                 LatLng p1 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, easting, northing);
                 LatLng p2 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, newEasting, northing);
                 PolylineOptions line = new PolylineOptions().add(p1).add(p2);
-                lines.add(line);
+                drawLine(bbox, canvas, line);
+
+                // Draw cell name
+                double centerEasting = easting + ((newEasting - easting) / 2);
+                double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+                LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+                double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+                double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+                String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+                drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
 
                 easting = newEasting;
             } while (easting < maxEasting);
@@ -265,22 +253,57 @@ public class ThousandKMTileProvider implements TileProvider {
             northing += ONE_HUNDRED_THOUSAND_METERS;
         } while (northing < maxNorthing);
 
-        return lines;
+        // go left
+        double easting = CENTER_EASTING;
+        LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
+        double minEasting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
+        do {
+            double newEasting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+
+            // Draw cell name
+            double centerEasting = easting - ((easting - newEasting) / 2);
+            double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+            LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+            double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+            double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+            String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+            drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+
+            easting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+        } while (easting > minEasting);
+
+        // go right
+        easting = CENTER_EASTING;
+        double maxEasting = (2 * utm.easting) - minEasting;
+        do {
+            double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
+
+            // Draw cell name
+            double centerEasting = easting + ((newEasting - easting) / 2);
+            double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+            LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+            double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+            double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+            String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+            drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+
+            easting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
+        } while (easting < maxEasting);
     }
 
-        /**
-         * Draw the shape on the canvas
-         *
-         * @param boundingBox
-         * @param canvas
-         */
+    /**
+     * Draw the shape on the canvas
+     *
+     * @param boundingBox
+     * @param canvas
+     */
     private void drawLine(double[] boundingBox, Canvas canvas, PolylineOptions line) {
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.GREEN);
+        paint.setColor(Color.rgb(76, 175, 80));
 //        paint.setAlpha(64);
 
         Path linePath = new Path();
@@ -288,30 +311,33 @@ public class ThousandKMTileProvider implements TileProvider {
         canvas.drawPath(linePath, paint);
     }
 
-    private void drawId(String id, LatLng centerLatLng, double[] boundingBox, Canvas canvas) {
+    private void drawId(String id, LatLng centerLatLng, double minLon, double maxLon, double[] boundingBox, Canvas canvas) {
 
         Log.e("GZD GRID NAME", id);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.GREEN);
-        paint.setAlpha(128);
+        paint.setColor(Color.rgb(76, 175, 80));
         paint.setTextSize(TEXT_SIZE * context.getResources().getDisplayMetrics().density);
 
         // Determine the text bounds
         Rect textBounds = new Rect();
         paint.getTextBounds(id, 0, id.length(), textBounds);
-
-        // Determine the center of the tile
-        // TODO determine the center of the bounding box for this grid
-//        double centerLon = ((longitudeGZDZone.getValue().second - longitudeGZDZone.getValue().first) / 2.0) + longitudeGZDZone.getValue().first;
-//        double centerLat = ((latitudeGZDZone.getValue().second - latitudeGZDZone.getValue().first) / 2.0) + latitudeGZDZone.getValue().first;
+        float textWidth = textBounds.right - textBounds.left;
 
         double[] meters = degreesToMeters(new LatLng(centerLatLng.latitude, centerLatLng.longitude));
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
 
-        // Draw the text
-        canvas.drawText(id, x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), paint);
+        double[] minMeters = degreesToMeters(new LatLng(centerLatLng.latitude, minLon));
+        double[] maxMeters = degreesToMeters(new LatLng(centerLatLng.latitude, maxLon));
+
+        float minX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, minMeters[0]);
+        float maxX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, maxMeters[0]);
+        float zoneWidth = maxX - minX;
+        if (zoneWidth > textWidth + 10) {
+            // Draw the text
+            canvas.drawText(id, x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), paint);
+        }
     }
 
     /**
