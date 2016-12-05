@@ -195,6 +195,12 @@ public class GeoUtility {
      * @return two letter MGRS 100k code.
      */
     private static String getLetter100kID(int column, int row, int parm) {
+
+        parm = parm % NUM_100K_SETS;
+        if (parm == 0) {
+            parm = NUM_100K_SETS;
+        }
+
         // colOrigin and rowOrigin are the letters at the origin of the set
         int index = parm - 1;
         char colOrigin = SET_ORIGIN_COLUMN_LETTERS.charAt(index);
@@ -255,6 +261,26 @@ public class GeoUtility {
         return twoLetter;
     }
 
+    /**
+     * Encodes a UTM location as MGRS string.
+     *
+     * @private
+     * @param {object} utm An object literal with easting, northing,
+     *     zoneLetter, zoneNumber
+     * @param {number} accuracy Accuracy in digits (1-5).
+     * @return {string} MGRS string for the given UTM location.
+     */
+    public static String latLngToMGRS(LatLng latLng, int accuracy) {
+        UTM utm = latLngToUtm(latLng.latitude, latLng.longitude);
+
+        String easting = String.format("%05d", Math.round(utm.easting));
+        String northing =  String.format("%05d", Math.round(utm.northing % 100000.0));
+
+        int column = (int) Math.floor(utm.easting / 100000);
+        int row = (int) Math.floor(utm.northing / 100000) % 20;
+
+        return "" + utm.zoneNumber + utm.zoneLetter + getLetter100kID(column, row, utm.zoneNumber) + easting.substring(0, accuracy) + northing.substring(0, accuracy);
+    }
 
     public static class UTM {
         public double northing;

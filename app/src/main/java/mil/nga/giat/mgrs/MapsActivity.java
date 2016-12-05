@@ -2,6 +2,8 @@ package mil.nga.giat.mgrs;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -10,22 +12,23 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import mil.nga.giat.mgrs.gzd.GZDGridTileProvider;
-import mil.nga.giat.mgrs.gzd.ThousandKMTileProvider;
+import mil.nga.giat.mgrs.gzd.GridTileProvider;
+import mil.nga.giat.mgrs.gzd.HundredKMTileProvider;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
     private GoogleMap map;
-
-
+    private TextView mgrsLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mgrsLabel = (TextView) findViewById(R.id.mgrs);
     }
 
 
@@ -42,14 +45,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-//        // Add a marker in Sy
-        TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new ThousandKMTileProvider(getApplicationContext())));
+        TileOverlay gridOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GridTileProvider(getApplicationContext())));
+        gridOverlay.clearTileCache();
+        TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new HundredKMTileProvider(getApplicationContext())));
         TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
 
-//        LatLng sydney = new LatLng(-34, 151);
-//        map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
+        map.setOnCameraIdleListener(this);
     }
 
+    @Override
+    public void onCameraIdle() {
+        com.google.android.gms.maps.model.LatLng center = map.getCameraPosition().target;
+        String mgrs = GeoUtility.latLngToMGRS(center, 4);
+        Log.i("MGRS", mgrs);
+
+        mgrsLabel.setText(mgrs);
+    }
 }
