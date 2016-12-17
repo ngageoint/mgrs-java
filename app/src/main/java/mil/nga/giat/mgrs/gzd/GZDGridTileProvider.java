@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import mil.nga.giat.mgrs.LatLng;
+import mil.nga.giat.mgrs.Line;
 import mil.nga.giat.mgrs.R;
 import mil.nga.giat.mgrs.TileBoundingBoxUtils;
 

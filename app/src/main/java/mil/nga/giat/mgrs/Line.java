@@ -1,7 +1,5 @@
-package mil.nga.giat.mgrs.gzd;
+package mil.nga.giat.mgrs;
 
-
-import mil.nga.giat.mgrs.LatLng;
 
 /**
  * Created by wnewman on 11/26/16.
