@@ -113,7 +113,7 @@ public class GZDGridTileProvider implements TileProvider {
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(color);
-        paint.setAlpha(64);
+        paint.setAlpha(128);
 
         Path linePath = new Path();
         addPolyline(boundingBox, linePath, line);
@@ -128,7 +128,7 @@ public class GZDGridTileProvider implements TileProvider {
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.RED);
-        paint.setAlpha(64);
+        paint.setAlpha(128);
         paint.setTextSize(TEXT_SIZE * context.getResources().getDisplayMetrics().density);
 
         // Determine the text bounds

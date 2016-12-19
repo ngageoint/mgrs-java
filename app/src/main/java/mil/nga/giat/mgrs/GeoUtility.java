@@ -32,6 +32,15 @@ public class GeoUtility {
     private static final int Z = 90; // Z
 
     private static double a = 6378137.0; // WGS-84 geoidal semi-major axis of earth in meters
+
+    private static double EQUATORIAL_RADIUS = 6378137.0;
+    private static double ECC_SQUARED = 0.006694380023;
+    private static double ECC_PRIME_SQUARED = ECC_SQUARED / (1 - ECC_SQUARED);
+    private static double EASTING_OFFSET  = 500000.0;   // (meters)
+
+    // scale factor of central meridian
+    private static double k0 = 0.9996;
+
     private static double e = 8.1819190842622e-2;  // eccentricity
     private static double asq = a * a;
     private static double esq = e * e;
@@ -69,6 +78,122 @@ public class GeoUtility {
 
     public static UTM latLngToUtm(double latitude, double longitude) {
         int zone = (int) Math.floor(longitude / 6 + 31);
+        return latLngToUtm(latitude, longitude, zone);
+    }
+
+    public static UTM LLtoUTM(double latitude, double longitude, Integer zone) {
+
+        char letter = 'Z';
+        if ((84 >= latitude) && (latitude >= 72)) {
+            letter = 'X';
+        }
+        else if ((72 > latitude) && (latitude >= 64)) {
+            letter = 'W';
+        }
+        else if ((64 > latitude) && (latitude >= 56)) {
+            letter = 'V';
+        }
+        else if ((56 > latitude) && (latitude >= 48)) {
+            letter = 'U';
+        }
+        else if ((48 > latitude) && (latitude >= 40)) {
+            letter = 'T';
+        }
+        else if ((40 > latitude) && (latitude >= 32)) {
+            letter = 'S';
+        }
+        else if ((32 > latitude) && (latitude >= 24)) {
+            letter = 'R';
+        }
+        else if ((24 > latitude) && (latitude >= 16)) {
+            letter = 'Q';
+        }
+        else if ((16 > latitude) && (latitude >= 8)) {
+            letter = 'P';
+        }
+        else if ((8 > latitude) && (latitude >= 0)) {
+            letter = 'N';
+        }
+        else if ((0 > latitude) && (latitude >= -8)) {
+            letter = 'M';
+        }
+        else if ((-8 > latitude) && (latitude >= -16)) {
+            letter = 'L';
+        }
+        else if ((-16 > latitude) && (latitude >= -24)) {
+            letter = 'K';
+        }
+        else if ((-24 > latitude) && (latitude >= -32)) {
+            letter = 'J';
+        }
+        else if ((-32 > latitude) && (latitude >= -40)) {
+            letter = 'H';
+        }
+        else if ((-40 > latitude) && (latitude >= -48)) {
+            letter = 'G';
+        }
+        else if ((-48 > latitude) && (latitude >= -56)) {
+            letter = 'F';
+        }
+        else if ((-56 > latitude) && (latitude >= -64)) {
+            letter = 'E';
+        }
+        else if ((-64 > latitude) && (latitude >= -72)) {
+            letter = 'D';
+        }
+        else if ((-72 > latitude) && (latitude >= -80)) {
+            letter = 'C';
+        }
+
+
+        // Make sure the longitude is between -180.00 .. 179.99..
+        // Convert values on 0-360 range to this range.
+        double latRad = latitude * Math.PI / 180;
+        double lonRad = longitude * Math.PI / 180;
+
+        // user-supplied zone number will force coordinates to be computed in a particular zone
+        if (zone == null) {
+            zone = (int) Math.floor(longitude / 6 + 31);
+        }
+
+        double lonOrigin = (zone - 1) * 6 - 180 + 3;  // +3 puts origin in middle of zone
+        double lonOriginRad = lonOrigin * Math.PI / 180;
+
+        // compute the UTM Zone from the latitude and longitude
+//        String UTMZone = zone + "" + UTMLetterDesignator(lat) + " ";
+
+        double N = EQUATORIAL_RADIUS / Math.sqrt(1 - ECC_SQUARED *
+                Math.sin(latRad) * Math.sin(latRad));
+        double T = Math.tan(latRad) * Math.tan(latRad);
+        double C = ECC_PRIME_SQUARED * Math.cos(latRad) * Math.cos(latRad);
+        double A = Math.cos(latRad) * (lonRad - lonOriginRad);
+
+        // Note that the term Mo drops out of the "M" equation, because phi
+        // (latitude crossing the central meridian, lambda0, at the origin of the
+        //  x,y coordinates), is equal to zero for UTM.
+        double M = EQUATORIAL_RADIUS * (( 1 - ECC_SQUARED / 4
+                - 3 * (ECC_SQUARED * ECC_SQUARED) / 64
+                - 5 * (ECC_SQUARED * ECC_SQUARED * ECC_SQUARED) / 256) * latRad
+                - ( 3 * ECC_SQUARED / 8 + 3 * ECC_SQUARED * ECC_SQUARED / 32
+                + 45 * ECC_SQUARED * ECC_SQUARED * ECC_SQUARED / 1024)
+                * Math.sin(2 * latRad) + (15 * ECC_SQUARED * ECC_SQUARED / 256
+                + 45 * ECC_SQUARED * ECC_SQUARED * ECC_SQUARED / 1024) * Math.sin(4 * latRad)
+                - (35 * ECC_SQUARED * ECC_SQUARED * ECC_SQUARED / 3072) * Math.sin(6 * latRad));
+
+        double UTMEasting = (k0 * N * (A + (1 - T + C) * (A * A * A) / 6
+                + (5 - 18 * T + T * T + 72 * C - 58 * ECC_PRIME_SQUARED )
+                * (A * A * A * A * A) / 120)
+                + EASTING_OFFSET);
+
+        double UTMNorthing = (k0 * (M + N * Math.tan(latRad) * ( (A * A) / 2 + (5 - T + 9
+                * C + 4 * C * C ) * (A * A * A * A) / 24
+                + (61 - 58 * T + T * T + 600 * C - 330 * ECC_PRIME_SQUARED )
+                * (A * A * A * A * A * A) / 720)));
+
+        return new UTM(UTMNorthing, UTMEasting, zone, letter);
+    }
+
+    public static UTM latLngToUtm(double latitude, double longitude, int zone) {
 
         char letter = 'Z';
         if ((84 >= latitude) && (latitude >= 72)) {

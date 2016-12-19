@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.support.v4.util.Pair;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import com.google.android.gms.maps.model.TileProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 import mil.nga.giat.mgrs.GeoUtility;
@@ -24,6 +26,10 @@ import mil.nga.giat.mgrs.R;
 import mil.nga.giat.mgrs.TileBoundingBoxUtils;
 import mil.nga.giat.mgrs.wgs84.Line;
 import mil.nga.giat.mgrs.wgs84.Point;
+
+// TODO fix names, not sure what I want to do with that yet
+// TODO don't draw outside tile bounds
+// TODO Combine this with GridTileProvider to do all grids
 
 /**
  * Created by wnewman on 11/17/16.
@@ -78,39 +84,62 @@ public class HundredKMTileProvider implements TileProvider {
         Bitmap bitmap = Bitmap.createBitmap(tileWidth, tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        double[] boundingBox = getBoundingBox(x, y, zoom);
+        double[] bbox = getBoundingBox(x, y, zoom);
         double[] webMercatorBoundingBox = getWebMercatorBoundingBox(x, y, zoom);
 
-        Map<Character, Pair<Double, Double>> latitudeZones = GZDZones.latitudeGZDZonesForBBOX(boundingBox);
-        Map<Integer, Pair<Double, Double>> longitudeZones = GZDZones.longitudeGZDZonesForBBOX(boundingBox);
+        Map<Character, Pair<Double, Double>> latitudeZones = GZDZones.latitudeGZDZonesForBBOX(bbox);
+        Map<Integer, Pair<Double, Double>> longitudeZones = GZDZones.longitudeGZDZonesForBBOX(bbox);
 
         for (Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone : latitudeZones.entrySet()) {
-//            if (!latitiudeGZDZone.getKey().equals('T')) continue;
+//            if (!latitiudeGZDZone.getKey().equals('U')) continue;
 
             for (Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone : longitudeZones.entrySet()) {
 //                if (!longitudeGZDZone.getKey().equals(11)) continue;
 
-                if (x == 341 && y == 423 && zoom == 11) {
-                    Log.i("foo", "ya");
-                }
+//                if ((x == 5) && (y == 11) && zoom == 5) {
+                    longitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
+                    latitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
+//                }
 
-                longitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, webMercatorBoundingBox, canvas);
-                latitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, webMercatorBoundingBox, canvas);
             }
         }
+
+//        // Draw the tile border
+//        Paint tileBorderPaint = new Paint();
+//        tileBorderPaint.setAntiAlias(true);
+//        tileBorderPaint.setStrokeWidth(4);
+//        tileBorderPaint.setStyle(Paint.Style.STROKE);
+//        tileBorderPaint.setColor(Color.YELLOW);
+//        tileBorderPaint.setAlpha(128);
+//        canvas.drawRect(0, 0, tileWidth, tileHeight, tileBorderPaint);
+//
+//        // Draw the tile x,y,z
+//        int centerX = (int) (bitmap.getWidth() / 2.0f);
+//        int centerY = (int) (bitmap.getHeight() / 2.0f);
+//        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+//        paint.setColor(Color.BLUE);
+//        paint.setTextSize(12 * context.getResources().getDisplayMetrics().density);
+//
+//        // Determine the text bounds
+//        String text = "" + x + "," + y + "," + zoom;
+//        Rect textBounds = new Rect();
+//        paint.getTextBounds(text, 0, text.length(), textBounds);
+//
+//        // Draw the text
+//        canvas.drawText(text, centerX - 200, centerY, paint);
 
         return bitmap;
     }
 
-    private void longitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
+    private void longitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, double[] webMercatorBoundingBox, Canvas canvas) {
         if (latitiudeGZDZone.getKey() > 'M') {
-            linesForNorthernGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, canvas);
+            linesForNorthernGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
         } else {
-            linesForSouthernGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, canvas);
+            linesForSouthernGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
         }
     }
 
-    private void linesForNorthernGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
+    private void linesForNorthernGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, double[] webMercatorBoundingBox, Canvas canvas) {
         double minLat = latitiudeGZDZone.getValue().first;
         double maxLat = latitiudeGZDZone.getValue().second;
 
@@ -129,6 +158,10 @@ public class HundredKMTileProvider implements TileProvider {
         endEasting = (Math.ceil(endEasting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
         double endNorthing = (Math.floor(upperRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
 
+        Point zoneLowerLeft = new Point(new LatLng(latitiudeGZDZone.getValue().first, longitudeGZDZone.getValue().first));
+        Point zoneUpperRight = new Point(new LatLng(latitiudeGZDZone.getValue().second, longitudeGZDZone.getValue().second));
+        double[] zoneBoundingBox = new double[]{zoneLowerLeft.x, zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y};
+
         double easting = lowerLeftEasting;
         while (easting <= endEasting) {
             double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
@@ -139,44 +172,22 @@ public class HundredKMTileProvider implements TileProvider {
                 LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, lowerLeftUTM.zoneLetter, easting, northing);
                 LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, upperRightUTM.zoneLetter, easting, newNorthing);
 
-                if (latLng1.longitude > minLon && latLng1.longitude < maxLon) {
+//                if (latLng1.longitude > minLon && latLng1.longitude < maxLon) {
                     Point p1 = new Point(latLng1);
                     Point p2 = new Point(latLng2);
                     Line line = new Line(p1, p2);
-                    line = horizontalIntersection(new Line(p1, p2), new Point(new LatLng(0, minLon)), new Point(new LatLng(0, maxLon)));
-                    drawLine(bbox, canvas, line);
-                }
+//                    line = horizontalIntersection(new Line(p1, p2), new Point(new LatLng(0, minLon)), new Point(new LatLng(0, maxLon)));
+                    drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
+//                }
 
                 northing = newNorthing;
             }
 
             easting = newEasting;
         }
-
-//        lowerLeftNorthing = (Math.ceil(lowerLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS)  * ONE_HUNDRED_THOUSAND_METERS);
-//        easting = lowerLeftUTM.easting;
-//        endEasting = 2 * CENTER_EASTING - easting;
-//        while (easting <= upperRightUTM.easting) {
-//            double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
-//            double northing = lowerLeftNorthing;
-//            while (northing <= endNorthing) {
-//                double newNorthing = northing + ONE_HUNDRED_THOUSAND_METERS;
-//
-//                LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, lowerLeftUTM.zoneLetter, easting, northing);
-//                LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, upperRightUTM.zoneLetter, newEasting, northing);
-//                Point p1 = new Point(latLng1);
-//                Point p2 = new Point(latLng2);
-//                Line line = new Line(p1, p2);
-//                drawLine(bbox, canvas, line);
-//
-//                northing = newNorthing;
-//            }
-//
-//            easting = newEasting;
-//        }
     }
 
-    private void linesForSouthernGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
+    private void linesForSouthernGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, double[] webMercatorBoundingBox, Canvas canvas) {
         double minLat = latitiudeGZDZone.getValue().first;
         double maxLat = latitiudeGZDZone.getValue().second;
 
@@ -198,6 +209,10 @@ public class HundredKMTileProvider implements TileProvider {
         lowerRightEasting = (Math.floor(lowerRightEasting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
         double lowerRightNorthing = (Math.ceil(lowerRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
 
+        Point zoneLowerLeft = new Point(new LatLng(latitiudeGZDZone.getValue().first, longitudeGZDZone.getValue().first));
+        Point zoneUpperRight = new Point(new LatLng(latitiudeGZDZone.getValue().second, longitudeGZDZone.getValue().second));
+        double[] zoneBoundingBox = new double[]{zoneLowerLeft.x, zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y};
+
         for (double easting = upperLeftEasting; easting <= lowerRightEasting; easting += ONE_HUNDRED_THOUSAND_METERS) {
             double northing = upperLeftNorthing;
             while (northing >= lowerRightNorthing) {
@@ -212,113 +227,103 @@ public class HundredKMTileProvider implements TileProvider {
                     Line line = new Line(p1, p2);
 
                     line = horizontalIntersection(line, new Point(new LatLng(0, minLon)), new Point(new LatLng(0, maxLon)));
-                    drawLine(bbox, canvas, line);
+                    drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
                 }
 
                 northing = newNorthing;
             }
         }
-
-//        upperLeftNorthing = (Math.floor(upperLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS + 1)  * ONE_HUNDRED_THOUSAND_METERS);
-//        if (latitiudeGZDZone.getKey() == 'M') {
-//            upperLeftNorthing = 10000000.0;
-//            upperLeftUTM.zoneLetter = 'M';
-//        }
-//        upperLeftEasting = (Math.floor(upperLeftUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
-//        for (double northing = upperLeftNorthing; northing >= lowerRightNorthing; northing -= ONE_HUNDRED_THOUSAND_METERS) {
-//            double easting = upperLeftEasting;
-//            while (easting <= lowerRightEasting) {
-//                double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
-//                LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, upperLeftUTM.zoneLetter, easting, northing);
-//                LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, lowerRightUTM.zoneLetter, newEasting, northing);
-//                Point p1 = new Point(latLng1);
-//                Point p2 = new Point(latLng2);
-//                Line line = new Line(p1, p2);
-//
-//                drawLine(bbox, canvas, line);
-//                easting = newEasting;
-//            }
-//        }
     }
 
 
-    private void latitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
+    private void latitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, double[] webMercatorBoundingBox, Canvas canvas) {
 
         Character zoneLetter = latitiudeGZDZone.getKey();
         Integer zoneNumber = longitudeGZDZone.getKey();
 
-        Double minLat = latitiudeGZDZone.getValue().first;
-        Double maxLat = latitiudeGZDZone.getValue().second;
+        Double minLat = Math.max(bbox[1], latitiudeGZDZone.getValue().first);
+        Double maxLat = Math.min(bbox[3], latitiudeGZDZone.getValue().second);
 
-        Double minLon = longitudeGZDZone.getValue().first;
-        Double maxLon = longitudeGZDZone.getValue().second;
+        Double minLon = Math.max(bbox[0], longitudeGZDZone.getValue().first);
+        Double maxLon = Math.min(bbox[2], longitudeGZDZone.getValue().second);
 
-        Double centerLongitude = Math.abs((maxLon - minLon) / 2) + minLon;
-        GeoUtility.UTM utm = GeoUtility.latLngToUtm(minLat, centerLongitude);
-        double northing = Math.ceil(utm.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
+        Point zoneLowerLeft = new Point(new LatLng(latitiudeGZDZone.getValue().first, longitudeGZDZone.getValue().first));
+        Point zoneUpperRight = new Point(new LatLng(latitiudeGZDZone.getValue().second, longitudeGZDZone.getValue().second));
+        double[] zoneBoundingBox = new double[]{zoneLowerLeft.x, zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y};
 
+//        Double centerLongitude = Math.abs((maxLon - minLon) / 2) + minLon;
+//        GeoUtility.UTM utm = GeoUtility.latLngToUtm(minLat, centerLongitude);
+//        double northing = Math.ceil(utm.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
+//
+//        double maxNorthing;
+//        if (zoneLetter.equals('M')) {
+//            maxNorthing = 10000000.0;
+//        } else {
+//            maxNorthing = GeoUtility.latLngToUtm(maxLat, centerLongitude).northing;
+//        }
 
-        double maxNorthing;
+        GeoUtility.UTM lowerLeftUTM = GeoUtility.latLngToUtm(minLat, minLon, zoneNumber);
+        double lowerEasting = (Math.floor(lowerLeftUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) - ONE_HUNDRED_THOUSAND_METERS;
+        double lowerNorthing = (Math.floor(lowerLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) - ONE_HUNDRED_THOUSAND_METERS;
+
+        GeoUtility.UTM upperRightUTM = GeoUtility.latLngToUtm(maxLat, maxLon, zoneNumber);
+        double upperEasting = (Math.floor(upperRightUTM.easting / ONE_HUNDRED_THOUSAND_METERS + 1) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
+        double upperNorthing = (Math.floor(upperRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS + 1) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
         if (zoneLetter.equals('M')) {
-            maxNorthing = 10000000.0;
-        } else {
-            maxNorthing = GeoUtility.latLngToUtm(maxLat, centerLongitude).northing;
+            upperNorthing = 10000000.0;
         }
 
-        GeoUtility.UTM lowerLeftUTM = GeoUtility.latLngToUtm(minLat, minLon);
-        double lowerLeftEasting = (Math.floor(lowerLeftUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
-        double lowerLeftNorthing = (Math.floor(lowerLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
+//        for (double northing = lowerNorthing; northing < upperNorthing; northing += ONE_HUNDRED_THOUSAND_METERS) {
+//            Line line = new Line();
+//            for (double easting = lowerEasting; easting < upperEasting; easting += ONE_HUNDRED_THOUSAND_METERS) {
+//                LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
+//                line.addPoint(new Point(latLng));
+//            }
+//
+//            Line clippedLine = new Line();
+//            List<Point> points = line.getPoints();
+//            for (int i = 0; i < points.size() - 1; i++) {
+//                if (clipToGZD(points.get(i), points.get(i + 1), zoneBoundingBox)) {
+//                    clippedLine.addPoint(points.get(i));
+//                };
+//            }
+//
+//            drawLine(webMercatorBoundingBox, canvas, clippedLine);
+//        }
 
-        GeoUtility.UTM upperRightUTM = GeoUtility.latLngToUtm(maxLat, maxLon);
-        double endEasting = (CENTER_EASTING - upperRightUTM.easting) + CENTER_EASTING;
-        endEasting = (Math.ceil(endEasting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
-        double endNorthing = (Math.floor(upperRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
-        do {
-            LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
-            double easting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
-            double maxEasting = (2 * utm.easting) - easting;
-            do {
-                double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
 
+        double northing = lowerNorthing;
+        while (northing < upperNorthing) {
+            double easting = lowerEasting;
+            while (easting < upperEasting) {
+                double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
                 LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
                 LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
                 Line line = new Line(new Point(latLng1), new Point(latLng2));
-                drawLine(bbox, canvas, line);
+                drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
 
                 easting = newEasting;
-            } while (easting < maxEasting);
+            }
 
             northing += ONE_HUNDRED_THOUSAND_METERS;
-        } while (northing < maxNorthing);
+        }
 
 //        do {
-//            // go left
-//            double easting = CENTER_EASTING;
 //            LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
-//            double minEasting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
-//            do {
-//                double newEasting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+//            double easting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
+//            double newEasting = Math.ceil(easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
+//            double maxEasting = GeoUtility.latLngToUtm(latLng.latitude, maxLon, zoneNumber).easting;
 //
+//            do {
 //                LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
 //                LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
 //                Line line = new Line(new Point(latLng1), new Point(latLng2));
-//                drawLine(bbox, canvas, line);
+//                drawLine(webMercatorBoundingBox, canvas, line);
 //
 //                easting = newEasting;
-//            } while (easting > minEasting);
+//                newEasting += ONE_HUNDRED_THOUSAND_METERS;
+//                if (newEasting > maxEasting) newEasting = maxEasting;
 //
-//            // go right
-//            easting = CENTER_EASTING;
-//            double maxEasting = (2 * utm.easting) - minEasting;
-//            do {
-//                double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
-//
-//                LatLng latLng1 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, easting, northing);
-//                LatLng latLng2 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, newEasting, northing);
-//                Line line = new Line(new Point(latLng1), new Point(latLng2));
-//                drawLine(bbox, canvas, line);
-//
-//                easting = newEasting;
 //            } while (easting < maxEasting);
 //
 //            northing += ONE_HUNDRED_THOUSAND_METERS;
@@ -331,7 +336,7 @@ public class HundredKMTileProvider implements TileProvider {
      * @param boundingBox
      * @param canvas
      */
-    private void drawLine(double[] boundingBox, Canvas canvas, Line line) {
+    private void drawLine(double[] boundingBox, double[] zoneBoundingBox, Canvas canvas, Line line) {
 
         Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -339,9 +344,24 @@ public class HundredKMTileProvider implements TileProvider {
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.rgb(76, 175, 80));
 
+        // TODO can I clip based on zone???
+
+
+        canvas.save();
+
+        float left = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, zoneBoundingBox[0]);
+        float top = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, zoneBoundingBox[3]);
+        float right = TileBoundingBoxUtils.getXPixel(tileHeight, boundingBox, zoneBoundingBox[2]);
+        float bottom = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, zoneBoundingBox[1]);
+
+
+        canvas.clipRect(left, top, right, bottom, Region.Op.INTERSECT);
+
         Path linePath = new Path();
         addPolyline(boundingBox, linePath, line);
         canvas.drawPath(linePath, paint);
+
+        canvas.restore();
     }
 
     private void drawId(String id, LatLng centerLatLng, double minLon, double maxLon, double[] boundingBox, Canvas canvas) {
@@ -380,14 +400,29 @@ public class HundredKMTileProvider implements TileProvider {
      * @param line
      */
     private void addPolyline(double[] boundingBox, Path path, mil.nga.giat.mgrs.wgs84.Line line) {
+        if (line.getPoints().size() > 0  && line.p1 == null && line.p2 == null) {
+            Iterator<Point> iterator = line.getPoints().iterator();
+            Point point = iterator.next();
+            float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, point.x);
+            float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, point.y);
+            path.moveTo(x, y);
 
-        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p1.x);
-        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p1.y);
-        path.moveTo(x, y);
+            while (iterator.hasNext()) {
+                point = iterator.next();
 
-        x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p2.x);
-        y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p2.y);
-        path.lineTo(x, y);
+                x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, point.x);
+                y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, point.y);
+                path.lineTo(x, y);
+            }
+        } else if (line.p1 != null && line.p2 != null) {
+            float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p1.x);
+            float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p1.y);
+            path.moveTo(x, y);
+
+            x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p2.x);
+            y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p2.y);
+            path.lineTo(x, y);
+        }
     }
 
     /**
@@ -557,5 +592,212 @@ public class HundredKMTileProvider implements TileProvider {
 
         return new Line(line.p1, p2);
     }
+
+    public boolean clipToGZD(Point p1, Point p2, double[] bbox) {
+        double u1 = p1.x;
+        double v1 = p1.y;
+        double u2 = p2.x;
+        double v2 = p2.y;
+
+        int code1 = outside(v1, u1, bbox);
+        int code2 = outside(v2, u2, bbox);
+
+        // line segment completely outside bounds
+        if ((code1 & code2) != 0) {
+            return false;
+        }
+
+        // line segment completely inside bounds
+        if ((code1 | code2) == 0) {
+            return true;
+        }
+
+        // If the first point is contained in the bbox
+        // then the second point is outside.  Swap the coordinates.
+        if (inside(v1, u1, bbox)) {
+            double swap;
+
+            swap = u1;
+            u1 = u2;
+            u2 = swap;
+
+            swap = v1;
+            v1 = v2;
+            v2 = swap;
+
+            code1 = code2;
+        }
+
+        if ((code1 & 8) > 0) { // clip along northern edge of polygon
+            double t = (bbox[3] - v1)/(v2-v1);
+            u1 += t*(u2-u1);
+            v1 = bbox[3];
+            p1 = new Point(u1, v1);
+        }
+        else if ((code1 & 4) > 0) { // clip along southern edge
+            double t = (bbox[1] - v1)/(v2-v1);
+            u1 += t*(u2-u1);
+            v1 = bbox[1];
+            p1 = new Point(u1, v1);
+        }
+        else if ((code1 & 1) > 0) { // clip along west edge
+            double t = (bbox[0] - u1)/(u2-u1);
+            v1 += t*(v2-v1);
+            u1 = bbox[0];
+            p1 = new Point(u1, v1);
+        }
+        else if ((code1 & 2) > 0) { // clip along east edge
+            double t = (bbox[2] - u1)/(u2-u1);
+            v1 += t*(v2-v1);
+            u1 = bbox[2];
+            p1 = new Point(u1, v1);
+        }
+
+        return true;
+    }
+
+
+    private int outside(double latitude, double longitude, double[] bbox) {
+        int outside = 0;
+
+        if (longitude < bbox[0]) {
+            outside |= 1;
+        }
+        if (longitude > bbox[2]) {
+            outside |= 2;
+        }
+        if (latitude < bbox[1]) {
+            outside |= 4;
+        }
+        if (latitude > bbox[3]) {
+            outside |= 8;
+        }
+
+        return outside;
+    }
+
+    private boolean inside(double latitiude, double longitude, double[] bbox) {
+        if (latitiude < bbox[1] || latitiude > bbox[3]) {
+            return false;
+        }
+
+        if (longitude < bbox[0] || longitude > bbox[2]) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Cell name stuff
+//    private void latitudeLinesForGZDZone(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double[] bbox, Canvas canvas) {
+//
+//        Character zoneLetter = latitiudeGZDZone.getKey();
+//        Integer zoneNumber = longitudeGZDZone.getKey();
+//
+//        Double minLat = latitiudeGZDZone.getValue().first;
+//        Double maxLat = latitiudeGZDZone.getValue().second;
+//
+//        Double minLon = longitudeGZDZone.getValue().first;
+//        Double maxLon = longitudeGZDZone.getValue().second;
+//
+//        Double centerLongitude = Math.abs((maxLon - minLon) / 2) + minLon;
+//        GeoUtility.UTM utm = GeoUtility.latLngToUtm(minLat, centerLongitude);
+//        double northing = Math.ceil(utm.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
+//
+//        double maxNorthing;
+//        if (zoneLetter.equals('M')) {
+//            maxNorthing = 10000000.0;
+//        } else {
+//            maxNorthing = GeoUtility.latLngToUtm(maxLat, centerLongitude).northing;
+//        }
+//
+//        do {
+//            // go left
+//            double easting = CENTER_EASTING;
+//            LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
+//            double minEasting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
+//            do {
+//                double newEasting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+//
+//                LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
+//                LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
+//                Line line = new Line(new Point(latLng1), new Point(latLng2));
+//                drawLine(bbox, canvas, line);
+//
+//                // Draw cell name
+//                double centerEasting = easting - ((easting - newEasting) / 2);
+//                double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+//                LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+//                double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+//                double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+//                String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+//                drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+//
+//                easting = newEasting;
+//            } while (easting > minEasting);
+//
+//            // go right
+//            easting = CENTER_EASTING;
+//            double maxEasting = (2 * utm.easting) - minEasting;
+//            do {
+//                double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
+//
+//                LatLng latLng1 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, easting, northing);
+//                LatLng latLng2 = GeoUtility.utmToLatLng(utm.zoneNumber, utm.zoneLetter, newEasting, northing);
+//                Line line = new Line(new Point(latLng1), new Point(latLng2));
+//                drawLine(bbox, canvas, line);
+//
+//                // Draw cell name
+//                double centerEasting = easting + ((newEasting - easting) / 2);
+//                double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+//                LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+//                double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+//                double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+//                String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+//                drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+//
+//                easting = newEasting;
+//            } while (easting < maxEasting);
+//
+//            northing += ONE_HUNDRED_THOUSAND_METERS;
+//        } while (northing < maxNorthing);
+//
+//        // go left
+//        double easting = CENTER_EASTING;
+//        LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
+//        double minEasting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
+//        do {
+//            double newEasting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+//
+//            // Draw cell name
+//            double centerEasting = easting - ((easting - newEasting) / 2);
+//            double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+//            LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+//            double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+//            double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+//            String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+//            drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+//
+//            easting = easting - ONE_HUNDRED_THOUSAND_METERS > minEasting ? easting - ONE_HUNDRED_THOUSAND_METERS : minEasting;
+//        } while (easting > minEasting);
+//
+//        // go right
+//        easting = CENTER_EASTING;
+//        double maxEasting = (2 * utm.easting) - minEasting;
+//        do {
+//            double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
+//
+//            // Draw cell name
+//            double centerEasting = easting + ((newEasting - easting) / 2);
+//            double centerNorthing = ((northing - (northing + ONE_HUNDRED_THOUSAND_METERS)) / 2) + northing;
+//            LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+//            double minZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, centerNorthing).longitude;
+//            double maxZoneLon = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, centerNorthing).longitude;
+//            String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+//            drawId(id, centerLatLng, minZoneLon, maxZoneLon, bbox, canvas);
+//
+//            easting = easting + ONE_HUNDRED_THOUSAND_METERS < maxEasting ? easting + ONE_HUNDRED_THOUSAND_METERS : maxEasting;
+//        } while (easting < maxEasting);
+//    }
 
 }

@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import mil.nga.giat.mgrs.gzd.GZDGridTileProvider;
-import mil.nga.giat.mgrs.gzd.GridTileProvider;
 import mil.nga.giat.mgrs.gzd.HundredKMTileProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
@@ -45,8 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        TileOverlay gridOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GridTileProvider(getApplicationContext())));
-        gridOverlay.clearTileCache();
+//        TileOverlay gridOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GridTileProvider(getApplicationContext())));
+//        gridOverlay.clearTileCache();
         TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new HundredKMTileProvider(getApplicationContext())));
         TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
 
