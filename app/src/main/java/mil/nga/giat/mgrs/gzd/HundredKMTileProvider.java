@@ -17,7 +17,6 @@ import com.google.android.gms.maps.model.TileProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import mil.nga.giat.mgrs.GeoUtility;
@@ -28,7 +27,6 @@ import mil.nga.giat.mgrs.wgs84.Line;
 import mil.nga.giat.mgrs.wgs84.Point;
 
 // TODO fix names, not sure what I want to do with that yet
-// TODO don't draw outside tile bounds
 // TODO Combine this with GridTileProvider to do all grids
 
 /**
@@ -70,7 +68,6 @@ public class HundredKMTileProvider implements TileProvider {
         try {
             bytes = toBytes(bitmap);
         } catch (IOException e) {
-            // uhhhh
             Log.e("FOO", "UHH", e);
         }
 
@@ -91,12 +88,12 @@ public class HundredKMTileProvider implements TileProvider {
         Map<Integer, Pair<Double, Double>> longitudeZones = GZDZones.longitudeGZDZonesForBBOX(bbox);
 
         for (Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone : latitudeZones.entrySet()) {
-//            if (!latitiudeGZDZone.getKey().equals('U')) continue;
+//            if (!latitiudeGZDZone.getKey().equals('T')) continue;
 
             for (Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone : longitudeZones.entrySet()) {
 //                if (!longitudeGZDZone.getKey().equals(11)) continue;
 
-//                if ((x == 5) && (y == 11) && zoom == 5) {
+//                if ((x == 5) && (y == 12) && zoom == 5) {
                     longitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
                     latitudeLinesForGZDZone(latitiudeGZDZone, longitudeGZDZone, bbox, webMercatorBoundingBox, canvas);
 //                }
@@ -172,13 +169,10 @@ public class HundredKMTileProvider implements TileProvider {
                 LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, lowerLeftUTM.zoneLetter, easting, northing);
                 LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, upperRightUTM.zoneLetter, easting, newNorthing);
 
-//                if (latLng1.longitude > minLon && latLng1.longitude < maxLon) {
-                    Point p1 = new Point(latLng1);
-                    Point p2 = new Point(latLng2);
-                    Line line = new Line(p1, p2);
-//                    line = horizontalIntersection(new Line(p1, p2), new Point(new LatLng(0, minLon)), new Point(new LatLng(0, maxLon)));
-                    drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
-//                }
+                Point p1 = new Point(latLng1);
+                Point p2 = new Point(latLng2);
+                Line line = new Line(p1, p2);
+                drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
 
                 northing = newNorthing;
             }
@@ -251,50 +245,21 @@ public class HundredKMTileProvider implements TileProvider {
         Point zoneUpperRight = new Point(new LatLng(latitiudeGZDZone.getValue().second, longitudeGZDZone.getValue().second));
         double[] zoneBoundingBox = new double[]{zoneLowerLeft.x, zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y};
 
-//        Double centerLongitude = Math.abs((maxLon - minLon) / 2) + minLon;
-//        GeoUtility.UTM utm = GeoUtility.latLngToUtm(minLat, centerLongitude);
-//        double northing = Math.ceil(utm.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
-//
-//        double maxNorthing;
-//        if (zoneLetter.equals('M')) {
-//            maxNorthing = 10000000.0;
-//        } else {
-//            maxNorthing = GeoUtility.latLngToUtm(maxLat, centerLongitude).northing;
-//        }
-
         GeoUtility.UTM lowerLeftUTM = GeoUtility.latLngToUtm(minLat, minLon, zoneNumber);
-        double lowerEasting = (Math.floor(lowerLeftUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) - ONE_HUNDRED_THOUSAND_METERS;
-        double lowerNorthing = (Math.floor(lowerLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) - ONE_HUNDRED_THOUSAND_METERS;
+        double lowerEasting = (Math.ceil(lowerLeftUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) - ONE_HUNDRED_THOUSAND_METERS;
+        double lowerNorthing = (Math.ceil(lowerLeftUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS);
 
         GeoUtility.UTM upperRightUTM = GeoUtility.latLngToUtm(maxLat, maxLon, zoneNumber);
-        double upperEasting = (Math.floor(upperRightUTM.easting / ONE_HUNDRED_THOUSAND_METERS + 1) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
-        double upperNorthing = (Math.floor(upperRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS + 1) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
+        double upperEasting = (Math.floor(upperRightUTM.easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
+        double upperNorthing = (Math.ceil(upperRightUTM.northing / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS) + ONE_HUNDRED_THOUSAND_METERS;
         if (zoneLetter.equals('M')) {
             upperNorthing = 10000000.0;
         }
 
-//        for (double northing = lowerNorthing; northing < upperNorthing; northing += ONE_HUNDRED_THOUSAND_METERS) {
-//            Line line = new Line();
-//            for (double easting = lowerEasting; easting < upperEasting; easting += ONE_HUNDRED_THOUSAND_METERS) {
-//                LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
-//                line.addPoint(new Point(latLng));
-//            }
-//
-//            Line clippedLine = new Line();
-//            List<Point> points = line.getPoints();
-//            for (int i = 0; i < points.size() - 1; i++) {
-//                if (clipToGZD(points.get(i), points.get(i + 1), zoneBoundingBox)) {
-//                    clippedLine.addPoint(points.get(i));
-//                };
-//            }
-//
-//            drawLine(webMercatorBoundingBox, canvas, clippedLine);
-//        }
-
-
         double northing = lowerNorthing;
         while (northing < upperNorthing) {
             double easting = lowerEasting;
+            double newNorthing = northing + ONE_HUNDRED_THOUSAND_METERS;
             while (easting < upperEasting) {
                 double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
                 LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
@@ -302,32 +267,14 @@ public class HundredKMTileProvider implements TileProvider {
                 Line line = new Line(new Point(latLng1), new Point(latLng2));
                 drawLine(webMercatorBoundingBox, zoneBoundingBox, canvas, line);
 
+                // Draw cell name
+                drawId(latitiudeGZDZone, longitudeGZDZone, easting, northing, webMercatorBoundingBox, canvas);
+
                 easting = newEasting;
             }
 
-            northing += ONE_HUNDRED_THOUSAND_METERS;
+            northing = newNorthing;
         }
-
-//        do {
-//            LatLng latLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, utm.easting, northing);
-//            double easting = GeoUtility.latLngToUtm(latLng.latitude, minLon).easting;
-//            double newEasting = Math.ceil(easting / ONE_HUNDRED_THOUSAND_METERS) * ONE_HUNDRED_THOUSAND_METERS;
-//            double maxEasting = GeoUtility.latLngToUtm(latLng.latitude, maxLon, zoneNumber).easting;
-//
-//            do {
-//                LatLng latLng1 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, northing);
-//                LatLng latLng2 = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
-//                Line line = new Line(new Point(latLng1), new Point(latLng2));
-//                drawLine(webMercatorBoundingBox, canvas, line);
-//
-//                easting = newEasting;
-//                newEasting += ONE_HUNDRED_THOUSAND_METERS;
-//                if (newEasting > maxEasting) newEasting = maxEasting;
-//
-//            } while (easting < maxEasting);
-//
-//            northing += ONE_HUNDRED_THOUSAND_METERS;
-//        } while (northing < maxNorthing);
     }
 
     /**
@@ -344,17 +291,12 @@ public class HundredKMTileProvider implements TileProvider {
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.rgb(76, 175, 80));
 
-        // TODO can I clip based on zone???
-
-
         canvas.save();
 
         float left = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, zoneBoundingBox[0]);
         float top = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, zoneBoundingBox[3]);
         float right = TileBoundingBoxUtils.getXPixel(tileHeight, boundingBox, zoneBoundingBox[2]);
         float bottom = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, zoneBoundingBox[1]);
-
-
         canvas.clipRect(left, top, right, bottom, Region.Op.INTERSECT);
 
         Path linePath = new Path();
@@ -364,7 +306,51 @@ public class HundredKMTileProvider implements TileProvider {
         canvas.restore();
     }
 
-    private void drawId(String id, LatLng centerLatLng, double minLon, double maxLon, double[] boundingBox, Canvas canvas) {
+    private void drawId(Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, double easting, double northing, double[] boundingBox, Canvas canvas) {
+        int zoneNumber = longitudeGZDZone.getKey();
+        Character zoneLetter = latitiudeGZDZone.getKey();
+
+        GeoUtility.UTM lowerLeftUTM = GeoUtility.latLngToUtm(latitiudeGZDZone.getValue().first, longitudeGZDZone.getValue().first, zoneNumber);
+        GeoUtility.UTM upperRightUTM = GeoUtility.latLngToUtm(latitiudeGZDZone.getValue().second, longitudeGZDZone.getValue().second, zoneNumber);
+
+        double newNorthing = northing - ONE_HUNDRED_THOUSAND_METERS;
+        double centerNorthing = northing - (ONE_HUNDRED_THOUSAND_METERS / 2);
+
+        double newEasting = easting + ONE_HUNDRED_THOUSAND_METERS;
+        double centerEasting = easting + (ONE_HUNDRED_THOUSAND_METERS / 2);
+
+        if (newNorthing < lowerLeftUTM.northing) {
+            LatLng currentLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, lowerLeftUTM.northing);
+            GeoUtility.UTM utm = GeoUtility.latLngToUtm(latitiudeGZDZone.getValue().first, currentLatLng.longitude, zoneNumber);
+            centerNorthing = ((northing - lowerLeftUTM.northing) / 2) + lowerLeftUTM.northing;
+            newNorthing = utm.northing;
+        } else if (northing > upperRightUTM.northing) {
+            String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+            if (id.equals("LP")) {
+                Log.i("f", "g");
+            }
+
+            LatLng currentLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, upperRightUTM.northing);
+            GeoUtility.UTM utm = GeoUtility.latLngToUtm(latitiudeGZDZone.getValue().second, currentLatLng.longitude, zoneNumber);
+            centerNorthing = ((upperRightUTM.northing - newNorthing) / 2) + newNorthing;
+            northing = utm.northing;
+        }
+
+        if (easting < lowerLeftUTM.easting) {
+            LatLng currentLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, lowerLeftUTM.easting, centerNorthing);
+            GeoUtility.UTM utm = GeoUtility.latLngToUtm(currentLatLng.latitude, longitudeGZDZone.getValue().first, zoneNumber);
+            centerEasting = utm.easting + ((newEasting - utm.easting) / 2);
+            easting = utm.easting;
+        } else if (newEasting > upperRightUTM.easting) {
+            LatLng currentLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, newNorthing);
+            GeoUtility.UTM utm = GeoUtility.latLngToUtm(currentLatLng.latitude, longitudeGZDZone.getValue().second, zoneNumber);
+            centerEasting = easting + ((utm.easting - easting) / 2);
+            newEasting = utm.easting;
+        }
+
+        String id = GeoUtility.get100KId(centerEasting, centerNorthing, zoneNumber);
+        LatLng centerLatLng = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, centerEasting, centerNorthing);
+        Point center = new Point(centerLatLng);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.rgb(76, 175, 80));
@@ -373,20 +359,25 @@ public class HundredKMTileProvider implements TileProvider {
         // Determine the text bounds
         Rect textBounds = new Rect();
         paint.getTextBounds(id, 0, id.length(), textBounds);
-        float textWidth = textBounds.right - textBounds.left;
 
-        double[] meters = degreesToMeters(new LatLng(centerLatLng.latitude, centerLatLng.longitude));
-        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);
-        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, meters[1]);
+        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, center.x);
+        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, center.y);
 
-        double[] minMeters = degreesToMeters(new LatLng(centerLatLng.latitude, minLon));
-        double[] maxMeters = degreesToMeters(new LatLng(centerLatLng.latitude, maxLon));
+        LatLng minZone = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, easting, newNorthing);
+        Point min = new Point(minZone);
 
-        float minX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, minMeters[0]);
-        float maxX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, maxMeters[0]);
+        LatLng maxZone = GeoUtility.utmToLatLng(zoneNumber, zoneLetter, newEasting, northing);
+        Point max = new Point(maxZone);
+
+        float minX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, min.x);
+        float maxX = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, max.x);
         float zoneWidth = maxX - minX;
-        if (zoneWidth > textWidth + 10) {
-            // Draw the text
+
+        float minY = TileBoundingBoxUtils.getYPixel(tileWidth, boundingBox, max.y);
+        float maxY = TileBoundingBoxUtils.getYPixel(tileWidth, boundingBox, min.y);
+        float zoneHeight = maxY - minY;
+
+        if (zoneWidth > textBounds.width() + 10 && zoneHeight > textBounds.height() + 10) {
             canvas.drawText(id, x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), paint);
         }
     }
@@ -400,29 +391,13 @@ public class HundredKMTileProvider implements TileProvider {
      * @param line
      */
     private void addPolyline(double[] boundingBox, Path path, mil.nga.giat.mgrs.wgs84.Line line) {
-        if (line.getPoints().size() > 0  && line.p1 == null && line.p2 == null) {
-            Iterator<Point> iterator = line.getPoints().iterator();
-            Point point = iterator.next();
-            float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, point.x);
-            float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, point.y);
-            path.moveTo(x, y);
+        float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p1.x);
+        float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p1.y);
+        path.moveTo(x, y);
 
-            while (iterator.hasNext()) {
-                point = iterator.next();
-
-                x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, point.x);
-                y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, point.y);
-                path.lineTo(x, y);
-            }
-        } else if (line.p1 != null && line.p2 != null) {
-            float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p1.x);
-            float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p1.y);
-            path.moveTo(x, y);
-
-            x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p2.x);
-            y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p2.y);
-            path.lineTo(x, y);
-        }
+        x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, line.p2.x);
+        y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox, line.p2.y);
+        path.lineTo(x, y);
     }
 
     /**
@@ -547,34 +522,6 @@ public class HundredKMTileProvider implements TileProvider {
         return new double[] {x, y};
     }
 
-    private static Point intersect(Line line1, Line line2) {
-        Point pt1 = line1.p1;
-        Point pt2 = line1.p2;
-        Point pt3 = line2.p1;
-        Point pt4 = line2.p2;
-
-        double x1 = pt1.x;
-        double y1 = pt1.y;
-        double x2 = pt2.x;
-        double y2 = pt2.y;
-        double x3 = pt3.x;
-        double y3 = pt3.y;
-        double x4 = pt4.x;
-        double y4 = pt4.y;
-
-        double denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-        if (denominator == 0) {
-            return null;
-        }
-
-        double ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
-        double ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
-        double x = x1 + ua * (x2 - x1);
-        double y = y1 + ua * (y2 - y1);
-
-        return new Point(x, y);
-    }
-
     private static Line horizontalIntersection(Line line, Point left, Point right) {
         Point p2 = line.p2;
 
@@ -591,101 +538,6 @@ public class HundredKMTileProvider implements TileProvider {
         }
 
         return new Line(line.p1, p2);
-    }
-
-    public boolean clipToGZD(Point p1, Point p2, double[] bbox) {
-        double u1 = p1.x;
-        double v1 = p1.y;
-        double u2 = p2.x;
-        double v2 = p2.y;
-
-        int code1 = outside(v1, u1, bbox);
-        int code2 = outside(v2, u2, bbox);
-
-        // line segment completely outside bounds
-        if ((code1 & code2) != 0) {
-            return false;
-        }
-
-        // line segment completely inside bounds
-        if ((code1 | code2) == 0) {
-            return true;
-        }
-
-        // If the first point is contained in the bbox
-        // then the second point is outside.  Swap the coordinates.
-        if (inside(v1, u1, bbox)) {
-            double swap;
-
-            swap = u1;
-            u1 = u2;
-            u2 = swap;
-
-            swap = v1;
-            v1 = v2;
-            v2 = swap;
-
-            code1 = code2;
-        }
-
-        if ((code1 & 8) > 0) { // clip along northern edge of polygon
-            double t = (bbox[3] - v1)/(v2-v1);
-            u1 += t*(u2-u1);
-            v1 = bbox[3];
-            p1 = new Point(u1, v1);
-        }
-        else if ((code1 & 4) > 0) { // clip along southern edge
-            double t = (bbox[1] - v1)/(v2-v1);
-            u1 += t*(u2-u1);
-            v1 = bbox[1];
-            p1 = new Point(u1, v1);
-        }
-        else if ((code1 & 1) > 0) { // clip along west edge
-            double t = (bbox[0] - u1)/(u2-u1);
-            v1 += t*(v2-v1);
-            u1 = bbox[0];
-            p1 = new Point(u1, v1);
-        }
-        else if ((code1 & 2) > 0) { // clip along east edge
-            double t = (bbox[2] - u1)/(u2-u1);
-            v1 += t*(v2-v1);
-            u1 = bbox[2];
-            p1 = new Point(u1, v1);
-        }
-
-        return true;
-    }
-
-
-    private int outside(double latitude, double longitude, double[] bbox) {
-        int outside = 0;
-
-        if (longitude < bbox[0]) {
-            outside |= 1;
-        }
-        if (longitude > bbox[2]) {
-            outside |= 2;
-        }
-        if (latitude < bbox[1]) {
-            outside |= 4;
-        }
-        if (latitude > bbox[3]) {
-            outside |= 8;
-        }
-
-        return outside;
-    }
-
-    private boolean inside(double latitiude, double longitude, double[] bbox) {
-        if (latitiude < bbox[1] || latitiude > bbox[3]) {
-            return false;
-        }
-
-        if (longitude < bbox[0] || longitude > bbox[2]) {
-            return false;
-        }
-
-        return true;
     }
 
     // Cell name stuff
