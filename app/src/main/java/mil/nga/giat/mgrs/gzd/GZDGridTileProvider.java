@@ -15,7 +15,6 @@ import com.google.android.gms.maps.model.TileProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
 
 import mil.nga.giat.mgrs.LatLng;
 import mil.nga.giat.mgrs.Line;
@@ -73,27 +72,24 @@ public class GZDGridTileProvider implements TileProvider {
         double[] boundingBox = getBoundingBox(x, y, zoom);
         double[] webMercatorBoundingBox = getWebMercatorBoundingBox(x, y, zoom);
 
-        Map<Character, Pair<Double, Double>> latitudeZones = GZDZones.latitudeGZDZonesForBBOX(boundingBox);
-        Map<Integer, Pair<Double, Double>> longitudeZones = GZDZones.longitudeGZDZonesForBBOX(boundingBox);
 
-        for (Map.Entry<Character, Pair<Double, Double>> latitiudeGZDZone : latitudeZones.entrySet()) {
-            for (Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone : longitudeZones.entrySet()) {
-                Double minLat = latitiudeGZDZone.getValue().first;
-                Double maxLat = latitiudeGZDZone.getValue().second;
+        for (GridZoneDesignator gridZone : GZDZones.zonesWithin(boundingBox)) {
+            double[] gridBounds = gridZone.zoneBounds();
+            Double minLat = gridBounds[1];
+            Double maxLat = gridBounds[3];
 
-                Double minLon = longitudeGZDZone.getValue().first;
-                Double maxLon = longitudeGZDZone.getValue().second;
+            Double minLon = gridBounds[0];
+            Double maxLon = gridBounds[2];
 
-                drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(maxLat, minLon), new LatLng(maxLat, maxLon)), Color.RED);
-                drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, maxLon), new LatLng(maxLat, maxLon)), Color.RED);
+            drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(maxLat, minLon), new LatLng(maxLat, maxLon)), Color.RED);
+            drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, maxLon), new LatLng(maxLat, maxLon)), Color.RED);
 
-                if (latitiudeGZDZone.getKey().equals('C')) {
-                    drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, minLon), new LatLng(minLat, maxLon)), Color.RED);
-                }
+            if (gridZone.zoneLetter().equals('C')) {
+                drawLine(webMercatorBoundingBox, canvas, new Line(new LatLng(minLat, minLon), new LatLng(minLat, maxLon)), Color.RED);
+            }
 
-                if (zoom > 3) {
-                    drawName(bitmap, longitudeGZDZone, latitiudeGZDZone, webMercatorBoundingBox, canvas);
-                }
+            if (zoom > 3) {
+                drawName(bitmap, gridZone, webMercatorBoundingBox, canvas);
             }
         }
 
@@ -121,9 +117,9 @@ public class GZDGridTileProvider implements TileProvider {
 
     }
 
-    private void drawName(Bitmap bitmap, Map.Entry<Integer, Pair<Double, Double>> longitudeGZDZone, Map.Entry<Character, Pair<Double, Double>> latitudeGZDZone, double[] boundingBox, Canvas canvas) {
+    private void drawName(Bitmap bitmap, GridZoneDesignator gridZone, double[] boundingBox, Canvas canvas) {
 
-        String name = longitudeGZDZone.getKey().toString() + latitudeGZDZone.getKey();
+        String name = gridZone.zoneNumber().toString() + gridZone.zoneLetter();
         Log.e("GZD GRID NAME", name);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -137,8 +133,9 @@ public class GZDGridTileProvider implements TileProvider {
 
         // Determine the center of the tile
         // TODO determine the center of the bounding box for this grid
-        double centerLon = ((longitudeGZDZone.getValue().second - longitudeGZDZone.getValue().first) / 2.0) + longitudeGZDZone.getValue().first;
-        double centerLat = ((latitudeGZDZone.getValue().second - latitudeGZDZone.getValue().first) / 2.0) + latitudeGZDZone.getValue().first;
+        double[] zoneBounds = gridZone.zoneBounds();
+        double centerLon = ((zoneBounds[2] - zoneBounds[0]) / 2.0) + zoneBounds[0];
+        double centerLat = ((zoneBounds[3] - zoneBounds[1]) / 2.0) + zoneBounds[1];
 
         double[] meters = degreesToMeters(new LatLng(centerLat, centerLon));
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox, meters[0]);

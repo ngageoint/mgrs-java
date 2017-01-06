@@ -2,7 +2,9 @@ package mil.nga.giat.mgrs.gzd;
 
 import android.support.v4.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,22 +98,20 @@ public class GZDZones {
         put('X', new Pair<>(72.0, 84.0));
     }};
 
-    public static Map<Character, Pair<Double, Double>> latitudeGZDZonesForBBOX(double[] bbox) {
-        Map<Character, Pair<Double, Double>> zones = new HashMap<>();
-        for (Map.Entry<Character, Pair<Double, Double>> zone : latitudeGZDZones.entrySet()) {
-            if (zone.getValue().first <= bbox[3] && zone.getValue().second >= bbox[1]) {
-                zones.put(zone.getKey(), zone.getValue());
+    public static final List<GridZoneDesignator> gridZones = new ArrayList<GridZoneDesignator>() {{
+        for (Map.Entry<Character, Pair<Double, Double>> latitudeZone : latitudeGZDZones.entrySet()) {
+            for (Map.Entry<Integer, Pair<Double, Double>> longitudeZone : longitudeGZDZones.entrySet()) {
+                double[] bbox = new double[] {longitudeZone.getValue().first, latitudeZone.getValue().first, longitudeZone.getValue().second, latitudeZone.getValue().second};
+                add(new GridZoneDesignator(latitudeZone.getKey(), longitudeZone.getKey(), bbox));
             }
         }
+    }};
 
-        return zones;
-    }
-
-    public static Map<Integer, Pair<Double, Double>> longitudeGZDZonesForBBOX(double[] bbox) {
-        Map<Integer, Pair<Double, Double>> zones = new HashMap<>();
-        for (Map.Entry<Integer, Pair<Double, Double>> zone : longitudeGZDZones.entrySet()) {
-            if ((zone.getValue().first <= bbox[2]) && (zone.getValue().second >= bbox[0])) {
-                zones.put(zone.getKey(), zone.getValue());
+    public static List<GridZoneDesignator> zonesWithin(double[] bbox) {
+        List<GridZoneDesignator> zones = new ArrayList<>();
+        for (GridZoneDesignator zone : gridZones) {
+            if (zone.within(bbox)) {
+                zones.add(zone);
             }
         }
 

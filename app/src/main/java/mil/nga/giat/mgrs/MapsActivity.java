@@ -11,8 +11,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
-import mil.nga.giat.mgrs.gzd.GZDGridTileProvider;
-import mil.nga.giat.mgrs.gzd.HundredKMTileProvider;
+import mil.nga.giat.mgrs.gzd.MGRSTileProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
@@ -30,7 +29,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mgrsLabel = (TextView) findViewById(R.id.mgrs);
     }
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -44,10 +42,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
 //        TileOverlay gridOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GridTileProvider(getApplicationContext())));
 //        gridOverlay.clearTileCache();
-        TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new HundredKMTileProvider(getApplicationContext())));
-        TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
+        TileOverlay kmOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new MGRSTileProvider(getApplicationContext())));
+//        TileOverlay gzdOverlay = map.addTileOverlay(new TileOverlayOptions().tileProvider(new GZDGridTileProvider(getApplicationContext())));
+
 
         map.setOnCameraIdleListener(this);
     }
@@ -55,7 +56,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onCameraIdle() {
         com.google.android.gms.maps.model.LatLng center = map.getCameraPosition().target;
-        String mgrs = GeoUtility.latLngToMGRS(center, 4);
+        String mgrs = GeoUtility.latLngToMGRS(new LatLng(center.latitude, center.longitude), 4);
         Log.i("MGRS", mgrs);
 
         mgrsLabel.setText(mgrs);

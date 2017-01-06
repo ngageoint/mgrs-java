@@ -1,6 +1,6 @@
 package mil.nga.giat.mgrs.wgs84;
 
-import com.google.android.gms.maps.model.LatLng;
+import mil.nga.giat.mgrs.LatLng;
 
 /**
  * Created by wnewman on 12/5/16.
