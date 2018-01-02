@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.TileProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import mil.nga.mgrs.LatLng;
+import mil.nga.mgrs.wgs84.LatLng;
 import mil.nga.mgrs.Line;
 import mil.nga.mgrs.TileBoundingBoxUtils;
 import mil.nga.mgrs.R;

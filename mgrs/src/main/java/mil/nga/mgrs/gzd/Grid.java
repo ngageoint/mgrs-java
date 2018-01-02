@@ -11,7 +11,7 @@ import android.util.Log;
 import java.util.Collection;
 
 import mil.nga.mgrs.Label;
-import mil.nga.mgrs.LatLng;
+import mil.nga.mgrs.wgs84.LatLng;
 import mil.nga.mgrs.MGRSTile;
 import mil.nga.mgrs.TileBoundingBoxUtils;
 import mil.nga.mgrs.wgs84.Line;

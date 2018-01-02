@@ -10,10 +10,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
-import mil.nga.mgrs.GeoUtility;
-import mil.nga.mgrs.LatLng;
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.app.R;
 import mil.nga.mgrs.gzd.MGRSTileProvider;
+import mil.nga.mgrs.wgs84.LatLng;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
 
@@ -54,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onCameraIdle() {
         com.google.android.gms.maps.model.LatLng center = map.getCameraPosition().target;
-        String mgrs = GeoUtility.latLngToMGRS(new LatLng(center.latitude, center.longitude), 4);
-        mgrsLabel.setText(mgrs);
+        MGRS mgrs = MGRS.from(new LatLng(center.latitude, center.longitude));
+        mgrsLabel.setText(mgrs.format(4));
     }
 }

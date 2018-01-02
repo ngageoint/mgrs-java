@@ -1,7 +1,5 @@
 package mil.nga.mgrs.wgs84;
 
-import mil.nga.mgrs.LatLng;
-
 /**
  * Created by wnewman on 12/5/16.
  */
