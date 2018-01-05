@@ -1,6 +1,7 @@
 package mil.nga.mgrs;
 
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,16 +72,25 @@ public class MGRS {
     }
 
     public String format(int accuracy) {
-        String easting =  String.format("%05d", this.easting);
-        String northing =  String.format("%05d", this.northing);
+        String easting =  String.format(Locale.getDefault(),"%05d", this.easting);
+        String northing =  String.format(Locale.getDefault(),"%05d", this.northing);
 
         return zone.toString() + band + e100k + n100k + easting.substring(0, accuracy) + northing.substring(0, accuracy);
     }
 
     /**
+     * Return whether the given string is valid MGRS string
+     *
+     * @param {String} potential MGRS string.
+     * @return true if MGRS string is valid, false otherwise.
+     */
+    public static boolean isMGRS(String mgrs) {
+        return mgrsPattern.matcher(mgrs).matches();
+    }
+
+    /**
      * Encodes a latitude/longitude as MGRS string.
      *
-     * @private
      * @param {object} LatLng An object literal latitude and longitude
      * @return {object} MGRS mgrs.
      */
@@ -106,7 +116,6 @@ public class MGRS {
     }
 
     public static MGRS parse(String mgrs) throws ParseException {
-        //var mgrsRef = new Mgrs(31, 'U', 'D', 'Q', 48251, 11932); // 31U DQ 48251 11932
         Matcher matcher = mgrsPattern.matcher(mgrs);
         if (!matcher.matches()) {
             throw new ParseException("Invalid MGRS", 0);
