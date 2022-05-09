@@ -1,25 +1,13 @@
-#java specific
-*.class
-*.settings
+/target/
+/bin/
 
-# Built application files
-*.apk
-*.ap_
-
-# Generated files
-.gradle/
-build/
-bin/
-gen/
-local.properties
-
-# generic files to ignore
-*~
-*.lock
-*.DS_Store
-*.swp
-*.out
-
-# IDE files
-.idea/
+# IntelliJ
+.idea
 *.iml
+
+# Eclipse Core
+.project
+.settings/
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
