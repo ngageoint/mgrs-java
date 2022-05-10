@@ -5,7 +5,7 @@
 	<artifactId>mgrs</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<name>Tagged Image File Format</name>
+	<name>Military Grid Reference System</name>
 	<url>https://github.com/ngageoint/mgrs-java</url>
 	<description>Library providing Military Grid Reference System (MGRS) functionality</description>
 	<scm>
