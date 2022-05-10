@@ -5,8 +5,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mil.nga.mgrs.utm.UTM;
 import mil.nga.mgrs.wgs84.LatLng;
-import mil.nga.utm.UTM;
 
 /**
  * Created by wnewman on 12/21/17.

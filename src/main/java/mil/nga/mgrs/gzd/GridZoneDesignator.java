@@ -6,10 +6,10 @@ import java.util.List;
 
 import mil.nga.mgrs.Label;
 import mil.nga.mgrs.MGRS;
+import mil.nga.mgrs.utm.UTM;
 import mil.nga.mgrs.wgs84.LatLng;
 import mil.nga.mgrs.wgs84.Line;
 import mil.nga.mgrs.wgs84.Point;
-import mil.nga.utm.UTM;
 
 /**
  * Created by wnewman on 12/23/16.

@@ -3,7 +3,7 @@ package mil.nga.mgrs.wgs84;
 import java.text.ParseException;
 
 import mil.nga.mgrs.MGRS;
-import mil.nga.utm.UTM;
+import mil.nga.mgrs.utm.UTM;
 
 /**
  * Created by wnewman on 11/26/16.

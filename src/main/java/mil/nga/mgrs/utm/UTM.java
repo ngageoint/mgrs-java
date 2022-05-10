@@ -1,4 +1,4 @@
-package mil.nga.utm;
+package mil.nga.mgrs.utm;
 
 import java.text.ParseException;
 
