@@ -1,6 +1,6 @@
 package mil.nga.mgrs;
 
-import mil.nga.mgrs.wgs84.LatLng;
+import mil.nga.mgrs.features.LatLng;
 
 /**
  * Created by wnewman on 11/17/16.
@@ -134,13 +134,6 @@ public class TileBoundingBoxUtils {
      */
     public static double tileSize(int tilesPerSide) {
         return (2 * WEB_MERCATOR_HALF_WORLD_WIDTH) / tilesPerSide;
-    }
-
-    private static double[] degreesToMeters(LatLng latLng) {
-        double x = latLng.longitude * WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-        double y = Math.log(Math.tan((90 + latLng.latitude) * Math.PI / 360)) / (Math.PI / 180);
-        y = y * WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-        return new double[] {x, y};
     }
     
 }

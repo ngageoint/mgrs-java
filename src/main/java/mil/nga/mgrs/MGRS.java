@@ -5,8 +5,9 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
-import mil.nga.mgrs.wgs84.LatLng;
 
 /**
  * Created by wnewman on 12/21/17.
@@ -162,7 +163,7 @@ public class MGRS {
             n2M += 2000000;
         }
 
-        UTM.Hemisphere hemisphere = band >= 'N' ? UTM.Hemisphere.NORTH : UTM.Hemisphere.SOUTH;
+        Hemisphere hemisphere = band >= 'N' ? Hemisphere.NORTH : Hemisphere.SOUTH;
 
         return new UTM(zone, hemisphere, e100kNum + easting, n2M + n100kNum + northing);
     }

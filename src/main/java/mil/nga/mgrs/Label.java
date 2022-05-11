@@ -1,7 +1,7 @@
 package mil.nga.mgrs;
 
 
-import mil.nga.mgrs.wgs84.Point;
+import mil.nga.mgrs.features.Point;
 
 /**
  * Created by wnewman on 1/5/17.
