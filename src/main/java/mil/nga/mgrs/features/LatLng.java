@@ -18,12 +18,12 @@ public class LatLng {
 	/**
 	 * Latitude
 	 */
-	public final double latitude;
+	private double latitude;
 
 	/**
 	 * Longitude
 	 */
-	public final double longitude;
+	private double longitude;
 
 	/**
 	 * Constructor
@@ -35,6 +35,44 @@ public class LatLng {
 	 */
 	public LatLng(double latitude, double longitude) {
 		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
+	/**
+	 * Get the latitude
+	 * 
+	 * @return latitude
+	 */
+	public double getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * Set the latitude
+	 * 
+	 * @param latitude
+	 *            latitude
+	 */
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * Get the longitude
+	 * 
+	 * @return longitude
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * Set the longitude
+	 * 
+	 * @param longitude
+	 *            longitude
+	 */
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
 

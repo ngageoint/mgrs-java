@@ -11,12 +11,12 @@ public class Point {
 	/**
 	 * X value
 	 */
-	public double x;
+	private double x;
 
 	/**
 	 * Y value
 	 */
-	public double y;
+	private double y;
 
 	/**
 	 * Constructor

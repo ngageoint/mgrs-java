@@ -295,8 +295,9 @@ public class GridZone {
 
 			Point zoneLowerLeft = bounds.getSouthwestPoint();
 			Point zoneUpperRight = bounds.getNortheastPoint();
-			double[] zoneBoundingBox = new double[] { zoneLowerLeft.x,
-					zoneLowerLeft.y, zoneUpperRight.x, zoneUpperRight.y };
+			double[] zoneBoundingBox = new double[] { zoneLowerLeft.getX(),
+					zoneLowerLeft.getY(), zoneUpperRight.getX(),
+					zoneUpperRight.getY() };
 
 			String name = Integer.toString(zoneNumber) + bandLetter;
 			Label gzdLabel = new Label(name, center, zoneBoundingBox,
@@ -381,7 +382,7 @@ public class GridZone {
 			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
 					centerEasting, lowerLeftUTM.getNorthing()));
 			UTM utm = UTM.from(
-					new LatLng(bounds.getSouth(), currentLatLng.longitude),
+					new LatLng(bounds.getSouth(), currentLatLng.getLongitude()),
 					zoneNumber, hemisphere);
 			centerNorthing = ((northing - lowerLeftUTM.getNorthing()) / 2)
 					+ lowerLeftUTM.getNorthing();
@@ -390,7 +391,7 @@ public class GridZone {
 			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
 					centerEasting, upperRightUTM.getNorthing()));
 			UTM utm = UTM.from(
-					new LatLng(bounds.getNorth(), currentLatLng.longitude),
+					new LatLng(bounds.getNorth(), currentLatLng.getLongitude()),
 					zoneNumber, hemisphere);
 			centerNorthing = ((upperRightUTM.getNorthing() - newNorthing) / 2)
 					+ newNorthing;
@@ -401,7 +402,7 @@ public class GridZone {
 			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
 					newEasting, centerNorthing));
 			UTM utm = UTM.from(
-					new LatLng(currentLatLng.latitude, bounds.getWest()),
+					new LatLng(currentLatLng.getLatitude(), bounds.getWest()),
 					zoneNumber, hemisphere);
 			centerEasting = utm.getEasting()
 					+ ((newEasting - utm.getEasting()) / 2);
@@ -410,7 +411,7 @@ public class GridZone {
 			LatLng currentLatLng = LatLng.from(
 					new UTM(zoneNumber, hemisphere, easting, centerNorthing));
 			UTM utm = UTM.from(
-					new LatLng(currentLatLng.latitude, bounds.getEast()),
+					new LatLng(currentLatLng.getLatitude(), bounds.getEast()),
 					zoneNumber, hemisphere);
 			centerEasting = easting + ((utm.getEasting() - easting) / 2);
 			newEasting = utm.getEasting();
@@ -430,17 +431,18 @@ public class GridZone {
 		LatLng l4 = LatLng
 				.from(new UTM(zoneNumber, hemisphere, newEasting, newNorthing));
 
-		double minLatitude = Math.max(l1.latitude, l4.latitude);
-		double maxLatitude = Math.min(l2.latitude, l3.latitude);
+		double minLatitude = Math.max(l1.getLatitude(), l4.getLatitude());
+		double maxLatitude = Math.min(l2.getLatitude(), l3.getLatitude());
 
-		double minLongitude = Math.max(l1.longitude, l2.longitude);
-		double maxLongitude = Math.min(l3.longitude, l4.longitude);
+		double minLongitude = Math.max(l1.getLongitude(), l2.getLongitude());
+		double maxLongitude = Math.min(l3.getLongitude(), l4.getLongitude());
 
 		Point minPoint = LatLng.toPoint(minLatitude, minLongitude);
 		Point maxPoint = LatLng.toPoint(maxLatitude, maxLongitude);
 
 		return new Label(id, center,
-				new double[] { minPoint.x, minPoint.y, maxPoint.x, maxPoint.y },
+				new double[] { minPoint.getX(), minPoint.getY(),
+						maxPoint.getX(), maxPoint.getY() },
 				getLetter(), zoneNumber);
 	}
 

@@ -11,12 +11,12 @@ public class Line {
 	/**
 	 * Point 1
 	 */
-	public Point point1;
+	private Point point1;
 
 	/**
 	 * Point 2
 	 */
-	public Point point2;
+	private Point point2;
 
 	/**
 	 * Constructor

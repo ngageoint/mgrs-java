@@ -109,7 +109,7 @@ public class UTM {
 	 * @return UTM
 	 */
 	public static UTM from(LatLng latLng) {
-		int zone = (int) Math.floor(latLng.longitude / 6 + 31);
+		int zone = (int) Math.floor(latLng.getLongitude() / 6 + 31);
 		return from(latLng, zone);
 	}
 
@@ -123,7 +123,7 @@ public class UTM {
 	 * @return UTM
 	 */
 	public static UTM from(LatLng latLng, int zone) {
-		Hemisphere hemisphere = latLng.latitude >= 0 ? Hemisphere.NORTH
+		Hemisphere hemisphere = latLng.getLatitude() >= 0 ? Hemisphere.NORTH
 				: Hemisphere.SOUTH;
 		return from(latLng, zone, hemisphere);
 	}
@@ -140,8 +140,8 @@ public class UTM {
 	 * @return UTM
 	 */
 	public static UTM from(LatLng latLng, int zone, Hemisphere hemisphere) {
-		double latitude = latLng.latitude;
-		double longitude = latLng.longitude;
+		double latitude = latLng.getLatitude();
+		double longitude = latLng.getLongitude();
 
 		// @formatter:off
         double easting = 0.5 * Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))*0.9996*6399593.62/Math.pow((1+Math.pow(0.0820944379, 2)*Math.pow(Math.cos(latitude*Math.PI/180), 2)), 0.5)*(1+ Math.pow(0.0820944379,2)/2*Math.pow((0.5*Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))),2)*Math.pow(Math.cos(latitude*Math.PI/180),2)/3)+500000;

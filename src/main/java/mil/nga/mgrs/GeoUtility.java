@@ -387,7 +387,7 @@ public class GeoUtility {
      * @return MGRS string for the given UTM location.
      */
     public static String latLngToMGRS(LatLng latLng, int accuracy) {
-        UTM utm = latLngToUtm(latLng.latitude, latLng.longitude);
+        UTM utm = latLngToUtm(latLng.getLatitude(), latLng.getLongitude());
 
         String easting = String.format("%05d", Math.round(utm.easting));
         String northing =  String.format("%05d", Math.round(utm.northing % 100000.0));

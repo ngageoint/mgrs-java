@@ -99,7 +99,7 @@ public class MGRS {
         UTM utm = UTM.from(latLng);
 
         // grid zones are 8° tall, 0°N is 10th band
-        char band = latBands.charAt((int) Math.floor(latLng.latitude / 8 + 10)); // latitude band
+        char band = latBands.charAt((int) Math.floor(latLng.getLatitude() / 8 + 10)); // latitude band
 
         // columns in zone 1 are A-H, zone 2 J-R, zone 3 S-Z, then repeating every 3rd zone
         int column = (int) Math.floor(utm.getEasting() / 100000);

@@ -11,12 +11,12 @@ public class LatLngLine {
 	/**
 	 * Coordinate 1
 	 */
-	public LatLng coordinate1;
+	private LatLng coordinate1;
 
 	/**
 	 * Coordinate 2
 	 */
-	public LatLng coordinate2;
+	private LatLng coordinate2;
 
 	/**
 	 * Constructor
