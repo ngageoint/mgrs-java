@@ -129,7 +129,7 @@ public class Bounds {
 	 * @param east
 	 *            eastern longitude
 	 */
-	public void setMaxLongitude(double east) {
+	public void setEast(double east) {
 		this.east = east;
 	}
 
@@ -150,6 +150,82 @@ public class Bounds {
 	 */
 	public void setNorth(double north) {
 		this.north = north;
+	}
+
+	/**
+	 * Get the western longitude
+	 * 
+	 * @return western longitude
+	 */
+	public double getMinLongitude() {
+		return getWest();
+	}
+
+	/**
+	 * Set the western longitude
+	 * 
+	 * @param west
+	 *            western longitude
+	 */
+	public void setMinLongitude(double west) {
+		setWest(west);
+	}
+
+	/**
+	 * Get the southern latitude
+	 * 
+	 * @return southern latitude
+	 */
+	public double getMinLatitude() {
+		return getSouth();
+	}
+
+	/**
+	 * Set the southern latitude
+	 * 
+	 * @param south
+	 *            southern latitude
+	 */
+	public void setMinLatitude(double south) {
+		setSouth(south);
+	}
+
+	/**
+	 * Get the eastern longitude
+	 * 
+	 * @return eastern longitude
+	 */
+	public double getMaxLongitude() {
+		return getEast();
+	}
+
+	/**
+	 * Set the eastern longitude
+	 * 
+	 * @param east
+	 *            eastern longitude
+	 */
+	public void setMaxLongitude(double east) {
+		setEast(east);
+	}
+
+	/**
+	 * Get the northern latitude
+	 * 
+	 * @return northern latitude
+	 */
+	public double getMaxLatitude() {
+		return getNorth();
+	}
+
+	/**
+	 * Set the northern latitude
+	 * 
+	 * @param north
+	 *            northern latitude
+	 */
+	public void setMaxLatitude(double north) {
+		setNorth(north);
 	}
 
 	/**
