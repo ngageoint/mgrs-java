@@ -1,17 +1,13 @@
 package mil.nga.mgrs;
 
-import java.util.List;
-
 import org.junit.Test;
 
-import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
 
 public class GZDZonesTest {
 
 	@Test
 	public void temp() {
-		List<GridZone> temp = GridZones.gridZones;
 
 		for (double longitude = -180.0; longitude <= 180.0; longitude += 1.0) {
 			System.out.println("west " + longitude + " - "
