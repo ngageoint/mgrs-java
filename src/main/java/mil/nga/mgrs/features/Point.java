@@ -1,5 +1,7 @@
 package mil.nga.mgrs.features;
 
+import mil.nga.mgrs.MGRSUtils;
+
 /**
  * Point in meters
  * 
@@ -67,6 +69,28 @@ public class Point {
 	 */
 	public void setY(double y) {
 		this.y = y;
+	}
+
+	/**
+	 * Convert to a WGS84 coordinate
+	 * 
+	 * @return coordinate
+	 */
+	public LatLng toLatLng() {
+		return toLatLng(x, y);
+	}
+
+	/**
+	 * Convert a point to a WGS84 coordinate
+	 * 
+	 * @param x
+	 *            x value
+	 * @param y
+	 *            y value
+	 * @return coordinate
+	 */
+	public static LatLng toLatLng(double x, double y) {
+		return MGRSUtils.toLatLng(x, y);
 	}
 
 }

@@ -2,6 +2,9 @@ package mil.nga.mgrs.gzd;
 
 import java.util.Iterator;
 
+import mil.nga.mgrs.MGRSConstants;
+import mil.nga.mgrs.MGRSUtils;
+
 /**
  * Band Letter Range
  * 
@@ -23,7 +26,7 @@ public class BandLetterRange implements Iterable<Character> {
 	 * Constructor, full range
 	 */
 	public BandLetterRange() {
-		this('C', 'X');
+		this(MGRSConstants.MIN_BAND_LETTER, MGRSConstants.MAX_BAND_LETTER);
 	}
 
 	/**
@@ -121,10 +124,7 @@ public class BandLetterRange implements Iterable<Character> {
 			@Override
 			public Character next() {
 				char value = letter;
-				letter++;
-				if (letter == 'I' || letter == 'O') {
-					letter++;
-				}
+				letter = MGRSUtils.nextBandLetter(letter);
 				return value;
 			}
 

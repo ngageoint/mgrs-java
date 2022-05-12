@@ -1,11 +1,11 @@
 package mil.nga.mgrs.gzd;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import mil.nga.mgrs.Label;
 import mil.nga.mgrs.MGRS;
+import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.features.LatLng;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
@@ -124,7 +124,7 @@ public class GridZone {
 	 *            grid
 	 * @return lines
 	 */
-	public Collection<Line> getLines(Grid grid) {
+	public List<Line> getLines(Grid grid) {
 		return getLines(grid.getPrecision());
 	}
 
@@ -135,7 +135,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	public Collection<Line> getLines(int precision) {
+	public List<Line> getLines(int precision) {
 		return getLines(bounds, precision);
 	}
 
@@ -149,7 +149,7 @@ public class GridZone {
 	 *            grid
 	 * @return lines
 	 */
-	public Collection<Line> getLines(double[] tileBounds, Grid grid) {
+	public List<Line> getLines(double[] tileBounds, Grid grid) {
 		return getLines(tileBounds, grid.getPrecision());
 	}
 
@@ -162,7 +162,7 @@ public class GridZone {
 	 *            grid
 	 * @return lines
 	 */
-	public Collection<Line> getLines(Bounds tileBounds, Grid grid) {
+	public List<Line> getLines(Bounds tileBounds, Grid grid) {
 		return getLines(tileBounds, grid.getPrecision());
 	}
 
@@ -176,7 +176,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	public Collection<Line> getLines(double[] tileBounds, int precision) {
+	public List<Line> getLines(double[] tileBounds, int precision) {
 		return getLines(new Bounds(tileBounds), precision);
 	}
 
@@ -189,21 +189,16 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	public Collection<Line> getLines(Bounds tileBounds, int precision) {
+	public List<Line> getLines(Bounds tileBounds, int precision) {
 
-		Collection<Line> lines = new ArrayList<>();
+		List<Line> lines = new ArrayList<>();
 
 		if (precision == 0) {
 			// if precision is 0, draw the zone bounds
 			lines.addAll(bounds.getLines());
 		} else {
-			Collection<Line> longitudeLines = longitudeLines(tileBounds,
-					precision);
-			lines.addAll(longitudeLines);
-
-			Collection<Line> latitudeLines = latitudeLines(tileBounds,
-					precision);
-			lines.addAll(latitudeLines);
+			lines.addAll(longitudeLines(tileBounds, precision));
+			lines.addAll(latitudeLines(tileBounds, precision));
 		}
 
 		return lines;
@@ -216,7 +211,7 @@ public class GridZone {
 	 *            grid
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(Grid grid) {
+	public List<Label> getLabels(Grid grid) {
 		return getLabels(grid.getPrecision());
 	}
 
@@ -227,7 +222,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(int precision) {
+	public List<Label> getLabels(int precision) {
 		return getLabels(bounds, precision);
 	}
 
@@ -241,7 +236,7 @@ public class GridZone {
 	 *            grid
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(double[] tileBounds, Grid grid) {
+	public List<Label> getLabels(double[] tileBounds, Grid grid) {
 		return getLabels(tileBounds, grid.getPrecision());
 	}
 
@@ -254,7 +249,7 @@ public class GridZone {
 	 *            grid
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(Bounds tileBounds, Grid grid) {
+	public List<Label> getLabels(Bounds tileBounds, Grid grid) {
 		return getLabels(tileBounds, grid.getPrecision());
 	}
 
@@ -268,7 +263,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(double[] tileBounds, int precision) {
+	public List<Label> getLabels(double[] tileBounds, int precision) {
 		return getLabels(new Bounds(tileBounds), precision);
 	}
 
@@ -281,13 +276,13 @@ public class GridZone {
 	 *            precision in meters
 	 * @return labels
 	 */
-	public Collection<Label> getLabels(Bounds tileBounds, int precision) {
+	public List<Label> getLabels(Bounds tileBounds, int precision) {
 
 		int zoneNumber = getNumber();
 		char bandLetter = getLetter();
 		Hemisphere hemisphere = getHemisphere();
 
-		Collection<Label> labels = new ArrayList<>();
+		List<Label> labels = new ArrayList<>();
 
 		if (precision == 0) {
 			// if precision is 0, draw the GZD name
@@ -455,7 +450,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	private Collection<Line> longitudeLines(Bounds tileBounds, int precision) {
+	private List<Line> longitudeLines(Bounds tileBounds, int precision) {
 		if (getHemisphere() == Hemisphere.NORTH) {
 			return northernLongitudeLines(tileBounds, precision);
 		} else {
@@ -472,7 +467,7 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	private Collection<Line> northernLongitudeLines(Bounds tileBounds,
+	private List<Line> northernLongitudeLines(Bounds tileBounds,
 			int precision) {
 
 		int zoneNumber = getNumber();
@@ -532,13 +527,13 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	private Collection<Line> southernLongitudeLines(Bounds tileBounds,
+	private List<Line> southernLongitudeLines(Bounds tileBounds,
 			int precision) {
 
 		int zoneNumber = getNumber();
 		Hemisphere hemisphere = getHemisphere();
 
-		Collection<Line> lines = new ArrayList<>();
+		List<Line> lines = new ArrayList<>();
 
 		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
 		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
@@ -552,7 +547,7 @@ public class GridZone {
 				.floor(upperLeftUTM.getEasting() / precision) * precision);
 		double upperLeftNorthing = (Math
 				.ceil(upperLeftUTM.getNorthing() / precision + 1) * precision);
-		if (getLetter() == 'M') {
+		if (getLetter() == MGRSConstants.BAND_LETTER_SOUTH) {
 			upperLeftNorthing = 10000000.0;
 			upperLeftUTM = new UTM(upperLeftUTM.getZoneNumber(),
 					Hemisphere.SOUTH, upperLeftUTM.getEasting(),
@@ -594,12 +589,12 @@ public class GridZone {
 	 *            precision in meters
 	 * @return lines
 	 */
-	private Collection<Line> latitudeLines(Bounds tileBounds, int precision) {
+	private List<Line> latitudeLines(Bounds tileBounds, int precision) {
 
 		int zoneNumber = getNumber();
 		Hemisphere hemisphere = getHemisphere();
 
-		Collection<Line> lines = new ArrayList<>();
+		List<Line> lines = new ArrayList<>();
 
 		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
 		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
@@ -621,7 +616,7 @@ public class GridZone {
 		double upperNorthing = (Math
 				.ceil(upperRightUTM.getNorthing() / precision) * precision)
 				+ precision;
-		if (getLetter() == 'M') {
+		if (getLetter() == MGRSConstants.BAND_LETTER_SOUTH) {
 			upperNorthing = 10000000.0;
 		}
 

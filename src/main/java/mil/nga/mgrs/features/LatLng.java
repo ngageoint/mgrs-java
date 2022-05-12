@@ -3,7 +3,7 @@ package mil.nga.mgrs.features;
 import java.text.ParseException;
 
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.TileBoundingBoxUtils;
+import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
@@ -95,12 +95,7 @@ public class LatLng {
 	 * @return point in meters
 	 */
 	public static Point toPoint(double latitude, double longitude) {
-		double x = longitude
-				* TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-		double y = Math.log(Math.tan((90 + latitude) * Math.PI / 360))
-				/ (Math.PI / 180);
-		y = y * TileBoundingBoxUtils.WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-		return new Point(x, y);
+		return MGRSUtils.toPoint(latitude, longitude);
 	}
 
 	/**

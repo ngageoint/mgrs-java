@@ -2,6 +2,8 @@ package mil.nga.mgrs.gzd;
 
 import java.util.Iterator;
 
+import mil.nga.mgrs.MGRSConstants;
+
 /**
  * Zone Number Range
  * 
@@ -23,7 +25,7 @@ public class ZoneNumberRange implements Iterable<Integer> {
 	 * Constructor, full range
 	 */
 	public ZoneNumberRange() {
-		this(1, 60);
+		this(MGRSConstants.MIN_ZONE_NUMBER, MGRSConstants.MAX_ZONE_NUMBER);
 	}
 
 	/**

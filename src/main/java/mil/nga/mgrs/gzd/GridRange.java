@@ -1,11 +1,15 @@
 package mil.nga.mgrs.gzd;
 
+import java.util.Iterator;
+
+import mil.nga.mgrs.MGRSUtils;
+
 /**
  * Grid Range
  * 
  * @author osbornb
  */
-public class GridRange {
+public class GridRange implements Iterable<GridZone> {
 
 	/**
 	 * Zone Number Range
@@ -82,6 +86,49 @@ public class GridRange {
 		double north = bandLetterRange.getNorthLatitude();
 
 		return new Bounds(west, south, east, north);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Iterator<GridZone> iterator() {
+		return new Iterator<GridZone>() {
+
+			/**
+			 * Zone number
+			 */
+			private int zoneNumber = zoneNumberRange.getWest();
+
+			/**
+			 * Band letter
+			 */
+			private char bandLetter = bandLetterRange.getSouth();
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public boolean hasNext() {
+				return zoneNumber <= zoneNumberRange.getEast();
+			}
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public GridZone next() {
+				GridZone gridZone = GridZones.getGridZone(zoneNumber,
+						bandLetter);
+				bandLetter = MGRSUtils.nextBandLetter(bandLetter);
+				if (bandLetter > bandLetterRange.getNorth()) {
+					zoneNumber++;
+					bandLetter = bandLetterRange.getSouth();
+				}
+				return gridZone;
+			}
+
+		};
 	}
 
 }

@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.mgrs.MGRSConstants;
+import mil.nga.mgrs.MGRSUtils;
+
 /**
  * Grid Zones, Longitudinal Strips, and Latitude Bands
  * 
@@ -33,20 +36,22 @@ public class GridZones {
 		// Create longitudinal strips
 		ZoneNumberRange numberRange = new ZoneNumberRange();
 		for (int zoneNumber : numberRange) {
-			double longitude = -180 + ((zoneNumber - 1) * 6.0);
+			double longitude = MGRSConstants.MIN_LON
+					+ ((zoneNumber - 1) * MGRSConstants.ZONE_WIDTH);
 			LongitudinalStrip strip = new LongitudinalStrip(zoneNumber,
-					longitude, longitude + 6.0);
+					longitude, longitude + MGRSConstants.ZONE_WIDTH);
 			strips.put(strip.getNumber(), strip);
 		}
 
 		// Create latitude bands
-		double latitude = -80.0;
+		double latitude = MGRSConstants.MIN_LAT;
 		BandLetterRange letterRange = new BandLetterRange();
 		for (char bandLetter : letterRange) {
 			double min = latitude;
-			latitude += 8.0;
-			if (bandLetter == 'X') {
-				latitude += 4.0;
+			if (bandLetter == MGRSConstants.MAX_BAND_LETTER) {
+				latitude += MGRSConstants.MAX_BAND_HEIGHT;
+			} else {
+				latitude += MGRSConstants.BAND_HEIGHT;
 			}
 			bands.put(bandLetter, new LatitudeBand(bandLetter, min, latitude));
 		}
@@ -70,6 +75,7 @@ public class GridZones {
 	 * @return longitudinal strip
 	 */
 	public static LongitudinalStrip getLongitudinalStrip(int zoneNumber) {
+		MGRSUtils.validateZoneNumber(zoneNumber);
 		return strips.get(zoneNumber);
 	}
 
@@ -81,6 +87,7 @@ public class GridZones {
 	 * @return latitude band
 	 */
 	public static LatitudeBand getLatitudeBand(char bandLetter) {
+		MGRSUtils.validateBandLetter(bandLetter);
 		return bands.get(bandLetter);
 	}
 
@@ -108,16 +115,38 @@ public class GridZones {
 		List<GridZone> zones = new ArrayList<>();
 
 		GridRange gridRange = getGridRange(bounds);
-		ZoneNumberRange zoneNumbers = gridRange.getZoneNumberRange();
-		BandLetterRange bandLetters = gridRange.getBandLetterRange();
-
-		for (int zoneNumber : zoneNumbers) {
-			Map<Character, GridZone> stripGridZones = gridZones.get(zoneNumber);
-			for (char bandLetter : bandLetters) {
-				zones.add(stripGridZones.get(bandLetter));
-			}
+		for (GridZone zone : gridRange) {
+			zones.add(zone);
 		}
+
 		return zones;
+	}
+
+	/**
+	 * Get the grid zone by zone number and band letter
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param bandLetter
+	 *            band letter
+	 * @return grid zone
+	 */
+	public static GridZone getGridZone(int zoneNumber, char bandLetter) {
+		MGRSUtils.validateZoneNumber(zoneNumber);
+		MGRSUtils.validateBandLetter(bandLetter);
+		return gridZones.get(zoneNumber).get(bandLetter);
+	}
+
+	/**
+	 * Get a grid range from the bounds
+	 * 
+	 * @param bounds
+	 *            bounds array: [west, south, east, north] or [minLon, minLat,
+	 *            maxLon, maxLat]
+	 * @return grid range
+	 */
+	public static GridRange getGridRange(double[] bounds) {
+		return getGridRange(new Bounds(bounds));
 	}
 
 	/**
@@ -160,7 +189,8 @@ public class GridZones {
 	}
 
 	/**
-	 * Get the zone number of the longitude
+	 * Get the zone number of the longitude (between
+	 * {@link MGRSConstants#MIN_LON} and {@link MGRSConstants#MAX_LON})
 	 * 
 	 * @param longitude
 	 *            longitude
@@ -170,7 +200,16 @@ public class GridZones {
 	 */
 	public static int getZoneNumber(double longitude, boolean eastern) {
 
-		double zoneValue = (longitude + 180.0) / 6.0;
+		// Normalize the longitude if needed
+		if (longitude < MGRSConstants.MIN_LON
+				|| longitude > MGRSConstants.MAX_LON) {
+			longitude = (longitude - MGRSConstants.MIN_LON)
+					% (2 * MGRSConstants.MAX_LON) + MGRSConstants.MIN_LON;
+		}
+
+		// Determine the zone
+		double zoneValue = (longitude - MGRSConstants.MIN_LON)
+				/ MGRSConstants.ZONE_WIDTH;
 		int zoneNumber = 1 + (int) zoneValue;
 
 		// Handle western edge cases and 180.0
@@ -178,7 +217,7 @@ public class GridZones {
 			if (zoneNumber > 1 && zoneValue % 1.0 == 0.0) {
 				zoneNumber--;
 			}
-		} else if (zoneNumber > 60) {
+		} else if (zoneNumber > MGRSConstants.MAX_ZONE_NUMBER) {
 			zoneNumber--;
 		}
 
@@ -213,7 +252,8 @@ public class GridZones {
 	}
 
 	/**
-	 * Get the band letter of the latitude
+	 * Get the band letter of the latitude (between
+	 * {@link MGRSConstants#MIN_LAT} and {@link MGRSConstants#MAX_LAT})
 	 * 
 	 * @param latitude
 	 *            latitude
@@ -223,11 +263,19 @@ public class GridZones {
 	 */
 	public static char getBandLetter(double latitude, boolean northern) {
 
-		double bandValue = (latitude + 80.0) / 8.0;
-		int bands = (int) ((latitude + 80.0) / 8.0);
+		// Bound the latitude if needed
+		if (latitude < MGRSConstants.MIN_LAT) {
+			latitude = MGRSConstants.MIN_LAT;
+		} else if (latitude > MGRSConstants.MAX_LAT) {
+			latitude = MGRSConstants.MAX_LAT;
+		}
+
+		double bandValue = (latitude - MGRSConstants.MIN_LAT)
+				/ MGRSConstants.BAND_HEIGHT;
+		int bands = (int) bandValue;
 
 		// Handle 80.0 to 84.0 and southern edge cases
-		if (bands > 19) {
+		if (bands >= MGRSConstants.NUM_BANDS) {
 			bands--;
 		} else if (!northern && bands > 0 && bandValue % 1.0 == 0.0) {
 			bands--;
@@ -240,7 +288,7 @@ public class GridZones {
 			bands++;
 		}
 
-		char letter = 'C';
+		char letter = MGRSConstants.MIN_BAND_LETTER;
 		letter += bands;
 		return letter;
 	}

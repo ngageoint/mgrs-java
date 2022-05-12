@@ -43,7 +43,7 @@ public class LatitudeBand {
 		this.letter = letter;
 		this.south = south;
 		this.north = north;
-		this.hemisphere = letter < 'N' ? Hemisphere.SOUTH : Hemisphere.NORTH;
+		this.hemisphere = Hemisphere.fromBandLetter(letter);
 	}
 
 	/**
@@ -56,6 +56,17 @@ public class LatitudeBand {
 	}
 
 	/**
+	 * Set the band letter
+	 * 
+	 * @param letter
+	 *            band letter
+	 */
+	public void setLetter(char letter) {
+		this.letter = letter;
+		this.hemisphere = Hemisphere.fromBandLetter(letter);
+	}
+
+	/**
 	 * Get the southern latitude
 	 * 
 	 * @return southern latitude
@@ -65,12 +76,32 @@ public class LatitudeBand {
 	}
 
 	/**
+	 * Set the southern latitude
+	 * 
+	 * @param south
+	 *            southern latitude
+	 */
+	public void setSouth(double south) {
+		this.south = south;
+	}
+
+	/**
 	 * Get the northern latitude
 	 * 
 	 * @return northern latitude
 	 */
 	public double getNorth() {
 		return north;
+	}
+
+	/**
+	 * Set the northern latitude
+	 * 
+	 * @param north
+	 *            northern latitude
+	 */
+	public void setNorth(double north) {
+		this.north = north;
 	}
 
 	/**

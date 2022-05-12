@@ -1,5 +1,12 @@
 package mil.nga.mgrs.gzd;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import mil.nga.mgrs.MGRSConstants;
+
 /**
  * Grid enumeration
  * 
@@ -54,6 +61,18 @@ public enum Grid {
 	private int maxZoom;
 
 	/**
+	 * Map between zoom levels and grids
+	 */
+	private static Map<Integer, Grids> grids = new HashMap<>();
+
+	static {
+		// Create zoom level grids
+		for (int zoom = 0; zoom <= MGRSConstants.MAX_MAP_ZOOM_LEVEL; zoom++) {
+			createGrids(zoom);
+		}
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param precision
@@ -105,6 +124,40 @@ public enum Grid {
 	 */
 	public boolean isWithin(int zoom) {
 		return zoom >= minZoom && zoom <= maxZoom;
+	}
+
+	/**
+	 * Get the grids for the zoom level
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @return grids
+	 */
+	public static Grids getGrids(int zoom) {
+		Grids zoomGrids = grids.get(zoom);
+		if (zoomGrids == null) {
+			zoomGrids = createGrids(zoom);
+		}
+		return zoomGrids;
+	}
+
+	/**
+	 * Create grids for the zoom level
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @return grids
+	 */
+	private static Grids createGrids(int zoom) {
+		List<Grid> gridList = new ArrayList<>();
+		for (Grid grid : Grid.values()) {
+			if (grid.isWithin(zoom)) {
+				gridList.add(grid);
+			}
+		}
+		Grids zoomGrids = new Grids(zoom, gridList);
+		grids.put(zoom, zoomGrids);
+		return zoomGrids;
 	}
 
 }

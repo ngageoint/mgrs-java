@@ -1,7 +1,7 @@
 package mil.nga.mgrs.gzd;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import mil.nga.mgrs.features.LatLng;
 import mil.nga.mgrs.features.Line;
@@ -243,7 +243,7 @@ public class Bounds {
 	 * @return center latitude
 	 */
 	public double getCenterLatitude() {
-		return ((north - south) / 2.0) + south;
+		return getCenter().getLatitude();
 	}
 
 	/**
@@ -252,7 +252,7 @@ public class Bounds {
 	 * @return center coordinate
 	 */
 	public LatLng getCenter() {
-		return new LatLng(getCenterLatitude(), getCenterLongitude());
+		return getCenterPoint().toLatLng();
 	}
 
 	/**
@@ -261,7 +261,13 @@ public class Bounds {
 	 * @return center point in meters
 	 */
 	public Point getCenterPoint() {
-		return getCenter().toPoint();
+		double centerLongitude = getCenterLongitude();
+		Point northPoint = LatLng.toPoint(north, centerLongitude);
+		Point southPoint = LatLng.toPoint(south, centerLongitude);
+		double centerX = northPoint.getX();
+		double centerY = southPoint.getY()
+				+ (0.5 * (northPoint.getY() - southPoint.getY()));
+		return new Point(centerX, centerY);
 	}
 
 	/**
@@ -341,14 +347,14 @@ public class Bounds {
 	 * 
 	 * @return lines
 	 */
-	public Collection<Line> getLines() {
+	public List<Line> getLines() {
 
 		Point southwest = getSouthwestPoint();
 		Point northwest = getNorthwestPoint();
 		Point northeast = getNortheastPoint();
 		Point southeast = getSoutheastPoint();
 
-		Collection<Line> lines = new ArrayList<>();
+		List<Line> lines = new ArrayList<>();
 		lines.add(new Line(southwest, northwest));
 		lines.add(new Line(northwest, northeast));
 		lines.add(new Line(northeast, southeast));
