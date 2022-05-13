@@ -6,7 +6,7 @@ import java.util.List;
 import mil.nga.mgrs.Label;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.MGRSConstants;
-import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.utm.Hemisphere;
@@ -104,6 +104,15 @@ public class GridZone {
 	}
 
 	/**
+	 * Get the label name
+	 * 
+	 * @return name
+	 */
+	public String getName() {
+		return MGRSUtils.getLabelName(getNumber(), getLetter());
+	}
+
+	/**
 	 * Is the provided bounds within the zone bounds
 	 * 
 	 * @param bounds
@@ -143,20 +152,6 @@ public class GridZone {
 	 * Get the grid zone lines
 	 * 
 	 * @param tileBounds
-	 *            tile bounds array: [west, south, east, north] or [minLon,
-	 *            minLat, maxLon, maxLat]
-	 * @param grid
-	 *            grid
-	 * @return lines
-	 */
-	public List<Line> getLines(double[] tileBounds, Grid grid) {
-		return getLines(tileBounds, grid.getPrecision());
-	}
-
-	/**
-	 * Get the grid zone lines
-	 * 
-	 * @param tileBounds
 	 *            tile bounds
 	 * @param grid
 	 *            grid
@@ -164,20 +159,6 @@ public class GridZone {
 	 */
 	public List<Line> getLines(Bounds tileBounds, Grid grid) {
 		return getLines(tileBounds, grid.getPrecision());
-	}
-
-	/**
-	 * Get the grid zone lines
-	 * 
-	 * @param tileBounds
-	 *            tile bounds array: [west, south, east, north] or [minLon,
-	 *            minLat, maxLon, maxLat]
-	 * @param precision
-	 *            precision in meters
-	 * @return lines
-	 */
-	public List<Line> getLines(double[] tileBounds, int precision) {
-		return getLines(new Bounds(tileBounds), precision);
 	}
 
 	/**
@@ -197,6 +178,7 @@ public class GridZone {
 			// if precision is 0, draw the zone bounds
 			lines.addAll(bounds.getLines());
 		} else {
+			tileBounds = tileBounds.toDegrees();
 			lines.addAll(longitudeLines(tileBounds, precision));
 			lines.addAll(latitudeLines(tileBounds, precision));
 		}
@@ -230,20 +212,6 @@ public class GridZone {
 	 * Get the grid zone labels
 	 * 
 	 * @param tileBounds
-	 *            tile bounds array: [west, south, east, north] or [minLon,
-	 *            minLat, maxLon, maxLat]
-	 * @param grid
-	 *            grid
-	 * @return labels
-	 */
-	public List<Label> getLabels(double[] tileBounds, Grid grid) {
-		return getLabels(tileBounds, grid.getPrecision());
-	}
-
-	/**
-	 * Get the grid zone labels
-	 * 
-	 * @param tileBounds
 	 *            tile bounds
 	 * @param grid
 	 *            grid
@@ -251,20 +219,6 @@ public class GridZone {
 	 */
 	public List<Label> getLabels(Bounds tileBounds, Grid grid) {
 		return getLabels(tileBounds, grid.getPrecision());
-	}
-
-	/**
-	 * Get the grid zone labels
-	 * 
-	 * @param tileBounds
-	 *            tile bounds array: [west, south, east, north] or [minLon,
-	 *            minLat, maxLon, maxLat]
-	 * @param precision
-	 *            precision in meters
-	 * @return labels
-	 */
-	public List<Label> getLabels(double[] tileBounds, int precision) {
-		return getLabels(new Bounds(tileBounds), precision);
 	}
 
 	/**
@@ -286,59 +240,46 @@ public class GridZone {
 
 		if (precision == 0) {
 			// if precision is 0, draw the GZD name
-			Point center = bounds.getCenterPoint();
+			labels.add(new Label(getName(), bounds.getCenter(), bounds,
+					zoneNumber, bandLetter));
+		} else {
 
-			Point zoneLowerLeft = bounds.getSouthwestPoint();
-			Point zoneUpperRight = bounds.getNortheastPoint();
-			double[] zoneBoundingBox = new double[] { zoneLowerLeft.getX(),
-					zoneLowerLeft.getY(), zoneUpperRight.getX(),
-					zoneUpperRight.getY() };
+			tileBounds = tileBounds.toDegrees();
 
-			String name = Integer.toString(zoneNumber) + bandLetter;
-			Label gzdLabel = new Label(name, center, zoneBoundingBox,
-					bandLetter, zoneNumber);
-			labels.add(gzdLabel);
+			tileBounds = tileBounds.union(bounds);
 
-			return labels;
-		}
+			UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
+					hemisphere);
+			double lowerEasting = (Math
+					.floor(lowerLeftUTM.getEasting() / precision) * precision)
+					- precision;
+			double lowerNorthing = (Math
+					.ceil(lowerLeftUTM.getNorthing() / precision) * precision);
 
-		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
-		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
+			UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
+					hemisphere);
+			double upperEasting = (Math
+					.floor(upperRightUTM.getEasting() / precision) * precision)
+					+ precision;
+			double upperNorthing = (Math
+					.ceil(upperRightUTM.getNorthing() / precision) * precision)
+					+ precision;
 
-		Double minLon = Math.max(tileBounds.getWest(), bounds.getWest());
-		Double maxLon = Math.min(tileBounds.getEast(), bounds.getEast());
+			double northing = lowerNorthing;
+			while (northing < upperNorthing) {
+				double easting = lowerEasting;
+				double newNorthing = northing + precision;
+				while (easting < upperEasting) {
+					double newEasting = easting + precision;
 
-		UTM lowerLeftUTM = UTM.from(new LatLng(minLat, minLon), zoneNumber,
-				hemisphere);
-		double lowerEasting = (Math.floor(lowerLeftUTM.getEasting() / precision)
-				* precision) - precision;
-		double lowerNorthing = (Math
-				.ceil(lowerLeftUTM.getNorthing() / precision) * precision);
+					// Draw cell name
+					labels.add(getLabel(precision, easting, northing));
 
-		UTM upperRightUTM = UTM.from(new LatLng(maxLat, maxLon), zoneNumber,
-				hemisphere);
-		double upperEasting = (Math
-				.floor(upperRightUTM.getEasting() / precision) * precision)
-				+ precision;
-		double upperNorthing = (Math
-				.ceil(upperRightUTM.getNorthing() / precision) * precision)
-				+ precision;
+					easting = newEasting;
+				}
 
-		double northing = lowerNorthing;
-		while (northing < upperNorthing) {
-			double easting = lowerEasting;
-			double newNorthing = northing + precision;
-			while (easting < upperEasting) {
-				double newEasting = easting + precision;
-
-				// Draw cell name
-				Label label = getLabel(precision, easting, northing);
-				labels.add(label);
-
-				easting = newEasting;
+				northing = newNorthing;
 			}
-
-			northing = newNorthing;
 		}
 
 		return labels;
@@ -360,11 +301,9 @@ public class GridZone {
 		int zoneNumber = getNumber();
 		Hemisphere hemisphere = getHemisphere();
 
-		UTM lowerLeftUTM = UTM.from(
-				new LatLng(bounds.getSouth(), bounds.getWest()), zoneNumber,
+		UTM lowerLeftUTM = UTM.from(bounds.getSouthwest(), zoneNumber,
 				hemisphere);
-		UTM upperRightUTM = UTM.from(
-				new LatLng(bounds.getNorth(), bounds.getEast()), zoneNumber,
+		UTM upperRightUTM = UTM.from(bounds.getNortheast(), zoneNumber,
 				hemisphere);
 
 		double newNorthing = northing - precision;
@@ -374,56 +313,55 @@ public class GridZone {
 		double centerEasting = easting + (precision / 2);
 
 		if (newNorthing < lowerLeftUTM.getNorthing()) {
-			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
+			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
 					centerEasting, lowerLeftUTM.getNorthing()));
-			UTM utm = UTM.from(
-					new LatLng(bounds.getSouth(), currentLatLng.getLongitude()),
-					zoneNumber, hemisphere);
+			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
+					bounds.getSouth()), zoneNumber, hemisphere);
 			centerNorthing = ((northing - lowerLeftUTM.getNorthing()) / 2)
 					+ lowerLeftUTM.getNorthing();
 			newNorthing = utm.getNorthing();
 		} else if (northing > upperRightUTM.getNorthing()) {
-			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
+			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
 					centerEasting, upperRightUTM.getNorthing()));
-			UTM utm = UTM.from(
-					new LatLng(bounds.getNorth(), currentLatLng.getLongitude()),
-					zoneNumber, hemisphere);
+			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
+					bounds.getNorth()), zoneNumber, hemisphere);
 			centerNorthing = ((upperRightUTM.getNorthing() - newNorthing) / 2)
 					+ newNorthing;
 			northing = utm.getNorthing();
 		}
 
 		if (easting < lowerLeftUTM.getEasting()) {
-			LatLng currentLatLng = LatLng.from(new UTM(zoneNumber, hemisphere,
+			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
 					newEasting, centerNorthing));
 			UTM utm = UTM.from(
-					new LatLng(currentLatLng.getLatitude(), bounds.getWest()),
+					Point.degrees(bounds.getWest(),
+							currentLatLng.getLatitude()),
 					zoneNumber, hemisphere);
 			centerEasting = utm.getEasting()
 					+ ((newEasting - utm.getEasting()) / 2);
 			easting = utm.getEasting();
 		} else if (newEasting > upperRightUTM.getEasting()) {
-			LatLng currentLatLng = LatLng.from(
+			Point currentLatLng = Point.from(
 					new UTM(zoneNumber, hemisphere, easting, centerNorthing));
 			UTM utm = UTM.from(
-					new LatLng(currentLatLng.getLatitude(), bounds.getEast()),
+					Point.degrees(bounds.getEast(),
+							currentLatLng.getLatitude()),
 					zoneNumber, hemisphere);
 			centerEasting = easting + ((utm.getEasting() - easting) / 2);
 			newEasting = utm.getEasting();
 		}
 
 		String id = MGRS.get100KId(centerEasting, centerNorthing, zoneNumber);
-		LatLng centerLatLng = LatLng.from(
+		Point center = Point.from(
 				new UTM(zoneNumber, hemisphere, centerEasting, centerNorthing));
-		Point center = centerLatLng.toPoint();
 
-		LatLng l1 = LatLng
+		Point l1 = Point
 				.from(new UTM(zoneNumber, hemisphere, easting, newNorthing));
-		LatLng l2 = LatLng
+		Point l2 = Point
 				.from(new UTM(zoneNumber, hemisphere, easting, northing));
-		LatLng l3 = LatLng
+		Point l3 = Point
 				.from(new UTM(zoneNumber, hemisphere, newEasting, northing));
-		LatLng l4 = LatLng
+		Point l4 = Point
 				.from(new UTM(zoneNumber, hemisphere, newEasting, newNorthing));
 
 		double minLatitude = Math.max(l1.getLatitude(), l4.getLatitude());
@@ -432,13 +370,10 @@ public class GridZone {
 		double minLongitude = Math.max(l1.getLongitude(), l2.getLongitude());
 		double maxLongitude = Math.min(l3.getLongitude(), l4.getLongitude());
 
-		Point minPoint = LatLng.toPoint(minLatitude, minLongitude);
-		Point maxPoint = LatLng.toPoint(maxLatitude, maxLongitude);
+		Bounds bounds = Bounds.degrees(minLongitude, minLatitude, maxLongitude,
+				maxLatitude);
 
-		return new Label(id, center,
-				new double[] { minPoint.getX(), minPoint.getY(),
-						maxPoint.getX(), maxPoint.getY() },
-				getLetter(), zoneNumber);
+		return new Label(id, center, bounds, zoneNumber, getLetter());
 	}
 
 	/**
@@ -475,20 +410,16 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
-		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
+		tileBounds = tileBounds.union(bounds);
 
-		Double minLon = Math.max(tileBounds.getWest(), bounds.getWest());
-		Double maxLon = Math.min(tileBounds.getEast(), bounds.getEast());
-
-		UTM lowerLeftUTM = UTM.from(new LatLng(minLat, minLon), zoneNumber,
+		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
 				hemisphere);
 		double lowerLeftEasting = (Math
 				.floor(lowerLeftUTM.getEasting() / precision) * precision);
 		double lowerLeftNorthing = (Math
 				.floor(lowerLeftUTM.getNorthing() / precision) * precision);
 
-		UTM upperRightUTM = UTM.from(new LatLng(maxLat, maxLon), zoneNumber,
+		UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
 				hemisphere);
 		double endEasting = (Math.ceil(upperRightUTM.getEasting() / precision)
 				* precision);
@@ -502,12 +433,11 @@ public class GridZone {
 			while (northing <= endNorthing) {
 				double newNorthing = northing + precision;
 
-				LatLng latLng1 = LatLng.from(
+				Point latLng1 = Point.from(
 						new UTM(zoneNumber, hemisphere, easting, northing));
-				LatLng latLng2 = LatLng.from(
+				Point latLng2 = Point.from(
 						new UTM(zoneNumber, hemisphere, easting, newNorthing));
-				Line line = new Line(latLng1, latLng2);
-				lines.add(line);
+				lines.add(Line.line(latLng1, latLng2));
 
 				northing = newNorthing;
 			}
@@ -535,13 +465,9 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
-		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
+		tileBounds = tileBounds.union(bounds);
 
-		Double minLon = Math.max(tileBounds.getWest(), bounds.getWest());
-		Double maxLon = Math.min(tileBounds.getEast(), bounds.getEast());
-
-		UTM upperLeftUTM = UTM.from(new LatLng(maxLat, minLon), zoneNumber,
+		UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(), zoneNumber,
 				hemisphere);
 		double upperLeftEasting = (Math
 				.floor(upperLeftUTM.getEasting() / precision) * precision);
@@ -554,7 +480,7 @@ public class GridZone {
 					upperLeftUTM.getNorthing());
 		}
 
-		UTM lowerRightUTM = UTM.from(new LatLng(minLat, maxLon), zoneNumber,
+		UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(), zoneNumber,
 				hemisphere);
 		double lowerRightEasting = (Math
 				.ceil(lowerRightUTM.getEasting() / precision) * precision);
@@ -566,12 +492,11 @@ public class GridZone {
 			while (northing >= lowerRightNorthing) {
 				double newNorthing = northing - precision;
 
-				LatLng latLng1 = LatLng.from(new UTM(zoneNumber,
+				Point latLng1 = Point.from(new UTM(zoneNumber,
 						upperLeftUTM.getHemisphere(), easting, northing));
-				LatLng latLng2 = LatLng.from(new UTM(zoneNumber,
+				Point latLng2 = Point.from(new UTM(zoneNumber,
 						lowerRightUTM.getHemisphere(), easting, newNorthing));
-				Line line = new Line(latLng1, latLng2);
-				lines.add(line);
+				lines.add(Line.line(latLng1, latLng2));
 
 				northing = newNorthing;
 			}
@@ -596,20 +521,16 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		Double minLat = Math.max(tileBounds.getSouth(), bounds.getSouth());
-		Double maxLat = Math.min(tileBounds.getNorth(), bounds.getNorth());
+		tileBounds = tileBounds.union(bounds);
 
-		Double minLon = Math.max(tileBounds.getWest(), bounds.getWest());
-		Double maxLon = Math.min(tileBounds.getEast(), bounds.getEast());
-
-		UTM lowerLeftUTM = UTM.from(new LatLng(minLat, minLon), zoneNumber,
+		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
 				hemisphere);
 		double lowerEasting = (Math.floor(lowerLeftUTM.getEasting() / precision)
 				* precision) - precision;
 		double lowerNorthing = (Math
 				.floor(lowerLeftUTM.getNorthing() / precision) * precision);
 
-		UTM upperRightUTM = UTM.from(new LatLng(maxLat, maxLon), zoneNumber,
+		UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
 				hemisphere);
 		double upperEasting = (Math.ceil(upperRightUTM.getEasting() / precision)
 				* precision) + precision;
@@ -626,12 +547,11 @@ public class GridZone {
 			double newNorthing = northing + precision;
 			while (easting < upperEasting) {
 				double newEasting = easting + precision;
-				LatLng latLng1 = LatLng.from(
+				Point latLng1 = Point.from(
 						new UTM(zoneNumber, hemisphere, easting, northing));
-				LatLng latLng2 = LatLng.from(
+				Point latLng2 = Point.from(
 						new UTM(zoneNumber, hemisphere, newEasting, northing));
-				Line line = new Line(latLng1, latLng2);
-				lines.add(line);
+				lines.add(Line.line(latLng1, latLng2));
 
 				easting = newEasting;
 			}

@@ -95,18 +95,6 @@ public class GridZones {
 	 * Get the zones within the bounds
 	 * 
 	 * @param bounds
-	 *            bounds array: [west, south, east, north] or [minLon, minLat,
-	 *            maxLon, maxLat]
-	 * @return grid zones
-	 */
-	public static List<GridZone> getZones(double[] bounds) {
-		return getZones(new Bounds(bounds));
-	}
-
-	/**
-	 * Get the zones within the bounds
-	 * 
-	 * @param bounds
 	 *            bounds
 	 * @return grid zones
 	 */
@@ -135,18 +123,6 @@ public class GridZones {
 		MGRSUtils.validateZoneNumber(zoneNumber);
 		MGRSUtils.validateBandLetter(bandLetter);
 		return gridZones.get(zoneNumber).get(bandLetter);
-	}
-
-	/**
-	 * Get a grid range from the bounds
-	 * 
-	 * @param bounds
-	 *            bounds array: [west, south, east, north] or [minLon, minLat,
-	 *            maxLon, maxLat]
-	 * @return grid range
-	 */
-	public static GridRange getGridRange(double[] bounds) {
-		return getGridRange(new Bounds(bounds));
 	}
 
 	/**

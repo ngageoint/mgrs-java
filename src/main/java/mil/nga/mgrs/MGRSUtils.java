@@ -1,28 +1,59 @@
 package mil.nga.mgrs;
 
-import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.features.Pixel;
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.features.Unit;
+import mil.nga.mgrs.gzd.Bounds;
 
 /**
- * Created by wnewman on 11/17/16.
+ * Military Grid Reference System utilities
+ * 
+ * @author wnewman
+ * @author osbornb
  */
 public class MGRSUtils {
 
 	/**
-	 * Get the X pixel for where the longitude fits into the bounding box
+	 * Get the pixel where the point fits into the bounds
+	 * 
+	 * @param width
+	 *            height
+	 * @param height
+	 *            height
+	 * @param bounds
+	 *            bounds
+	 * @param point
+	 *            point
+	 * @return pixel
+	 */
+	public static Pixel getPixel(int width, int height, Bounds bounds,
+			Point point) {
+
+		point = point.toMeters();
+		bounds = bounds.toMeters();
+
+		float x = getXPixel(width, bounds, point.getLongitude());
+		float y = getYPixel(height, bounds, point.getLatitude());
+		return new Pixel(x, y);
+	}
+
+	/**
+	 * Get the X pixel for where the longitude in meters fits into the bounds
 	 *
 	 * @param width
 	 *            width
-	 * @param boundingBox
-	 *            bounding box
-	 * @param x
-	 *            x
+	 * @param bounds
+	 *            bounds
+	 * @param longitude
+	 *            longitude in meters
 	 * @return x pixel
 	 */
-	public static float getXPixel(long width, double[] boundingBox, double x) {
+	public static float getXPixel(int width, Bounds bounds, double longitude) {
 
-		double boxWidth = boundingBox[2] - boundingBox[0];
-		double offset = x - boundingBox[0];
+		bounds = bounds.toMeters();
+
+		double boxWidth = bounds.getMaxLongitude() - bounds.getMinLongitude();
+		double offset = longitude - bounds.getMinLongitude();
 		double percentage = offset / boxWidth;
 		float pixel = (float) (percentage * width);
 
@@ -30,20 +61,22 @@ public class MGRSUtils {
 	}
 
 	/**
-	 * Get the Y pixel for where the latitude fits into the bounding box
+	 * Get the Y pixel for where the latitude in meters fits into the bounds
 	 *
 	 * @param height
 	 *            height
-	 * @param boundingBox
-	 *            bounding box
-	 * @param y
-	 *            y
+	 * @param bounds
+	 *            bounds
+	 * @param latitude
+	 *            latitude
 	 * @return y pixel
 	 */
-	public static float getYPixel(long height, double[] boundingBox, double y) {
+	public static float getYPixel(int height, Bounds bounds, double latitude) {
 
-		double boxHeight = boundingBox[3] - boundingBox[1];
-		double offset = boundingBox[3] - y;
+		bounds = bounds.toMeters();
+
+		double boxHeight = bounds.getMaxLatitude() - bounds.getMinLatitude();
+		double offset = bounds.getMaxLatitude() - latitude;
 		double percentage = offset / boxHeight;
 		float pixel = (float) (percentage * height);
 
@@ -51,8 +84,8 @@ public class MGRSUtils {
 	}
 
 	/**
-	 * Get the Web Mercator tile bounding box from the Google Maps API tile
-	 * coordinates and zoom level
+	 * Get the Web Mercator tile bounds from the XYZ tile coordinates and zoom
+	 * level
 	 *
 	 * @param x
 	 *            x coordinate
@@ -60,28 +93,27 @@ public class MGRSUtils {
 	 *            y coordinate
 	 * @param zoom
 	 *            zoom level
-	 * @return bounding box
+	 * @return bounds
 	 */
-	public static double[] getWebMercatorBoundingBox(long x, long y, int zoom) {
+	public static Bounds getWebMercatorBounds(int x, int y, int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
 		double tileSize = tileSize(tilesPerSide);
 
 		double minLon = (-1 * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH)
 				+ (x * tileSize);
-		double maxLon = (-1 * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH)
-				+ ((x + 1) * tileSize);
 		double minLat = MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
 				- ((y + 1) * tileSize);
+		double maxLon = (-1 * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH)
+				+ ((x + 1) * tileSize);
 		double maxLat = MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
 				- (y * tileSize);
 
-		return new double[] { minLon, minLat, maxLon, maxLat };
+		return Bounds.meters(minLon, minLat, maxLon, maxLat);
 	}
 
 	/**
-	 * Get the tile bounding box from the Google Maps API tile coordinates and
-	 * zoom level
+	 * Get the tile bounds from the XYZ tile coordinates and zoom level
 	 *
 	 * @param x
 	 *            x coordinate
@@ -89,22 +121,41 @@ public class MGRSUtils {
 	 *            y coordinate
 	 * @param zoom
 	 *            zoom level
-	 * @return bounding box
+	 * @return bounds
 	 */
-	public static double[] getBoundingBox(long x, long y, int zoom) {
+	public static Bounds getBounds(int x, int y, int zoom) {
 
-		double[] bbox = new double[] { tileToLongitue(x, zoom),
-				tileToLatitude(y + 1, zoom), tileToLongitue(x + 1, zoom),
-				tileToLatitude(y, zoom), };
+		double minLon = tileToLongitude(x, zoom);
+		double minLat = tileToLatitude(y + 1, zoom);
+		double maxLon = tileToLongitude(x + 1, zoom);
+		double maxLat = tileToLatitude(y, zoom);
 
-		return bbox;
+		return Bounds.degrees(minLon, minLat, maxLon, maxLat);
 	}
 
-	private static double tileToLongitue(long x, long zoom) {
+	/**
+	 * Get the tile longitude from the XZ coordinate
+	 * 
+	 * @param x
+	 *            x coordinate
+	 * @param zoom
+	 *            zoom level
+	 * @return longitude
+	 */
+	public static double tileToLongitude(int x, int zoom) {
 		return (x / Math.pow(2, zoom) * 360 - 180);
 	}
 
-	private static double tileToLatitude(long y, long zoom) {
+	/**
+	 * Get the tile latitude from the YZ coordinate
+	 * 
+	 * @param y
+	 *            y coordinate
+	 * @param zoom
+	 *            zoom level
+	 * @return latitude
+	 */
+	public static double tileToLatitude(int y, int zoom) {
 		double n = Math.PI - 2 * Math.PI * y / Math.pow(2, zoom);
 		return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
 	}
@@ -132,39 +183,90 @@ public class MGRSUtils {
 	}
 
 	/**
-	 * Convert a WGS84 coordinate to a point in meters
+	 * Convert a coordinate from a unit to another unit
 	 * 
-	 * @param latitude
-	 *            WGS84 latitude
+	 * @param fromUnit
+	 *            unit of provided coordinate
 	 * @param longitude
-	 *            WGS84 longitude
-	 * @return point in meters
+	 *            longitude
+	 * @param latitude
+	 *            latitude
+	 * @param toUnit
+	 *            desired unit
+	 * @return point in unit
 	 */
-	public static Point toPoint(double latitude, double longitude) {
-		double x = longitude * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
-				/ 180;
-		double y = Math.log(Math.tan((90 + latitude) * Math.PI / 360))
-				/ (Math.PI / 180);
-		y = y * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
-		return new Point(x, y);
+	public static Point toUnit(Unit fromUnit, double longitude, double latitude,
+			Unit toUnit) {
+		Point point = null;
+		if (fromUnit == toUnit) {
+			point = Point.point(longitude, latitude, toUnit);
+		} else {
+			point = toUnit(longitude, latitude, toUnit);
+		}
+		return point;
 	}
 
 	/**
-	 * Convert a point in meters to a WGS84 coordinate
+	 * Convert a coordinate to the unit, assumes the coordinate is in the
+	 * opposite unit
 	 * 
-	 * @param x
-	 *            x value
-	 * @param y
-	 *            y value
+	 * @param longitude
+	 *            longitude
+	 * @param latitude
+	 *            latitude
+	 * @param unit
+	 *            desired unit
+	 * @return point in unit
+	 */
+	public static Point toUnit(double longitude, double latitude, Unit unit) {
+		Point point = null;
+		switch (unit) {
+		case DEGREE:
+			point = toDegrees(longitude, latitude);
+			break;
+		case METER:
+			point = toMeters(longitude, latitude);
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported unit: " + unit);
+		}
+		return point;
+	}
+
+	/**
+	 * Convert a WGS84 coordinate to a point in meters
+	 * 
+	 * @param longitude
+	 *            WGS84 longitude
+	 * @param latitude
+	 *            WGS84 latitude
+	 * @return point in meters
+	 */
+	public static Point toMeters(double longitude, double latitude) {
+		double lon = longitude * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
+				/ 180;
+		double lat = Math.log(Math.tan((90 + latitude) * Math.PI / 360))
+				/ (Math.PI / 180);
+		lat = lat * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH / 180;
+		return Point.meters(lon, lat);
+	}
+
+	/**
+	 * Convert a coordinate in meters to a WGS84 point
+	 * 
+	 * @param longitude
+	 *            longitude in meters
+	 * @param latitude
+	 *            latitude in meters
 	 * @return WGS84 coordinate
 	 */
-	public static LatLng toLatLng(double x, double y) {
-		double longitude = x * 180
+	public static Point toDegrees(double longitude, double latitude) {
+		double lon = longitude * 180
 				/ MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH;
-		double latitude = y * 180 / MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH;
-		latitude = Math.atan(Math.exp(latitude * (Math.PI / 180))) / Math.PI
-				* 360 - 90;
-		return new LatLng(latitude, longitude);
+		double lat = latitude * 180
+				/ MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH;
+		lat = Math.atan(Math.exp(lat * (Math.PI / 180))) / Math.PI * 360 - 90;
+		return Point.degrees(lon, lat);
 	}
 
 	/**
@@ -243,6 +345,19 @@ public class MGRSUtils {
 	public static boolean isOmittedBandLetter(char letter) {
 		return letter == MGRSConstants.BAND_LETTER_OMIT_I
 				|| letter == MGRSConstants.BAND_LETTER_OMIT_O;
+	}
+
+	/**
+	 * Get the label name
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param bandLetter
+	 *            band letter
+	 * @return name
+	 */
+	public static String getLabelName(int zoneNumber, char bandLetter) {
+		return Integer.toString(zoneNumber) + bandLetter;
 	}
 
 }

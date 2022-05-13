@@ -32,4 +32,15 @@ public enum Hemisphere {
 				: Hemisphere.NORTH;
 	}
 
+	/**
+	 * Get the hemisphere for the latitude
+	 * 
+	 * @param latitude
+	 *            latitude
+	 * @return hemisphere
+	 */
+	public static Hemisphere fromLatitude(double latitude) {
+		return latitude >= 0 ? Hemisphere.NORTH : Hemisphere.SOUTH;
+	}
+
 }

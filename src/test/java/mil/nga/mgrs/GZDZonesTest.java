@@ -2,6 +2,7 @@ package mil.nga.mgrs;
 
 import org.junit.Test;
 
+import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GridZones;
 
 public class GZDZonesTest {
@@ -22,6 +23,14 @@ public class GZDZonesTest {
 			System.out.println("north " + latitude + " - "
 					+ GridZones.getBandLetter(latitude, true));
 		}
+
+		Point latLng = Point.degrees(-112.500003, 21.943049);
+		System.out.println(latLng.getLongitude() + " " + latLng.getLatitude());
+		Point point = latLng.toMeters();
+		System.out.println(point.getLongitude() + " " + point.getLatitude());
+		Point latLng2 = point.toDegrees();
+		System.out
+				.println(latLng2.getLongitude() + " " + latLng2.getLatitude());
 
 	}
 

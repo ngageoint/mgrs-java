@@ -3,12 +3,13 @@ package mil.nga.mgrs.utm;
 import java.text.ParseException;
 
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.features.LatLng;
+import mil.nga.mgrs.features.Point;
 
 /**
  * Universal Transverse Mercator Projection
  * 
  * @author wnewman
+ * @author osbornb
  */
 public class UTM {
 
@@ -108,7 +109,8 @@ public class UTM {
 	 *            coordinate
 	 * @return UTM
 	 */
-	public static UTM from(LatLng latLng) {
+	public static UTM from(Point latLng) {
+		latLng = latLng.toDegrees();
 		int zone = (int) Math.floor(latLng.getLongitude() / 6 + 31);
 		return from(latLng, zone);
 	}
@@ -122,9 +124,8 @@ public class UTM {
 	 *            zone number
 	 * @return UTM
 	 */
-	public static UTM from(LatLng latLng, int zone) {
-		Hemisphere hemisphere = latLng.getLatitude() >= 0 ? Hemisphere.NORTH
-				: Hemisphere.SOUTH;
+	public static UTM from(Point latLng, int zone) {
+		Hemisphere hemisphere = Hemisphere.fromLatitude(latLng.getLatitude());
 		return from(latLng, zone, hemisphere);
 	}
 
@@ -139,7 +140,10 @@ public class UTM {
 	 *            hemisphere
 	 * @return UTM
 	 */
-	public static UTM from(LatLng latLng, int zone, Hemisphere hemisphere) {
+	public static UTM from(Point latLng, int zone, Hemisphere hemisphere) {
+
+		latLng = latLng.toDegrees();
+
 		double latitude = latLng.getLatitude();
 		double longitude = latLng.getLongitude();
 

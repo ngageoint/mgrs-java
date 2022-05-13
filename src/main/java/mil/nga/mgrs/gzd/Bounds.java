@@ -3,9 +3,9 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.features.LatLng;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.features.Unit;
 
 /**
  * Zone Bounds
@@ -35,7 +35,144 @@ public class Bounds {
 	private double north;
 
 	/**
-	 * Constructor
+	 * Unit
+	 */
+	private Unit unit;
+
+	/**
+	 * Create bounds
+	 * 
+	 * @param west
+	 *            western longitude
+	 * @param south
+	 *            southern latitude
+	 * @param east
+	 *            eastern longitude
+	 * @param north
+	 *            northern latitude
+	 * @param unit
+	 *            unit
+	 * @return bounds
+	 */
+	public static Bounds bounds(double west, double south, double east,
+			double north, Unit unit) {
+		return new Bounds(west, south, east, north, unit);
+	}
+
+	/**
+	 * Create bounds in degrees
+	 * 
+	 * @param west
+	 *            western longitude
+	 * @param south
+	 *            southern latitude
+	 * @param east
+	 *            eastern longitude
+	 * @param north
+	 *            northern latitude
+	 * @return bounds
+	 */
+	public static Bounds degrees(double west, double south, double east,
+			double north) {
+		return bounds(west, south, east, north, Unit.DEGREE);
+	}
+
+	/**
+	 * Create bounds in degrees
+	 * 
+	 * @param west
+	 *            western longitude
+	 * @param south
+	 *            southern latitude
+	 * @param east
+	 *            eastern longitude
+	 * @param north
+	 *            northern latitude
+	 * @return bounds
+	 */
+	public static Bounds meters(double west, double south, double east,
+			double north) {
+		return bounds(west, south, east, north, Unit.METER);
+	}
+
+	/**
+	 * Create bounds
+	 * 
+	 * @param southwest
+	 *            southwest corner
+	 * @param northeast
+	 *            northeast corner
+	 * @return bounds
+	 */
+	public static Bounds bounds(Point southwest, Point northeast) {
+		return new Bounds(southwest, northeast);
+	}
+
+	/**
+	 * Create bounds, in {@link Unit#DEGREE} units
+	 * 
+	 * @param strip
+	 *            longitudinal strip
+	 * @param band
+	 *            latitude band
+	 * @return bounds
+	 */
+	public static Bounds bounds(LongitudinalStrip strip, LatitudeBand band) {
+		return new Bounds(strip, band);
+	}
+
+	/**
+	 * Create bounds, in {@link Unit#DEGREE} units
+	 * 
+	 * @param bounds
+	 *            bounds array: [west, south, east, north] or [minLon, minLat,
+	 *            maxLon, maxLat]
+	 * @return bounds
+	 */
+	public static Bounds bounds(double[] bounds) {
+		return new Bounds(bounds);
+	}
+
+	/**
+	 * Create bounds
+	 * 
+	 * @param bounds
+	 *            bounds array: [west, south, east, north] or [minLon, minLat,
+	 *            maxLon, maxLat]
+	 * @param unit
+	 *            unit
+	 * @return bounds
+	 */
+	public static Bounds bounds(double[] bounds, Unit unit) {
+		return new Bounds(bounds, unit);
+	}
+
+	/**
+	 * Create bounds in degrees
+	 * 
+	 * @param bounds
+	 *            bounds degrees array: [west, south, east, north] or [minLon,
+	 *            minLat, maxLon, maxLat]
+	 * @return bounds
+	 */
+	public static Bounds degrees(double[] bounds) {
+		return bounds(bounds, Unit.DEGREE);
+	}
+
+	/**
+	 * Create bounds in meters
+	 * 
+	 * @param bounds
+	 *            bounds meters array: [west, south, east, north] or [minLon,
+	 *            minLat, maxLon, maxLat]
+	 * @return bounds
+	 */
+	public static Bounds meters(double[] bounds) {
+		return bounds(bounds, Unit.METER);
+	}
+
+	/**
+	 * Constructor, in {@link Unit#DEGREE} units
 	 * 
 	 * @param west
 	 *            western longitude
@@ -47,14 +184,54 @@ public class Bounds {
 	 *            northern latitude
 	 */
 	public Bounds(double west, double south, double east, double north) {
-		this.west = west;
-		this.south = south;
-		this.east = east;
-		this.north = north;
+		this(west, south, east, north, Unit.DEGREE);
 	}
 
 	/**
 	 * Constructor
+	 * 
+	 * @param west
+	 *            western longitude
+	 * @param south
+	 *            southern latitude
+	 * @param east
+	 *            eastern longitude
+	 * @param north
+	 *            northern latitude
+	 * @param unit
+	 *            unit
+	 */
+	public Bounds(double west, double south, double east, double north,
+			Unit unit) {
+		this.west = west;
+		this.south = south;
+		this.east = east;
+		this.north = north;
+		this.unit = unit;
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param southwest
+	 *            southwest corner
+	 * @param northeast
+	 *            northeast corner
+	 */
+	public Bounds(Point southwest, Point northeast) {
+		this(southwest.getLongitude(), southwest.getLatitude(),
+				northeast.getLongitude(), northeast.getLatitude(),
+				southwest.getUnit());
+
+		if (!isUnit(northeast.getUnit())) {
+			throw new IllegalArgumentException(
+					"Points are in different units. southwest: " + unit
+							+ ", northeast: " + northeast.getUnit());
+		}
+	}
+
+	/**
+	 * Constructor, in {@link Unit#DEGREE} units
 	 * 
 	 * @param strip
 	 *            longitudinal strip
@@ -62,18 +239,32 @@ public class Bounds {
 	 *            latitude band
 	 */
 	public Bounds(LongitudinalStrip strip, LatitudeBand band) {
-		this(strip.getWest(), band.getSouth(), strip.getEast(),
-				band.getNorth());
+		this(strip.getWest(), band.getSouth(), strip.getEast(), band.getNorth(),
+				Unit.DEGREE);
+	}
+
+	/**
+	 * Constructor, in {@link Unit#DEGREE} units
+	 * 
+	 * @param bounds
+	 *            bounds array: [west, south, east, north] or [minLon, minLat,
+	 *            maxLon, maxLat]
+	 */
+	public Bounds(double[] bounds) {
+		this(bounds, Unit.DEGREE);
 	}
 
 	/**
 	 * Constructor
 	 * 
 	 * @param bounds
-	 *            bounds array: [west, south, east, north]
+	 *            bounds array: [west, south, east, north] or [minLon, minLat,
+	 *            maxLon, maxLat]
+	 * @param unit
+	 *            unit
 	 */
-	public Bounds(double[] bounds) {
-		this(bounds[0], bounds[1], bounds[2], bounds[3]);
+	public Bounds(double[] bounds, Unit unit) {
+		this(bounds[0], bounds[1], bounds[2], bounds[3], unit);
 	}
 
 	/**
@@ -150,6 +341,91 @@ public class Bounds {
 	 */
 	public void setNorth(double north) {
 		this.north = north;
+	}
+
+	/**
+	 * Get the unit
+	 * 
+	 * @return unit
+	 */
+	public Unit getUnit() {
+		return unit;
+	}
+
+	/**
+	 * Set the unit
+	 * 
+	 * @param unit
+	 *            unit
+	 */
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+	/**
+	 * Is in the provided unit type
+	 * 
+	 * @param unit
+	 *            unit
+	 * @return true if in the unit
+	 */
+	public boolean isUnit(Unit unit) {
+		return this.unit == unit;
+	}
+
+	/**
+	 * Are bounds in degrees
+	 * 
+	 * @return true if degrees
+	 */
+	public boolean isDegrees() {
+		return isUnit(Unit.DEGREE);
+	}
+
+	/**
+	 * Are bounds in meters
+	 * 
+	 * @return true if meters
+	 */
+	public boolean isMeters() {
+		return isUnit(Unit.METER);
+	}
+
+	/**
+	 * Convert to the unit
+	 * 
+	 * @param unit
+	 *            unit
+	 * @return bounds in units, same bounds if equal units
+	 */
+	public Bounds toUnit(Unit unit) {
+		Bounds bounds = null;
+		if (isUnit(unit)) {
+			bounds = this;
+		} else {
+			Point southwest = getSouthwest().toUnit(unit);
+			Point northeast = getNortheast().toUnit(unit);
+			bounds = new Bounds(southwest, northeast);
+		}
+		return bounds;
+	}
+
+	/**
+	 * Convert to degrees
+	 * 
+	 * @return bounds in degrees, same bounds if already in degrees
+	 */
+	public Bounds toDegrees() {
+		return toUnit(Unit.DEGREE);
+	}
+
+	/**
+	 * Convert to meters
+	 * 
+	 * @return bounds in meters, same bounds if already in meters
+	 */
+	public Bounds toMeters() {
+		return toUnit(Unit.METER);
 	}
 
 	/**
@@ -251,23 +527,35 @@ public class Bounds {
 	 * 
 	 * @return center coordinate
 	 */
-	public LatLng getCenter() {
-		return getCenterPoint().toLatLng();
-	}
+	public Point getCenter() {
 
-	/**
-	 * Get the center point in meters
-	 * 
-	 * @return center point in meters
-	 */
-	public Point getCenterPoint() {
 		double centerLongitude = getCenterLongitude();
-		Point northPoint = LatLng.toPoint(north, centerLongitude);
-		Point southPoint = LatLng.toPoint(south, centerLongitude);
-		double centerX = northPoint.getX();
-		double centerY = southPoint.getY()
-				+ (0.5 * (northPoint.getY() - southPoint.getY()));
-		return new Point(centerX, centerY);
+
+		Point northPoint = null;
+		Point southPoint = null;
+		switch (unit) {
+		case DEGREE:
+			northPoint = Point.degreesToMeters(centerLongitude, north);
+			southPoint = Point.degreesToMeters(centerLongitude, south);
+			break;
+		case METER:
+			northPoint = Point.meters(centerLongitude, north);
+			southPoint = Point.meters(centerLongitude, south);
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported unit: " + unit);
+		}
+
+		double centerX = northPoint.getLongitude();
+		double centerY = southPoint.getLatitude()
+				+ (0.5 * (northPoint.getLatitude() - southPoint.getLatitude()));
+
+		Point point = Point.meters(centerX, centerY);
+		if (unit == Unit.DEGREE) {
+			point.toDegrees();
+		}
+
+		return point;
 	}
 
 	/**
@@ -275,17 +563,8 @@ public class Bounds {
 	 * 
 	 * @return southwest coordinate
 	 */
-	public LatLng getSouthwest() {
-		return new LatLng(getSouth(), getWest());
-	}
-
-	/**
-	 * Get the southwest point in meters
-	 * 
-	 * @return southwest point in meters
-	 */
-	public Point getSouthwestPoint() {
-		return getSouthwest().toPoint();
+	public Point getSouthwest() {
+		return Point.point(getWest(), getSouth(), unit);
 	}
 
 	/**
@@ -293,17 +572,8 @@ public class Bounds {
 	 * 
 	 * @return northwest coordinate
 	 */
-	public LatLng getNorthwest() {
-		return new LatLng(getNorth(), getWest());
-	}
-
-	/**
-	 * Get the northwest point in meters
-	 * 
-	 * @return northwest point in meters
-	 */
-	public Point getNorthwestPoint() {
-		return getNorthwest().toPoint();
+	public Point getNorthwest() {
+		return Point.point(getWest(), getNorth(), unit);
 	}
 
 	/**
@@ -311,17 +581,8 @@ public class Bounds {
 	 * 
 	 * @return southeast coordinate
 	 */
-	public LatLng getSoutheast() {
-		return new LatLng(getSouth(), getEast());
-	}
-
-	/**
-	 * Get the southeast point in meters
-	 * 
-	 * @return southeast point in meters
-	 */
-	public Point getSoutheastPoint() {
-		return getSoutheast().toPoint();
+	public Point getSoutheast() {
+		return Point.point(getEast(), getSouth(), unit);
 	}
 
 	/**
@@ -329,17 +590,27 @@ public class Bounds {
 	 * 
 	 * @return northeast coordinate
 	 */
-	public LatLng getNortheast() {
-		return new LatLng(getNorth(), getEast());
+	public Point getNortheast() {
+		return Point.point(getEast(), getNorth(), unit);
 	}
 
 	/**
-	 * Get the northeast point in meters
+	 * Create a new bounds as the union between this bounds and the provided
 	 * 
-	 * @return northeast point in meters
+	 * @param bounds
+	 *            bounds
+	 * @return bounds
 	 */
-	public Point getNortheastPoint() {
-		return getNortheast().toPoint();
+	public Bounds union(Bounds bounds) {
+
+		bounds = bounds.toUnit(unit);
+
+		double west = Math.min(getWest(), bounds.getWest());
+		double south = Math.min(getSouth(), bounds.getSouth());
+		double east = Math.max(getEast(), bounds.getEast());
+		double north = Math.max(getNorth(), bounds.getNorth());
+
+		return new Bounds(west, south, east, north, unit);
 	}
 
 	/**
@@ -349,16 +620,16 @@ public class Bounds {
 	 */
 	public List<Line> getLines() {
 
-		Point southwest = getSouthwestPoint();
-		Point northwest = getNorthwestPoint();
-		Point northeast = getNortheastPoint();
-		Point southeast = getSoutheastPoint();
+		Point southwest = getSouthwest();
+		Point northwest = getNorthwest();
+		Point northeast = getNortheast();
+		Point southeast = getSoutheast();
 
 		List<Line> lines = new ArrayList<>();
-		lines.add(new Line(southwest, northwest));
-		lines.add(new Line(northwest, northeast));
-		lines.add(new Line(northeast, southeast));
-		lines.add(new Line(southeast, southwest));
+		lines.add(Line.line(southwest, northwest));
+		lines.add(Line.line(northwest, northeast));
+		lines.add(Line.line(northeast, southeast));
+		lines.add(Line.line(southeast, southwest));
 
 		return lines;
 	}
