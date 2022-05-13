@@ -17,7 +17,7 @@ public class MGRSUtils {
 	 * Get the pixel where the point fits into the bounds
 	 * 
 	 * @param width
-	 *            height
+	 *            width
 	 * @param height
 	 *            height
 	 * @param bounds

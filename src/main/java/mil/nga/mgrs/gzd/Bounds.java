@@ -3,7 +3,11 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.mgrs.MGRSTile;
+import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Line;
+import mil.nga.mgrs.features.Pixel;
+import mil.nga.mgrs.features.PixelRange;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.features.Unit;
 
@@ -611,6 +615,39 @@ public class Bounds {
 		double north = Math.max(getNorth(), bounds.getNorth());
 
 		return new Bounds(west, south, east, north, unit);
+	}
+
+	/**
+	 * Get the pixel range where the bounds fit into the provided bounds
+	 * 
+	 * @param tile
+	 *            tile
+	 * @param bounds
+	 *            bounds
+	 * @return pixel range
+	 */
+	public PixelRange getPixelRange(MGRSTile tile, Bounds bounds) {
+		return getPixelRange(tile.getWidth(), tile.getHeight(), bounds);
+	}
+
+	/**
+	 * Get the pixel range where the bounds fit into the provided bounds
+	 * 
+	 * @param width
+	 *            width
+	 * @param height
+	 *            height
+	 * @param bounds
+	 *            bounds
+	 * @return pixel range
+	 */
+	public PixelRange getPixelRange(int width, int height, Bounds bounds) {
+		bounds = bounds.toMeters();
+		Pixel topLeft = MGRSUtils.getPixel(width, height, bounds,
+				getNorthwest());
+		Pixel bottomRight = MGRSUtils.getPixel(width, height, bounds,
+				getSoutheast());
+		return new PixelRange(topLeft, bottomRight);
 	}
 
 	/**
