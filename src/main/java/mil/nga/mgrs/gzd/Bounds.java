@@ -603,7 +603,7 @@ public class Bounds {
 	 * 
 	 * @param bounds
 	 *            bounds
-	 * @return bounds
+	 * @return union bounds
 	 */
 	public Bounds union(Bounds bounds) {
 
@@ -613,6 +613,26 @@ public class Bounds {
 		double south = Math.min(getSouth(), bounds.getSouth());
 		double east = Math.max(getEast(), bounds.getEast());
 		double north = Math.max(getNorth(), bounds.getNorth());
+
+		return new Bounds(west, south, east, north, unit);
+	}
+
+	/**
+	 * Create a new bounds as the overlapping between this bounds and the
+	 * provided
+	 * 
+	 * @param bounds
+	 *            bounds
+	 * @return overlap bounds
+	 */
+	public Bounds overlap(Bounds bounds) {
+
+		bounds = bounds.toUnit(unit);
+
+		double west = Math.max(getWest(), bounds.getWest());
+		double south = Math.max(getSouth(), bounds.getSouth());
+		double east = Math.min(getEast(), bounds.getEast());
+		double north = Math.min(getNorth(), bounds.getNorth());
 
 		return new Bounds(west, south, east, north, unit);
 	}

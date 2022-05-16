@@ -246,7 +246,7 @@ public class GridZone {
 
 			tileBounds = tileBounds.toDegrees();
 
-			tileBounds = tileBounds.union(bounds);
+			tileBounds = tileBounds.overlap(bounds);
 
 			UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
 					hemisphere);
@@ -410,7 +410,7 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		tileBounds = tileBounds.union(bounds);
+		tileBounds = tileBounds.overlap(bounds);
 
 		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
 				hemisphere);
@@ -465,7 +465,7 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		tileBounds = tileBounds.union(bounds);
+		tileBounds = tileBounds.overlap(bounds);
 
 		UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(), zoneNumber,
 				hemisphere);
@@ -521,7 +521,7 @@ public class GridZone {
 
 		List<Line> lines = new ArrayList<>();
 
-		tileBounds = tileBounds.union(bounds);
+		tileBounds = tileBounds.overlap(bounds);
 
 		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
 				hemisphere);
