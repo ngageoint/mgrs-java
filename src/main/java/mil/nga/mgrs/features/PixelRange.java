@@ -140,4 +140,22 @@ public class PixelRange {
 		return getMaxY();
 	}
 
+	/**
+	 * Get the pixel width
+	 * 
+	 * @return pixel width
+	 */
+	public float getWidth() {
+		return getMaxX() - getMinX();
+	}
+
+	/**
+	 * Get the pixel height
+	 * 
+	 * @return pixel height
+	 */
+	public float getHeight() {
+		return getMaxY() - getMinY();
+	}
+
 }

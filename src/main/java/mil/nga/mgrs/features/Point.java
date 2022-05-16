@@ -282,16 +282,14 @@ public class Point {
 	}
 
 	/**
-	 * Get the pixel where the point fits into the bounds
+	 * Get the pixel where the point fits into tile
 	 * 
 	 * @param tile
 	 *            tile
-	 * @param bounds
-	 *            bounds
 	 * @return pixel
 	 */
-	public Pixel getPixel(MGRSTile tile, Bounds bounds) {
-		return getPixel(tile.getWidth(), tile.getHeight(), bounds);
+	public Pixel getPixel(MGRSTile tile) {
+		return getPixel(tile.getWidth(), tile.getHeight(), tile.getBounds());
 	}
 
 	/**

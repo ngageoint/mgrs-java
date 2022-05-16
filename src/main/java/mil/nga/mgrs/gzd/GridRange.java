@@ -85,7 +85,7 @@ public class GridRange implements Iterable<GridZone> {
 		double east = zoneNumberRange.getEastLongitude();
 		double north = bandLetterRange.getNorthLatitude();
 
-		return new Bounds(west, south, east, north);
+		return Bounds.degrees(west, south, east, north);
 	}
 
 	/**

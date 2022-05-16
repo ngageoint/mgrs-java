@@ -84,8 +84,7 @@ public class MGRSUtils {
 	}
 
 	/**
-	 * Get the Web Mercator tile bounds from the XYZ tile coordinates and zoom
-	 * level
+	 * Get the tile bounds from the XYZ tile coordinates and zoom level
 	 *
 	 * @param x
 	 *            x coordinate
@@ -95,7 +94,7 @@ public class MGRSUtils {
 	 *            zoom level
 	 * @return bounds
 	 */
-	public static Bounds getWebMercatorBounds(int x, int y, int zoom) {
+	public static Bounds getBounds(int x, int y, int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
 		double tileSize = tileSize(tilesPerSide);
@@ -110,54 +109,6 @@ public class MGRSUtils {
 				- (y * tileSize);
 
 		return Bounds.meters(minLon, minLat, maxLon, maxLat);
-	}
-
-	/**
-	 * Get the tile bounds from the XYZ tile coordinates and zoom level
-	 *
-	 * @param x
-	 *            x coordinate
-	 * @param y
-	 *            y coordinate
-	 * @param zoom
-	 *            zoom level
-	 * @return bounds
-	 */
-	public static Bounds getBounds(int x, int y, int zoom) {
-
-		double minLon = tileToLongitude(x, zoom);
-		double minLat = tileToLatitude(y + 1, zoom);
-		double maxLon = tileToLongitude(x + 1, zoom);
-		double maxLat = tileToLatitude(y, zoom);
-
-		return Bounds.degrees(minLon, minLat, maxLon, maxLat);
-	}
-
-	/**
-	 * Get the tile longitude from the XZ coordinate
-	 * 
-	 * @param x
-	 *            x coordinate
-	 * @param zoom
-	 *            zoom level
-	 * @return longitude
-	 */
-	public static double tileToLongitude(int x, int zoom) {
-		return (x / Math.pow(2, zoom) * 360 - 180);
-	}
-
-	/**
-	 * Get the tile latitude from the YZ coordinate
-	 * 
-	 * @param y
-	 *            y coordinate
-	 * @param zoom
-	 *            zoom level
-	 * @return latitude
-	 */
-	public static double tileToLatitude(int y, int zoom) {
-		double n = Math.PI - 2 * Math.PI * y / Math.pow(2, zoom);
-		return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
 	}
 
 	/**

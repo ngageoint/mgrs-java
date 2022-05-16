@@ -556,7 +556,7 @@ public class Bounds {
 
 		Point point = Point.meters(centerX, centerY);
 		if (unit == Unit.DEGREE) {
-			point.toDegrees();
+			point = point.toDegrees();
 		}
 
 		return point;
@@ -638,16 +638,15 @@ public class Bounds {
 	}
 
 	/**
-	 * Get the pixel range where the bounds fit into the provided bounds
+	 * Get the pixel range where the bounds fit into the tile
 	 * 
 	 * @param tile
 	 *            tile
-	 * @param bounds
-	 *            bounds
 	 * @return pixel range
 	 */
-	public PixelRange getPixelRange(MGRSTile tile, Bounds bounds) {
-		return getPixelRange(tile.getWidth(), tile.getHeight(), bounds);
+	public PixelRange getPixelRange(MGRSTile tile) {
+		return getPixelRange(tile.getWidth(), tile.getHeight(),
+				tile.getBounds());
 	}
 
 	/**

@@ -133,6 +133,7 @@ public class GridZones {
 	 * @return grid range
 	 */
 	public static GridRange getGridRange(Bounds bounds) {
+		bounds = bounds.toDegrees();
 		ZoneNumberRange zoneNumberRange = getZoneNumberRange(bounds);
 		BandLetterRange bandLetterRange = getBandLetterRange(bounds);
 		return new GridRange(zoneNumberRange, bandLetterRange);
@@ -146,6 +147,7 @@ public class GridZones {
 	 * @return zone number range
 	 */
 	public static ZoneNumberRange getZoneNumberRange(Bounds bounds) {
+		bounds = bounds.toDegrees();
 		return getZoneNumberRange(bounds.getWest(), bounds.getEast());
 	}
 
@@ -208,6 +210,7 @@ public class GridZones {
 	 * @return band letter range
 	 */
 	public static BandLetterRange getBandLetterRange(Bounds bounds) {
+		bounds = bounds.toDegrees();
 		return getBandLetterRange(bounds.getSouth(), bounds.getNorth());
 	}
 

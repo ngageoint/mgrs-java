@@ -120,6 +120,7 @@ public class GridZone {
 	 * @return true if within bounds
 	 */
 	public boolean isWithin(Bounds bounds) {
+		bounds = bounds.toUnit(this.bounds.getUnit());
 		return this.bounds.getSouth() <= bounds.getNorth()
 				&& this.bounds.getNorth() >= bounds.getSouth()
 				&& this.bounds.getWest() <= bounds.getEast()
