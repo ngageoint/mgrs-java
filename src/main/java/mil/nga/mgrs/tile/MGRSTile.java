@@ -29,6 +29,41 @@ public class MGRSTile {
 	private Bounds bounds;
 
 	/**
+	 * Create a tile
+	 * 
+	 * @param width
+	 *            tile width
+	 * @param height
+	 *            tile height
+	 * @param x
+	 *            x coordinate
+	 * @param y
+	 *            y coordinate
+	 * @param zoom
+	 *            zoom level
+	 * @return tile
+	 */
+	public static MGRSTile create(int width, int height, int x, int y,
+			int zoom) {
+		return new MGRSTile(width, height, x, y, zoom);
+	}
+
+	/**
+	 * Create a tile
+	 * 
+	 * @param width
+	 *            tile width
+	 * @param height
+	 *            tile height
+	 * @param bounds
+	 *            tile bounds
+	 * @return tile
+	 */
+	public static MGRSTile create(int width, int height, Bounds bounds) {
+		return new MGRSTile(width, height, bounds);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param width
@@ -43,9 +78,23 @@ public class MGRSTile {
 	 *            zoom level
 	 */
 	public MGRSTile(int width, int height, int x, int y, int zoom) {
+		this(width, height, MGRSUtils.getBounds(x, y, zoom));
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param width
+	 *            tile width
+	 * @param height
+	 *            tile height
+	 * @param bounds
+	 *            tile bounds
+	 */
+	public MGRSTile(int width, int height, Bounds bounds) {
 		this.width = width;
 		this.height = height;
-		bounds = MGRSUtils.getBounds(x, y, zoom);
+		this.bounds = bounds;
 	}
 
 	/**
