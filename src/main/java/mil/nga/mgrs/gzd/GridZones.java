@@ -7,6 +7,7 @@ import java.util.Map;
 
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
+import mil.nga.mgrs.features.Bounds;
 
 /**
  * Grid Zones, Longitudinal Strips, and Latitude Bands
@@ -80,6 +81,28 @@ public class GridZones {
 	}
 
 	/**
+	 * Get the west longitude in degrees of the zone number
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return longitude in degrees
+	 */
+	public static double getWestLongitude(int zoneNumber) {
+		return getLongitudinalStrip(zoneNumber).getWest();
+	}
+
+	/**
+	 * Get the east longitude in degrees of the zone number
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return longitude in degrees
+	 */
+	public static double getEastLongitude(int zoneNumber) {
+		return getLongitudinalStrip(zoneNumber).getEast();
+	}
+
+	/**
 	 * Get the latitude band by band letter
 	 * 
 	 * @param bandLetter
@@ -89,6 +112,28 @@ public class GridZones {
 	public static LatitudeBand getLatitudeBand(char bandLetter) {
 		MGRSUtils.validateBandLetter(bandLetter);
 		return bands.get(bandLetter);
+	}
+
+	/**
+	 * Get the south latitude in degrees of the band letter
+	 * 
+	 * @param bandLetter
+	 *            band letter
+	 * @return latitude in degrees
+	 */
+	public static double getSouthLatitude(char bandLetter) {
+		return getLatitudeBand(bandLetter).getSouth();
+	}
+
+	/**
+	 * Get the north latitude in degrees of the band letter
+	 * 
+	 * @param bandLetter
+	 *            band letter
+	 * @return latitude in degrees
+	 */
+	public static double getNorthLatitude(char bandLetter) {
+		return getLatitudeBand(bandLetter).getNorth();
 	}
 
 	/**
@@ -140,7 +185,7 @@ public class GridZones {
 	}
 
 	/**
-	 * Get a zone number range between the western and eastern longitudes
+	 * Get a zone number range between the western and eastern bounds
 	 * 
 	 * @param bounds
 	 *            bounds
@@ -155,9 +200,9 @@ public class GridZones {
 	 * Get a zone number range between the western and eastern longitudes
 	 * 
 	 * @param west
-	 *            western longitude
+	 *            western longitude in degrees
 	 * @param east
-	 *            eastern longitude
+	 *            eastern longitude in degrees
 	 * @return zone number range
 	 */
 	public static ZoneNumberRange getZoneNumberRange(double west, double east) {
@@ -167,11 +212,24 @@ public class GridZones {
 	}
 
 	/**
-	 * Get the zone number of the longitude (between
+	 * Get the zone number of the longitude (degrees between
+	 * {@link MGRSConstants#MIN_LON} and {@link MGRSConstants#MAX_LON}). Eastern
+	 * zone number on borders.
+	 * 
+	 * @param longitude
+	 *            longitude in degrees
+	 * @return zone number
+	 */
+	public static int getZoneNumber(double longitude) {
+		return getZoneNumber(longitude, true);
+	}
+
+	/**
+	 * Get the zone number of the longitude (degrees between
 	 * {@link MGRSConstants#MIN_LON} and {@link MGRSConstants#MAX_LON})
 	 * 
 	 * @param longitude
-	 *            longitude
+	 *            longitude in degrees
 	 * @param eastern
 	 *            true for eastern number on edges, false for western
 	 * @return zone number
@@ -203,7 +261,7 @@ public class GridZones {
 	}
 
 	/**
-	 * Get a band letter range between the southern and northern latitudes
+	 * Get a band letter range between the southern and northern bounds
 	 * 
 	 * @param bounds
 	 *            bounds
@@ -215,12 +273,13 @@ public class GridZones {
 	}
 
 	/**
-	 * Get a band letter range between the southern and northern latitudes
+	 * Get a band letter range between the southern and northern latitudes in
+	 * degrees
 	 * 
 	 * @param south
-	 *            southern latitude
+	 *            southern latitude in degrees
 	 * @param north
-	 *            northern latitude
+	 *            northern latitude in degrees
 	 * @return band letter range
 	 */
 	public static BandLetterRange getBandLetterRange(double south,
@@ -231,11 +290,24 @@ public class GridZones {
 	}
 
 	/**
-	 * Get the band letter of the latitude (between
+	 * Get the band letter of the latitude (degrees between
+	 * {@link MGRSConstants#MIN_LAT} and {@link MGRSConstants#MAX_LAT}).
+	 * Northern band letter on borders.
+	 * 
+	 * @param latitude
+	 *            latitude in degrees
+	 * @return band letter
+	 */
+	public static char getBandLetter(double latitude) {
+		return getBandLetter(latitude, true);
+	}
+
+	/**
+	 * Get the band letter of the latitude (degrees between
 	 * {@link MGRSConstants#MIN_LAT} and {@link MGRSConstants#MAX_LAT})
 	 * 
 	 * @param latitude
-	 *            latitude
+	 *            latitude in degrees
 	 * @param northern
 	 *            true for northern band on edges, false for southern
 	 * @return band letter

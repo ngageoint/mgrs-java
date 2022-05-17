@@ -1,4 +1,4 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.grid;
 
 import java.util.ArrayList;
 import java.util.HashMap;

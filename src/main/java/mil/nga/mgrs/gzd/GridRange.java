@@ -3,6 +3,7 @@ package mil.nga.mgrs.gzd;
 import java.util.Iterator;
 
 import mil.nga.mgrs.MGRSUtils;
+import mil.nga.mgrs.features.Bounds;
 
 /**
  * Grid Range

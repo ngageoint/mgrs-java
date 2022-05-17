@@ -1,5 +1,6 @@
 package mil.nga.mgrs.utm;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 
 import mil.nga.mgrs.MGRS;
@@ -90,6 +91,36 @@ public class UTM {
 	}
 
 	/**
+	 * Format to a UTM string
+	 * 
+	 * @return UTM string
+	 */
+	public String format() {
+
+		StringBuilder value = new StringBuilder();
+
+		DecimalFormat formatter = new DecimalFormat("0");
+
+		value.append(String.format("%02d", zoneNumber));
+		value.append(" ");
+		value.append(hemisphere == Hemisphere.NORTH ? "N" : "S");
+		value.append(" ");
+		value.append(formatter.format(easting));
+		value.append(" ");
+		value.append(formatter.format(northing));
+
+		return value.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return format();
+	}
+
+	/**
 	 * Parse a MGRS value
 	 * 
 	 * @param mgrs
@@ -99,7 +130,7 @@ public class UTM {
 	 *             upon failure to parse MGRS value
 	 */
 	public static UTM parse(String mgrs) throws ParseException {
-		return MGRS.parse(mgrs).utm();
+		return MGRS.parse(mgrs).getUTM();
 	}
 
 	/**
@@ -110,9 +141,7 @@ public class UTM {
 	 * @return UTM
 	 */
 	public static UTM from(Point latLng) {
-		latLng = latLng.toDegrees();
-		int zone = (int) Math.floor(latLng.getLongitude() / 6 + 31);
-		return from(latLng, zone);
+		return from(latLng, latLng.getZoneNumber());
 	}
 
 	/**
@@ -125,8 +154,7 @@ public class UTM {
 	 * @return UTM
 	 */
 	public static UTM from(Point latLng, int zone) {
-		Hemisphere hemisphere = Hemisphere.fromLatitude(latLng.getLatitude());
-		return from(latLng, zone, hemisphere);
+		return from(latLng, zone, latLng.getHemisphere());
 	}
 
 	/**

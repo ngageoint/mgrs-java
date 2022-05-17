@@ -1,4 +1,4 @@
-package mil.nga.mgrs.features;
+package mil.nga.mgrs.tile;
 
 /**
  * Tile Pixel

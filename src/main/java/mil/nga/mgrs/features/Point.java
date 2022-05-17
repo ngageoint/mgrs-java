@@ -3,9 +3,10 @@ package mil.nga.mgrs.features;
 import java.text.ParseException;
 
 import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.MGRSTile;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.gzd.Bounds;
+import mil.nga.mgrs.gzd.GridZones;
+import mil.nga.mgrs.tile.MGRSTile;
+import mil.nga.mgrs.tile.Pixel;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
@@ -308,6 +309,33 @@ public class Point {
 	}
 
 	/**
+	 * Get the point zone number
+	 * 
+	 * @return zone number
+	 */
+	public int getZoneNumber() {
+		return GridZones.getZoneNumber(toDegrees().getLongitude());
+	}
+
+	/**
+	 * Get the point band letter
+	 * 
+	 * @return band letter
+	 */
+	public char getBandLetter() {
+		return GridZones.getBandLetter(toDegrees().getLatitude());
+	}
+
+	/**
+	 * Get the point hemisphere
+	 * 
+	 * @return hemisphere
+	 */
+	public Hemisphere getHemisphere() {
+		return Hemisphere.fromLatitude(latitude);
+	}
+
+	/**
 	 * Create from a Universal Transverse Mercator Projection
 	 * 
 	 * @param utm
@@ -351,7 +379,7 @@ public class Point {
 	 *             upon failure to parse the MGRS value
 	 */
 	public static Point parse(String mgrs) throws ParseException {
-		UTM utm = MGRS.parse(mgrs).utm();
+		UTM utm = MGRS.parse(mgrs).getUTM();
 		return from(utm);
 	}
 

@@ -1,15 +1,18 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.features;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.MGRSTile;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Pixel;
-import mil.nga.mgrs.features.PixelRange;
-import mil.nga.mgrs.features.Point;
-import mil.nga.mgrs.features.Unit;
+import mil.nga.mgrs.gzd.BandLetterRange;
+import mil.nga.mgrs.gzd.GridRange;
+import mil.nga.mgrs.gzd.GridZones;
+import mil.nga.mgrs.gzd.LatitudeBand;
+import mil.nga.mgrs.gzd.LongitudinalStrip;
+import mil.nga.mgrs.gzd.ZoneNumberRange;
+import mil.nga.mgrs.tile.MGRSTile;
+import mil.nga.mgrs.tile.Pixel;
+import mil.nga.mgrs.tile.PixelRange;
 
 /**
  * Zone Bounds

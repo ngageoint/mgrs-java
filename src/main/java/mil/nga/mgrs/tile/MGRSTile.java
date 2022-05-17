@@ -1,9 +1,9 @@
-package mil.nga.mgrs;
+package mil.nga.mgrs.tile;
 
-import mil.nga.mgrs.features.Pixel;
+import mil.nga.mgrs.MGRSUtils;
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.features.Unit;
-import mil.nga.mgrs.gzd.Bounds;
 
 /**
  * Military Grid Reference System Tile

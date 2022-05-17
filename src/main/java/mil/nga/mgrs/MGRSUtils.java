@@ -1,9 +1,9 @@
 package mil.nga.mgrs;
 
-import mil.nga.mgrs.features.Pixel;
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.features.Unit;
-import mil.nga.mgrs.gzd.Bounds;
+import mil.nga.mgrs.tile.Pixel;
 
 /**
  * Military Grid Reference System utilities
@@ -308,7 +308,7 @@ public class MGRSUtils {
 	 * @return name
 	 */
 	public static String getLabelName(int zoneNumber, char bandLetter) {
-		return Integer.toString(zoneNumber) + bandLetter;
+		return String.valueOf(zoneNumber) + bandLetter;
 	}
 
 }

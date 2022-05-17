@@ -1,7 +1,8 @@
-package mil.nga.mgrs;
+package mil.nga.mgrs.gzd;
 
+import mil.nga.mgrs.MGRSUtils;
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
-import mil.nga.mgrs.gzd.Bounds;
 
 /**
  * MGRS Label

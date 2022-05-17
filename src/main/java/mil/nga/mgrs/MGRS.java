@@ -6,197 +6,239 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.gzd.GridZones;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
 /**
- * Created by wnewman on 12/21/17.
+ * Military Grid Reference System Coordinate
+ * 
+ * @author wnewman
+ * @author osbornb
  */
-
 public class MGRS {
 
-	/*
-	 * Latitude bands C..X 8° each, covering 80°S to 84°N
+	/**
+	 * Default easting and northing accuracy
 	 */
-	private static final String latBands = "CDEFGHJKLMNPQRSTUVWXX"; // X is
-																	// repeated
-																	// for
-																	// 80-84°N
+	public static final int DEFAULT_ACCURACY = 4;
 
-	/*
+	/**
 	 * 100km grid square column (‘e’) letters repeat every third zone
 	 */
-	private static final String[] e100kLetters = new String[] { "ABCDEFGH",
+	private static final String[] columnLetters = new String[] { "ABCDEFGH",
 			"JKLMNPQR", "STUVWXYZ" };
 
-	/*
+	/**
 	 * 100km grid square row (‘n’) letters repeat every other zone
 	 */
-	private static final String[] n100kLetters = new String[] {
+	private static final String[] rowLetters = new String[] {
 			"ABCDEFGHJKLMNPQRSTUV", "FGHJKLMNPQRSTUVABCDE" };
 
+	/**
+	 * MGRS string pattern
+	 */
 	private static final Pattern mgrsPattern = Pattern
 			.compile("^(\\d{1,2})([^ABIOYZabioyz])([A-Za-z]{2})([0-9][0-9]+$)");
 
-	private Integer zone;
-	private Character band;
-	private Character e100k;
-	private Character n100k;
-	private Long easting;
-	private Long northing;
+	/**
+	 * Zone number
+	 */
+	private int zone;
 
-	public MGRS(Integer zone, Character band, Character e100k, Character n100k,
-			Long easting, Long northing) {
+	/**
+	 * Band letter
+	 */
+	private char band;
+
+	/**
+	 * Column letter
+	 */
+	private char column;
+
+	/**
+	 * Row letter
+	 */
+	private char row;
+
+	/**
+	 * Easting
+	 */
+	private long easting;
+
+	/**
+	 * Northing
+	 */
+	private long northing;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param zone
+	 *            zone number
+	 * @param band
+	 *            band letter
+	 * @param column
+	 *            column letter
+	 * @param row
+	 *            row letter
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 */
+	public MGRS(int zone, char band, char column, char row, long easting,
+			long northing) {
 		this.zone = zone;
 		this.band = band;
-		this.e100k = e100k;
-		this.n100k = n100k;
+		this.column = column;
+		this.row = row;
 		this.easting = easting;
 		this.northing = northing;
 	}
 
-	public Integer getZone() {
+	/**
+	 * Get the zone number
+	 * 
+	 * @return zone number
+	 */
+	public int getZone() {
 		return zone;
 	}
 
-	public Character getBand() {
+	/**
+	 * Get the band letter
+	 * 
+	 * @return band letter
+	 */
+	public char getBand() {
 		return band;
 	}
 
-	public Character getE100k() {
-		return e100k;
+	/**
+	 * Get the column letter
+	 * 
+	 * @return column letter
+	 */
+	public char getColumn() {
+		return column;
 	}
 
-	public Character getN100k() {
-		return n100k;
+	/**
+	 * Get the row letter
+	 * 
+	 * @return row letter
+	 */
+	public char getRow() {
+		return row;
 	}
 
-	public Long getEasting() {
+	/**
+	 * Get the easting
+	 * 
+	 * @return easting
+	 */
+	public long getEasting() {
 		return easting;
 	}
 
-	public Long getNorthing() {
+	/**
+	 * Get the northing
+	 * 
+	 * @return northing
+	 */
+	public long getNorthing() {
 		return northing;
 	}
 
+	/**
+	 * Get the hemisphere
+	 * 
+	 * @return hemisphere
+	 */
+	public Hemisphere getHemisphere() {
+		return Hemisphere.fromBandLetter(band);
+	}
+
+	/**
+	 * Format to a MGRS string with {@link #DEFAULT_ACCURACY}
+	 * 
+	 * @return MGRS string
+	 */
+	public String format() {
+		return format(DEFAULT_ACCURACY);
+	}
+
+	/**
+	 * Format to a MGRS string with the accuracy
+	 * 
+	 * @param accuracy
+	 *            accuracy
+	 * @return MGRS string
+	 */
 	public String format(int accuracy) {
 		String easting = String.format(Locale.getDefault(), "%05d",
 				this.easting);
 		String northing = String.format(Locale.getDefault(), "%05d",
 				this.northing);
-
-		return zone.toString() + band + e100k + n100k
+		return String.valueOf(zone) + band + column + row
 				+ easting.substring(0, accuracy)
 				+ northing.substring(0, accuracy);
 	}
 
 	/**
-	 * Return whether the given string is valid MGRS string
-	 *
-	 * @param mgrs
-	 *            potential MGRS string.
-	 * @return true if MGRS string is valid, false otherwise.
+	 * Convert to UTM coordinate
+	 * 
+	 * @return UTM
 	 */
-	public static boolean isMGRS(String mgrs) {
-		return mgrsPattern.matcher(mgrs).matches();
+	public UTM getUTM() {
+
+		double easting = getUTMEasting();
+		double northing = getUTMNorthing();
+		Hemisphere hemisphere = getHemisphere();
+
+		return new UTM(zone, hemisphere, easting, northing);
 	}
 
 	/**
-	 * Encodes a latitude/longitude as MGRS string.
-	 *
-	 * @param latLng
-	 *            LatLng An object literal latitude and longitude
-	 * @return MGRS mgrs.
+	 * Get the UTM easting
+	 * 
+	 * @return UTM easting
 	 */
-	public static MGRS from(Point latLng) {
+	public double getUTMEasting() {
 
-		latLng = latLng.toDegrees();
-
-		UTM utm = UTM.from(latLng);
-
-		// grid zones are 8° tall, 0°N is 10th band
-		char band = latBands
-				.charAt((int) Math.floor(latLng.getLatitude() / 8 + 10)); // latitude
-																			// band
-
-		// columns in zone 1 are A-H, zone 2 J-R, zone 3 S-Z, then repeating
-		// every 3rd zone
-		int column = (int) Math.floor(utm.getEasting() / 100000);
-		Character e100k = e100kLetters[(utm.getZoneNumber() - 1) % 3]
-				.charAt(column - 1); // col-1 since 1*100e3 -> A (index 0),
-										// 2*100e3 -> B (index 1), etc.
-
-		// rows in even zones are A-V, in odd zones are F-E
-		int row = (int) Math.floor(utm.getNorthing() / 100000) % 20;
-		Character n100k = n100kLetters[(utm.getZoneNumber() - 1) % 2]
-				.charAt(row);
-
-		// truncate easting/northing to within 100km grid square
-		Long easting = Math.round(utm.getEasting() % 100000);
-		Long northing = Math.round(utm.getNorthing() % 100000);
-
-		return new MGRS(utm.getZoneNumber(), band, e100k, n100k, easting,
-				northing);
-	}
-
-	public static MGRS parse(String mgrs) throws ParseException {
-		Matcher matcher = mgrsPattern.matcher(mgrs);
-		if (!matcher.matches()) {
-			throw new ParseException("Invalid MGRS", 0);
-		}
-
-		int zone = Integer.parseInt(matcher.group(1));
-		char band = matcher.group(2).toUpperCase().charAt(0);
-		Character e100k = matcher.group(3).toUpperCase().charAt(0);
-		Character n100k = matcher.group(3).toUpperCase().charAt(1);
-
-		String numericLocation = matcher.group(4);
-		int precision = numericLocation.length() / 2;
-		String[] numericLocations = { numericLocation.substring(0, precision),
-				numericLocation.substring(precision) };
-
-		// parse easting & northing
-		double multiplier = Math.pow(10.0, 5 - precision);
-		Long easting = new Double(
-				Double.parseDouble(numericLocations[0]) * multiplier)
-						.longValue();
-		Long northing = new Double(
-				Double.parseDouble(numericLocations[1]) * multiplier)
-						.longValue();
-
-		return new MGRS(zone, band, e100k, n100k, easting, northing);
-	}
-
-	public UTM utm() {
 		// get easting specified by e100k
-		double col = e100kLetters[(zone - 1) % 3].indexOf(e100k) + 1; // index+1
-																		// since
-																		// A
-																		// (index
-																		// 0) ->
-																		// 1*100e3,
-																		// B
-																		// (index
-																		// 1) ->
-																		// 2*100e3,
-																		// etc.
-		double e100kNum = col * 100000; // e100k in meters
+		String columnLetters = getColumnLetters(zone);
+		int columnIndex = columnLetters.indexOf(column) + 1;
+		// index+1 since A (index 0) -> 1*100e3, B (index 1) -> 2*100e3, etc.
+		double e100kNum = columnIndex * 100000.0; // e100k in meters
+
+		return e100kNum + easting;
+	}
+
+	/**
+	 * Get the UTM northing
+	 * 
+	 * @return UTM northing
+	 */
+	public double getUTMNorthing() {
 
 		// get northing specified by n100k
-		double row = n100kLetters[(zone - 1) % 2].indexOf(n100k);
-		double n100kNum = row * 100000; // n100k in meters
+		String rowLetters = getRowLetters(zone);
+		int rowIndex = rowLetters.indexOf(row);
+		double n100kNum = rowIndex * 100000.0; // n100k in meters
 
 		// get latitude of (bottom of) band
-		double latBand = (latBands.indexOf(band) - 10) * 8;
+		double latBand = GridZones.getSouthLatitude(band);
 
 		// northing of bottom of band, extended to include entirety of
 		// bottommost 100km square
 		// (100km square boundaries are aligned with 100km UTM northing
 		// intervals)
 
-		double nBand = Math.floor(
-				UTM.from(Point.degrees(0, latBand)).getNorthing() / 100000)
-				* 100000;
+		double latBandNorthing = UTM.from(Point.degrees(0, latBand))
+				.getNorthing();
+		double nBand = Math.floor(latBandNorthing / 100000) * 100000;
 
 		// 100km grid square row letters repeat every 2,000km north; add enough
 		// 2,000km blocks to get
@@ -206,10 +248,88 @@ public class MGRS {
 			n2M += 2000000;
 		}
 
-		Hemisphere hemisphere = Hemisphere.fromBandLetter(band);
+		return n2M + n100kNum + northing;
+	}
 
-		return new UTM(zone, hemisphere, e100kNum + easting,
-				n2M + n100kNum + northing);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return format();
+	}
+
+	/**
+	 * Return whether the given string is valid MGRS string
+	 *
+	 * @param mgrs
+	 *            potential MGRS string
+	 * @return true if MGRS string is valid, false otherwise
+	 */
+	public static boolean isMGRS(String mgrs) {
+		return mgrsPattern.matcher(mgrs).matches();
+	}
+
+	/**
+	 * Encodes a point as a MGRS string
+	 *
+	 * @param latLng
+	 *            LatLng An object literal latitude and longitude
+	 * @return MGRS
+	 */
+	public static MGRS from(Point latLng) {
+
+		latLng = latLng.toDegrees();
+
+		UTM utm = UTM.from(latLng);
+
+		char bandLetter = latLng.getBandLetter();
+
+		char columnLetter = getColumnLetter(utm);
+
+		char rowLetter = getRowLetter(utm);
+
+		// truncate easting/northing to within 100km grid square
+		long easting = Math.round(utm.getEasting() % 100000);
+		long northing = Math.round(utm.getNorthing() % 100000);
+
+		return new MGRS(utm.getZoneNumber(), bandLetter, columnLetter,
+				rowLetter, easting, northing);
+	}
+
+	/**
+	 * Parse a MGRS string
+	 * 
+	 * @param mgrs
+	 *            MGRS string
+	 * @return MGRS
+	 * @throws ParseException
+	 *             upon failure to parse the MGRS string
+	 */
+	public static MGRS parse(String mgrs) throws ParseException {
+		Matcher matcher = mgrsPattern.matcher(mgrs);
+		if (!matcher.matches()) {
+			throw new ParseException("Invalid MGRS: " + mgrs, 0);
+		}
+
+		int zone = Integer.parseInt(matcher.group(1));
+		char band = matcher.group(2).toUpperCase().charAt(0);
+		char column = matcher.group(3).toUpperCase().charAt(0);
+		char row = matcher.group(3).toUpperCase().charAt(1);
+
+		String numericLocation = matcher.group(4);
+		int precision = numericLocation.length() / 2;
+		String[] numericLocations = { numericLocation.substring(0, precision),
+				numericLocation.substring(precision) };
+
+		// parse easting & northing
+		double multiplier = Math.pow(10.0, 5 - precision);
+		long easting = (long) (Double.parseDouble(numericLocations[0])
+				* multiplier);
+		long northing = (long) (Double.parseDouble(numericLocations[1])
+				* multiplier);
+
+		return new MGRS(zone, band, column, row, easting, northing);
 	}
 
 	/**
@@ -225,29 +345,90 @@ public class MGRS {
 	 * @return the two letter 100k designator for the given UTM location.
 	 */
 	public static String get100KId(double easting, double northing,
-			Integer zoneNumber) {
+			int zoneNumber) {
 
+		char columnLetter = getColumnLetter(zoneNumber, easting);
+
+		char rowLetter = getRowLetter(zoneNumber, northing);
+
+		return String.valueOf(columnLetter) + rowLetter;
+	}
+
+	/**
+	 * Get the column letter from the UTM
+	 * 
+	 * @param utm
+	 *            UTM
+	 * @return column letter
+	 */
+	public static char getColumnLetter(UTM utm) {
+		return getColumnLetter(utm.getZoneNumber(), utm.getEasting());
+	}
+
+	/**
+	 * Get the column letter from the zone number and easting
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param easting
+	 *            easting
+	 * @return column letter
+	 */
+	public static char getColumnLetter(int zoneNumber, double easting) {
 		// columns in zone 1 are A-H, zone 2 J-R, zone 3 S-Z, then repeating
 		// every 3rd zone
 		int column = (int) Math.floor(easting / 100000);
-		Character e100k = e100kLetters[(zoneNumber - 1) % 3].charAt(column - 1); // col-1
-																					// since
-																					// 1*100e3
-																					// ->
-																					// A
-																					// (index
-																					// 0),
-																					// 2*100e3
-																					// ->
-																					// B
-																					// (index
-																					// 1),
-																					// etc.
+		String columnLetters = getColumnLetters(zoneNumber);
+		return columnLetters.charAt(column - 1);
+	}
 
+	/**
+	 * Get the row letter from the UTM
+	 * 
+	 * @param utm
+	 *            UTM
+	 * @return row letter
+	 */
+	public static char getRowLetter(UTM utm) {
+		return getRowLetter(utm.getZoneNumber(), utm.getNorthing());
+	}
+
+	/**
+	 * Get the row letter from the zone number and northing
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param northing
+	 *            northing
+	 * @return row letter
+	 */
+	public static char getRowLetter(int zoneNumber, double northing) {
 		// rows in even zones are A-V, in odd zones are F-E
 		int row = (int) Math.floor(northing / 100000) % 20;
-		Character n100k = n100kLetters[(zoneNumber - 1) % 2].charAt(row);
-
-		return e100k.toString() + n100k.toString();
+		String rowLetters = getRowLetters(zoneNumber);
+		return rowLetters.charAt(row);
 	}
+
+	/**
+	 * Get the column letters for the zone number
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return column letters
+	 */
+	private static String getColumnLetters(int zoneNumber) {
+		return columnLetters[(zoneNumber - 1) % 3];
+	}
+
+	/**
+	 * Get the row letters for the zone number
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return row letters
+	 */
+	private static String getRowLetters(int zoneNumber) {
+		return rowLetters[(zoneNumber - 1) % 2];
+	}
+
 }
