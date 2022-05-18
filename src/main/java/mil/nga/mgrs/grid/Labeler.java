@@ -94,7 +94,7 @@ public abstract class Labeler {
 	 * @param enabled
 	 *            enabled flag
 	 */
-	protected void setEnabled(boolean enabled) {
+	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
 
@@ -113,7 +113,7 @@ public abstract class Labeler {
 	 * @param minZoom
 	 *            minimum zoom level
 	 */
-	protected void setMinZoom(int minZoom) {
+	public void setMinZoom(int minZoom) {
 		this.minZoom = minZoom;
 	}
 
@@ -141,7 +141,7 @@ public abstract class Labeler {
 	 * @param maxZoom
 	 *            maximum zoom level
 	 */
-	protected void setMaxZoom(Integer maxZoom) {
+	public void setMaxZoom(Integer maxZoom) {
 		this.maxZoom = maxZoom;
 	}
 

@@ -323,7 +323,7 @@ public class Grid implements Comparable<Grid> {
 	 */
 	public List<Label> getLabels(int zoom, Bounds tileBounds, GridZone zone) {
 		List<Label> labels = null;
-		if (hasLabeler() && labeler.isWithin(zoom)) {
+		if (hasLabeler() && labeler.isEnabled() && labeler.isWithin(zoom)) {
 			labels = labeler.getLabels(tileBounds, getPrecision(), zone);
 		}
 		return labels;
