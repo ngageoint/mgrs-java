@@ -1,4 +1,4 @@
-package mil.nga.mgrs.gzd;
+package mil.nga.mgrs.grid;
 
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;

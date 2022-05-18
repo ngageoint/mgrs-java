@@ -1,5 +1,12 @@
 package mil.nga.mgrs.grid;
 
+import java.util.List;
+
+import mil.nga.mgrs.features.Bounds;
+import mil.nga.mgrs.features.Line;
+import mil.nga.mgrs.gzd.GridZone;
+import mil.nga.mgrs.tile.MGRSTile;
+
 /**
  * Grid
  * 
@@ -29,6 +36,11 @@ public class Grid implements Comparable<Grid> {
 	private Integer maxZoom;
 
 	/**
+	 * Grid labeler
+	 */
+	private Labeler labeler;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param type
@@ -37,7 +49,21 @@ public class Grid implements Comparable<Grid> {
 	 *            minimum zoom level
 	 */
 	protected Grid(GridType type, int minZoom) {
-		this(type, minZoom, null);
+		this(type, minZoom, null, null);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom level
+	 * @param labeler
+	 *            grid labeler
+	 */
+	protected Grid(GridType type, int minZoom, Labeler labeler) {
+		this(type, minZoom, null, labeler);
 	}
 
 	/**
@@ -51,7 +77,24 @@ public class Grid implements Comparable<Grid> {
 	 *            maximum zoom level
 	 */
 	protected Grid(GridType type, int minZoom, Integer maxZoom) {
-		this(type, true, minZoom, maxZoom);
+		this(type, minZoom, maxZoom, null);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom level
+	 * @param maxZoom
+	 *            maximum zoom level
+	 * @param labeler
+	 *            grid labeler
+	 */
+	protected Grid(GridType type, int minZoom, Integer maxZoom,
+			Labeler labeler) {
+		this(type, true, minZoom, maxZoom, labeler);
 	}
 
 	/**
@@ -68,10 +111,30 @@ public class Grid implements Comparable<Grid> {
 	 */
 	protected Grid(GridType type, boolean enabled, int minZoom,
 			Integer maxZoom) {
+		this(type, enabled, minZoom, maxZoom, null);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param enabled
+	 *            enabled grid
+	 * @param minZoom
+	 *            minimum zoom level
+	 * @param maxZoom
+	 *            maximum zoom level
+	 * @param labeler
+	 *            grid labeler
+	 */
+	protected Grid(GridType type, boolean enabled, int minZoom, Integer maxZoom,
+			Labeler labeler) {
 		this.type = type;
 		this.enabled = enabled;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+		this.labeler = labeler;
 	}
 
 	/**
@@ -178,6 +241,92 @@ public class Grid implements Comparable<Grid> {
 	 */
 	public boolean isWithin(int zoom) {
 		return zoom >= minZoom && (maxZoom == null || zoom <= maxZoom);
+	}
+
+	/**
+	 * Get the grid labeler
+	 * 
+	 * @return grid labeler
+	 */
+	public Labeler getLabeler() {
+		return labeler;
+	}
+
+	/**
+	 * Has a grid labeler
+	 * 
+	 * @return true if has a grid labeler
+	 */
+	public boolean hasLabeler() {
+		return labeler != null;
+	}
+
+	/**
+	 * Set the grid labeler
+	 * 
+	 * @param labeler
+	 *            grid labeler
+	 */
+	protected void setLabeler(Labeler labeler) {
+		this.labeler = labeler;
+	}
+
+	/**
+	 * Get the lines for the tile and zone
+	 * 
+	 * @param tile
+	 *            tile
+	 * @param zone
+	 *            grid zone
+	 * @return lines
+	 */
+	public List<Line> getLines(MGRSTile tile, GridZone zone) {
+		return getLines(tile.getBounds(), zone);
+	}
+
+	/**
+	 * Get the lines for the tile bounds and zone
+	 * 
+	 * @param tileBounds
+	 *            tile bounds
+	 * @param zone
+	 *            grid zone
+	 * @return lines
+	 */
+	public List<Line> getLines(Bounds tileBounds, GridZone zone) {
+		return zone.getLines(tileBounds, getPrecision());
+	}
+
+	/**
+	 * Get the labels for the tile and zone
+	 * 
+	 * @param tile
+	 *            tile
+	 * @param zone
+	 *            grid zone
+	 * @return labels
+	 */
+	public List<Label> getLabels(MGRSTile tile, GridZone zone) {
+		return getLabels(tile.getZoom(), tile.getBounds(), zone);
+	}
+
+	/**
+	 * Get the labels for the zoom, tile bounds, and zone
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @param tileBounds
+	 *            tile bounds
+	 * @param zone
+	 *            grid zone
+	 * @return labels
+	 */
+	public List<Label> getLabels(int zoom, Bounds tileBounds, GridZone zone) {
+		List<Label> labels = null;
+		if (hasLabeler() && labeler.isWithin(zoom)) {
+			labels = labeler.getLabels(tileBounds, getPrecision(), zone);
+		}
+		return labels;
 	}
 
 	/**

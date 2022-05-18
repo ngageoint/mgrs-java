@@ -24,6 +24,21 @@ public class MGRSTile {
 	private int height;
 
 	/**
+	 * X coordinate
+	 */
+	private int x;
+
+	/**
+	 * Y coordinate
+	 */
+	private int y;
+
+	/**
+	 * Zoom level
+	 */
+	private int zoom;
+
+	/**
 	 * Bounds
 	 */
 	private Bounds bounds;
@@ -49,21 +64,6 @@ public class MGRSTile {
 	}
 
 	/**
-	 * Create a tile
-	 * 
-	 * @param width
-	 *            tile width
-	 * @param height
-	 *            tile height
-	 * @param bounds
-	 *            tile bounds
-	 * @return tile
-	 */
-	public static MGRSTile create(int width, int height, Bounds bounds) {
-		return new MGRSTile(width, height, bounds);
-	}
-
-	/**
 	 * Constructor
 	 * 
 	 * @param width
@@ -78,23 +78,12 @@ public class MGRSTile {
 	 *            zoom level
 	 */
 	public MGRSTile(int width, int height, int x, int y, int zoom) {
-		this(width, height, MGRSUtils.getBounds(x, y, zoom));
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param width
-	 *            tile width
-	 * @param height
-	 *            tile height
-	 * @param bounds
-	 *            tile bounds
-	 */
-	public MGRSTile(int width, int height, Bounds bounds) {
 		this.width = width;
 		this.height = height;
-		this.bounds = bounds;
+		this.x = x;
+		this.y = y;
+		this.zoom = zoom;
+		this.bounds = MGRSUtils.getBounds(x, y, zoom);
 	}
 
 	/**
@@ -113,6 +102,33 @@ public class MGRSTile {
 	 */
 	public int getHeight() {
 		return height;
+	}
+
+	/**
+	 * Get the x coordinate
+	 * 
+	 * @return x coordinate
+	 */
+	public int getX() {
+		return x;
+	}
+
+	/**
+	 * Get the y coordinate
+	 * 
+	 * @return y coordinate
+	 */
+	public int getY() {
+		return y;
+	}
+
+	/**
+	 * Get the zoom level
+	 * 
+	 * @return zoom level
+	 */
+	public int getZoom() {
+		return zoom;
 	}
 
 	/**

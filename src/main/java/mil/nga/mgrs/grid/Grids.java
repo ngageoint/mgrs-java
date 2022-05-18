@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import mil.nga.mgrs.MGRSConstants;
+import mil.nga.mgrs.gzd.GZDLabeler;
 
 /**
  * Grids
@@ -109,8 +110,9 @@ public class Grids {
 	 *            enable created grids
 	 */
 	private void createGrids(boolean enabled) {
-		createGrid(GridType.GZD, enabled, 0);
-		createGrid(GridType.HUNDRED_KILOMETER, enabled, 5);
+		createGrid(GridType.GZD, enabled, 0, new GZDLabeler(4));
+		createGrid(GridType.HUNDRED_KILOMETER, enabled, 5,
+				new ColumnRowLabeler(6));
 		createGrid(GridType.TEN_KILOMETER, enabled, 9, 11);
 		createGrid(GridType.KILOMETER, enabled, 12, 14);
 		createGrid(GridType.HUNDRED_METER, enabled, 15, 17);
@@ -128,7 +130,24 @@ public class Grids {
 	 *            minimum zoom
 	 */
 	private void createGrid(GridType type, boolean enabled, int minZoom) {
-		createGrid(type, enabled, minZoom, null);
+		createGrid(type, enabled, minZoom, null, null);
+	}
+
+	/**
+	 * Create a grid
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param enabled
+	 *            flag
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param labeler
+	 *            grid labeler
+	 */
+	private void createGrid(GridType type, boolean enabled, int minZoom,
+			Labeler labeler) {
+		createGrid(type, enabled, minZoom, null, labeler);
 	}
 
 	/**
@@ -145,7 +164,26 @@ public class Grids {
 	 */
 	private void createGrid(GridType type, boolean enabled, int minZoom,
 			Integer maxZoom) {
-		grids.put(type, new Grid(type, enabled, minZoom, maxZoom));
+		createGrid(type, enabled, minZoom, maxZoom, null);
+	}
+
+	/**
+	 * Create a grid
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param enabled
+	 *            flag
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param labeler
+	 *            grid labeler
+	 */
+	private void createGrid(GridType type, boolean enabled, int minZoom,
+			Integer maxZoom, Labeler labeler) {
+		grids.put(type, new Grid(type, enabled, minZoom, maxZoom, labeler));
 	}
 
 	/**
