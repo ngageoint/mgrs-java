@@ -1,54 +1,22 @@
 package mil.nga.mgrs.grid;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import mil.nga.mgrs.MGRSConstants;
-
 /**
- * Grid enumeration
+ * Grid
  * 
  * @author wnewman
  * @author osbornb
  */
-public enum Grid {
+public class Grid implements Comparable<Grid> {
 
 	/**
-	 * Ten Meter
+	 * Grid type
 	 */
-	TEN_METER(10, 18, Integer.MAX_VALUE),
+	private final GridType type;
 
 	/**
-	 * Hundred Meter
+	 * Enabled grid
 	 */
-	HUNDRED_METER(100, 15, 17),
-
-	/**
-	 * Kilometer
-	 */
-	KILOMETER(1000, 12, 14),
-
-	/**
-	 * Ten Kilometer
-	 */
-	TEN_KILOMETER(10000, 9, 11),
-
-	/**
-	 * Hundred Kilometer
-	 */
-	HUNDRED_KILOMETER(100000, 5, Integer.MAX_VALUE),
-
-	/**
-	 * Grid Zone Designator
-	 */
-	GZD(0, 0, Integer.MAX_VALUE);
-
-	/**
-	 * Grid precision in meters
-	 */
-	public int precision;
+	private boolean enabled;
 
 	/**
 	 * Minimum zoom level
@@ -58,34 +26,72 @@ public enum Grid {
 	/**
 	 * Maximum zoom level
 	 */
-	private int maxZoom;
+	private Integer maxZoom;
 
 	/**
-	 * Map between zoom levels and grids
+	 * Constructor
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom level
 	 */
-	private static Map<Integer, Grids> grids = new HashMap<>();
-
-	static {
-		// Create zoom level grids
-		for (int zoom = 0; zoom <= MGRSConstants.MAX_MAP_ZOOM_LEVEL; zoom++) {
-			createGrids(zoom);
-		}
+	protected Grid(GridType type, int minZoom) {
+		this(type, minZoom, null);
 	}
 
 	/**
 	 * Constructor
 	 * 
-	 * @param precision
-	 *            precision in meters
+	 * @param type
+	 *            grid type
 	 * @param minZoom
 	 *            minimum zoom level
 	 * @param maxZoom
 	 *            maximum zoom level
 	 */
-	private Grid(int precision, int minZoom, int maxZoom) {
-		this.precision = precision;
+	protected Grid(GridType type, int minZoom, Integer maxZoom) {
+		this(type, true, minZoom, maxZoom);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param enabled
+	 *            enabled grid
+	 * @param minZoom
+	 *            minimum zoom level
+	 * @param maxZoom
+	 *            maximum zoom level
+	 */
+	protected Grid(GridType type, boolean enabled, int minZoom,
+			Integer maxZoom) {
+		this.type = type;
+		this.enabled = enabled;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+	}
+
+	/**
+	 * Get the grid type
+	 * 
+	 * @return grid type
+	 */
+	public GridType getType() {
+		return type;
+	}
+
+	/**
+	 * Is the provided grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return true if the type
+	 */
+	public boolean isType(GridType type) {
+		return this.type == type;
 	}
 
 	/**
@@ -94,7 +100,26 @@ public enum Grid {
 	 * @return precision meters
 	 */
 	public int getPrecision() {
-		return precision;
+		return type.getPrecision();
+	}
+
+	/**
+	 * Is the grid enabled
+	 * 
+	 * @return enabled flag
+	 */
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	/**
+	 * Set the enabled flag
+	 * 
+	 * @param enabled
+	 *            enabled flag
+	 */
+	protected void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	/**
@@ -107,12 +132,41 @@ public enum Grid {
 	}
 
 	/**
+	 * Set the minimum zoom level
+	 * 
+	 * @param minZoom
+	 *            minimum zoom level
+	 */
+	protected void setMinZoom(int minZoom) {
+		this.minZoom = minZoom;
+	}
+
+	/**
 	 * Get the maximum zoom level
 	 * 
 	 * @return maximum zoom level
 	 */
-	public int getMaxZoom() {
+	public Integer getMaxZoom() {
 		return maxZoom;
+	}
+
+	/**
+	 * Has a maximum zoom level
+	 * 
+	 * @return true if has a maximum, false if unbounded
+	 */
+	public boolean hasMaxZoom() {
+		return maxZoom != null;
+	}
+
+	/**
+	 * Set the maximum zoom level
+	 * 
+	 * @param maxZoom
+	 *            maximum zoom level
+	 */
+	protected void setMaxZoom(Integer maxZoom) {
+		this.maxZoom = maxZoom;
 	}
 
 	/**
@@ -123,41 +177,56 @@ public enum Grid {
 	 * @return true if within range
 	 */
 	public boolean isWithin(int zoom) {
-		return zoom >= minZoom && zoom <= maxZoom;
+		return zoom >= minZoom && (maxZoom == null || zoom <= maxZoom);
 	}
 
 	/**
-	 * Get the grids for the zoom level
-	 * 
-	 * @param zoom
-	 *            zoom level
-	 * @return grids
+	 * {@inheritDoc}
 	 */
-	public static Grids getGrids(int zoom) {
-		Grids zoomGrids = grids.get(zoom);
-		if (zoomGrids == null) {
-			zoomGrids = createGrids(zoom);
-		}
-		return zoomGrids;
+	@Override
+	public int compareTo(Grid other) {
+		return other.getPrecisionCompare() - getPrecisionCompare();
 	}
 
 	/**
-	 * Create grids for the zoom level
+	 * Get the precision in meters
 	 * 
-	 * @param zoom
-	 *            zoom level
-	 * @return grids
+	 * @return precision meters
 	 */
-	private static Grids createGrids(int zoom) {
-		List<Grid> gridList = new ArrayList<>();
-		for (Grid grid : Grid.values()) {
-			if (grid.isWithin(zoom)) {
-				gridList.add(grid);
-			}
+	public int getPrecisionCompare() {
+		int precision = getPrecision();
+		if (precision <= 0) {
+			precision = Integer.MAX_VALUE;
 		}
-		Grids zoomGrids = new Grids(zoom, gridList);
-		grids.put(zoom, zoomGrids);
-		return zoomGrids;
+		return precision;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Grid other = (Grid) obj;
+		if (type != other.type)
+			return false;
+		return true;
 	}
 
 }

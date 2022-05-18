@@ -1,36 +1,34 @@
 package mil.nga.mgrs.grid;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Zoom Level Matching Grids
  * 
  * @author osbornb
  */
-public class Grids implements Iterable<Grid> {
+public class ZoomGrids implements Iterable<Grid> {
 
 	/**
 	 * Zoom level
 	 */
-	private int zoom;
+	private final int zoom;
 
 	/**
 	 * Grids
 	 */
-	private List<Grid> grids;
+	private final Set<Grid> grids = new TreeSet<>();
 
 	/**
 	 * Constructor
 	 * 
 	 * @param zoom
 	 *            zoom level
-	 * @param grids
-	 *            grids
 	 */
-	public Grids(int zoom, List<Grid> grids) {
+	public ZoomGrids(int zoom) {
 		this.zoom = zoom;
-		this.grids = grids;
 	}
 
 	/**
@@ -47,7 +45,7 @@ public class Grids implements Iterable<Grid> {
 	 * 
 	 * @return grids
 	 */
-	public List<Grid> getGrids() {
+	public Set<Grid> getGrids() {
 		return grids;
 	}
 
@@ -67,6 +65,28 @@ public class Grids implements Iterable<Grid> {
 	 */
 	public boolean hasGrids() {
 		return !grids.isEmpty();
+	}
+
+	/**
+	 * Add a grid
+	 * 
+	 * @param grid
+	 *            grid
+	 * @return true if added
+	 */
+	public boolean addGrid(Grid grid) {
+		return grids.add(grid);
+	}
+
+	/**
+	 * Remove the grid
+	 * 
+	 * @param grid
+	 *            grid
+	 * @return true if removed
+	 */
+	public boolean removeGrid(Grid grid) {
+		return grids.remove(grid);
 	}
 
 	/**
