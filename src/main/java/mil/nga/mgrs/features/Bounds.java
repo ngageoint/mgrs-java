@@ -566,6 +566,24 @@ public class Bounds {
 	}
 
 	/**
+	 * Get the width
+	 * 
+	 * @return width
+	 */
+	public double getWidth() {
+		return east - west;
+	}
+
+	/**
+	 * Get the height
+	 * 
+	 * @return height
+	 */
+	public double getHeight() {
+		return north - south;
+	}
+
+	/**
 	 * Get the southwest coordinate
 	 * 
 	 * @return southwest coordinate

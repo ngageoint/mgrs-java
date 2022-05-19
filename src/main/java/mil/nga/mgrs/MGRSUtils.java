@@ -134,6 +134,21 @@ public class MGRSUtils {
 	}
 
 	/**
+	 * Get the zoom level of the bounds using the shortest bounds side length
+	 * 
+	 * @param bounds
+	 *            bounds
+	 * @return zoom level
+	 */
+	public static double getZoomLevel(Bounds bounds) {
+		bounds = bounds.toMeters();
+		double tileSize = Math.min(bounds.getWidth(), bounds.getHeight());
+		double tilesPerSide = 2 * MGRSConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
+				/ tileSize;
+		return Math.log(tilesPerSide) / Math.log(2);
+	}
+
+	/**
 	 * Convert a coordinate from a unit to another unit
 	 * 
 	 * @param fromUnit
