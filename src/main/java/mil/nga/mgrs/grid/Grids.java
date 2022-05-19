@@ -762,6 +762,29 @@ public class Grids {
 	}
 
 	/**
+	 * Get the label grid zone edge buffer
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return label buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public double getLabelBuffer(GridType type) {
+		return getGrid(type).getLabelBuffer();
+	}
+
+	/**
+	 * Set the label grid zone edge buffer
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param buffer
+	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public void setLabelBuffer(GridType type, double buffer) {
+		getRequiredLabeler(type).setBuffer(buffer);
+	}
+
+	/**
 	 * Get the labeler for the grid type
 	 * 
 	 * @param type

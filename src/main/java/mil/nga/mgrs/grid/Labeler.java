@@ -28,6 +28,11 @@ public abstract class Labeler {
 	private Integer maxZoom;
 
 	/**
+	 * Grid zone edge buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	private double buffer = 0.05;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param minZoom
@@ -154,6 +159,30 @@ public abstract class Labeler {
 	 */
 	public boolean isWithin(int zoom) {
 		return zoom >= minZoom && (maxZoom == null || zoom <= maxZoom);
+	}
+
+	/**
+	 * Get the grid zone edge buffer
+	 * 
+	 * @return buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public double getBuffer() {
+		return buffer;
+	}
+
+	/**
+	 * Set the grid zone edge buffer
+	 * 
+	 * @param buffer
+	 *            buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public void setBuffer(double buffer) {
+		if (buffer < 0.0 || buffer >= 0.5) {
+			throw new IllegalArgumentException(
+					"Grid zone edge buffer must be >= 0 and < 0.5. buffer: "
+							+ buffer);
+		}
+		this.buffer = buffer;
 	}
 
 }

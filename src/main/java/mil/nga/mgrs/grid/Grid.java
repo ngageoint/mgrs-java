@@ -330,6 +330,15 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
+	 * Get the label grid zone edge buffer
+	 * 
+	 * @return label buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public double getLabelBuffer() {
+		return hasLabeler() ? labeler.getBuffer() : 0.0;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
