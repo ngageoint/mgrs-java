@@ -329,7 +329,7 @@ public class Grid implements Comparable<Grid> {
 	 */
 	@Override
 	public int compareTo(Grid other) {
-		return other.getPrecisionCompare() - getPrecisionCompare();
+		return getPrecisionCompare() - other.getPrecisionCompare();
 	}
 
 	/**
