@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import mil.nga.mgrs.MGRSConstants;
+import mil.nga.mgrs.color.Color;
+import mil.nga.mgrs.color.ColorConstants;
 import mil.nga.mgrs.gzd.GZDLabeler;
 
 /**
@@ -110,13 +112,27 @@ public class Grids {
 	 *            enable created grids
 	 */
 	private void createGrids(boolean enabled) {
-		createGrid(GridType.GZD, enabled, 0, new GZDLabeler(4));
-		createGrid(GridType.HUNDRED_KILOMETER, enabled, 5,
-				new ColumnRowLabeler(6));
-		createGrid(GridType.TEN_KILOMETER, enabled, 9, 11);
-		createGrid(GridType.KILOMETER, enabled, 12, 14);
-		createGrid(GridType.HUNDRED_METER, enabled, 15, 17);
-		createGrid(GridType.TEN_METER, enabled, 18);
+
+		Color gzdColor = new Color(239, 83, 80);
+		Color hundKMColor = new Color(76, 175, 80);
+		Color otherKMColor = new Color(ColorConstants.GRAY);
+
+		final double width = Grid.DEFAULT_WIDTH;
+		final double textSize = Labeler.DEFAULT_TEXT_SIZE;
+
+		Labeler gzdLabels = new GZDLabeler(4, gzdColor.copy(), textSize);
+		Labeler hundKMLabels = new ColumnRowLabeler(6, hundKMColor.copy(),
+				textSize);
+
+		createGrid(GridType.GZD, enabled, 0, gzdColor, width, gzdLabels);
+		createGrid(GridType.HUNDRED_KILOMETER, enabled, 5, hundKMColor, width,
+				hundKMLabels);
+		createGrid(GridType.TEN_KILOMETER, enabled, 9, 11, otherKMColor, width);
+		createGrid(GridType.KILOMETER, enabled, 12, 14, otherKMColor, width);
+		createGrid(GridType.HUNDRED_METER, enabled, 15, 17, otherKMColor,
+				width);
+		createGrid(GridType.TEN_METER, enabled, 18, otherKMColor, width);
+
 	}
 
 	/**
@@ -128,9 +144,12 @@ public class Grids {
 	 *            flag
 	 * @param minZoom
 	 *            minimum zoom
+	 * @param color
+	 *            grid line colors
 	 */
-	private void createGrid(GridType type, boolean enabled, int minZoom) {
-		createGrid(type, enabled, minZoom, null, null);
+	private void createGrid(GridType type, boolean enabled, int minZoom,
+			Color color, double width) {
+		createGrid(type, enabled, minZoom, null, color, width, null);
 	}
 
 	/**
@@ -142,12 +161,14 @@ public class Grids {
 	 *            flag
 	 * @param minZoom
 	 *            minimum zoom
+	 * @param color
+	 *            grid line colors
 	 * @param labeler
 	 *            grid labeler
 	 */
 	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Labeler labeler) {
-		createGrid(type, enabled, minZoom, null, labeler);
+			Color color, double width, Labeler labeler) {
+		createGrid(type, enabled, minZoom, null, color, width, labeler);
 	}
 
 	/**
@@ -161,10 +182,12 @@ public class Grids {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            grid line colors
 	 */
 	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom) {
-		createGrid(type, enabled, minZoom, maxZoom, null);
+			Integer maxZoom, Color color, double width) {
+		createGrid(type, enabled, minZoom, maxZoom, color, width, null);
 	}
 
 	/**
@@ -178,12 +201,39 @@ public class Grids {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            grid line colors
 	 * @param labeler
 	 *            grid labeler
 	 */
 	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom, Labeler labeler) {
-		grids.put(type, new Grid(type, enabled, minZoom, maxZoom, labeler));
+			Integer maxZoom, Color color, double width, Labeler labeler) {
+		grids.put(type, newGrid(type, enabled, minZoom, maxZoom, color.copy(),
+				width, labeler));
+	}
+
+	/**
+	 * Create a new grid, override to create a specialized grid
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param enabled
+	 *            flag
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            grid line colors
+	 * @param width
+	 *            grid line width
+	 * @param labeler
+	 *            grid labeler
+	 * @return grid
+	 */
+	protected Grid newGrid(GridType type, boolean enabled, int minZoom,
+			Integer maxZoom, Color color, double width, Labeler labeler) {
+		return new Grid(type, enabled, minZoom, maxZoom, color, width, labeler);
 	}
 
 	/**

@@ -2,6 +2,7 @@ package mil.nga.mgrs.grid;
 
 import java.util.List;
 
+import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.gzd.GridZone;
@@ -14,6 +15,11 @@ import mil.nga.mgrs.tile.MGRSTile;
  * @author osbornb
  */
 public class Grid implements Comparable<Grid> {
+
+	/**
+	 * Default line width
+	 */
+	public static final double DEFAULT_WIDTH = 2.0;
 
 	/**
 	 * Grid type
@@ -36,6 +42,16 @@ public class Grid implements Comparable<Grid> {
 	private Integer maxZoom;
 
 	/**
+	 * Grid line color
+	 */
+	private Color color;
+
+	/**
+	 * Grid line width
+	 */
+	private double width;
+
+	/**
 	 * Grid labeler
 	 */
 	private Labeler labeler;
@@ -45,95 +61,27 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @param type
 	 *            grid type
-	 * @param minZoom
-	 *            minimum zoom level
-	 */
-	protected Grid(GridType type, int minZoom) {
-		this(type, minZoom, null, null);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param minZoom
-	 *            minimum zoom level
-	 * @param labeler
-	 *            grid labeler
-	 */
-	protected Grid(GridType type, int minZoom, Labeler labeler) {
-		this(type, minZoom, null, labeler);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param minZoom
-	 *            minimum zoom level
-	 * @param maxZoom
-	 *            maximum zoom level
-	 */
-	protected Grid(GridType type, int minZoom, Integer maxZoom) {
-		this(type, minZoom, maxZoom, null);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param minZoom
-	 *            minimum zoom level
-	 * @param maxZoom
-	 *            maximum zoom level
-	 * @param labeler
-	 *            grid labeler
-	 */
-	protected Grid(GridType type, int minZoom, Integer maxZoom,
-			Labeler labeler) {
-		this(type, true, minZoom, maxZoom, labeler);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type
-	 *            grid type
 	 * @param enabled
 	 *            enabled grid
 	 * @param minZoom
 	 *            minimum zoom level
 	 * @param maxZoom
 	 *            maximum zoom level
-	 */
-	protected Grid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom) {
-		this(type, enabled, minZoom, maxZoom, null);
-	}
-
-	/**
-	 * Constructor
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param enabled
-	 *            enabled grid
-	 * @param minZoom
-	 *            minimum zoom level
-	 * @param maxZoom
-	 *            maximum zoom level
+	 * @param color
+	 *            grid line color
+	 * @param width
+	 *            grid line width
 	 * @param labeler
 	 *            grid labeler
 	 */
 	protected Grid(GridType type, boolean enabled, int minZoom, Integer maxZoom,
-			Labeler labeler) {
+			Color color, double width, Labeler labeler) {
 		this.type = type;
 		this.enabled = enabled;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+		this.color = color;
+		this.width = width;
 		this.labeler = labeler;
 	}
 
@@ -241,6 +189,44 @@ public class Grid implements Comparable<Grid> {
 	 */
 	public boolean isWithin(int zoom) {
 		return zoom >= minZoom && (maxZoom == null || zoom <= maxZoom);
+	}
+
+	/**
+	 * Get the grid line color
+	 * 
+	 * @return grid line color
+	 */
+	public Color getColor() {
+		return color;
+	}
+
+	/**
+	 * Set the grid line color
+	 * 
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	/**
+	 * Get the grid line width
+	 * 
+	 * @return grid line width
+	 */
+	public double getWidth() {
+		return width;
+	}
+
+	/**
+	 * Set the grid line width
+	 * 
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(double width) {
+		this.width = width;
 	}
 
 	/**

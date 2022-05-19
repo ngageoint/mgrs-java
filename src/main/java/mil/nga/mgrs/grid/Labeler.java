@@ -2,6 +2,7 @@ package mil.nga.mgrs.grid;
 
 import java.util.List;
 
+import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.gzd.GridZone;
 
@@ -11,6 +12,11 @@ import mil.nga.mgrs.gzd.GridZone;
  * @author osbornb
  */
 public abstract class Labeler {
+
+	/**
+	 * Default text size
+	 */
+	public static final double DEFAULT_TEXT_SIZE = 24.0;
 
 	/**
 	 * Enabled labeler
@@ -28,6 +34,16 @@ public abstract class Labeler {
 	private Integer maxZoom;
 
 	/**
+	 * Label color
+	 */
+	private Color color;
+
+	/**
+	 * Label text size
+	 */
+	private double textSize;
+
+	/**
 	 * Grid zone edge buffer (greater than or equal to 0.0 and less than 0.5)
 	 */
 	private double buffer = 0.05;
@@ -37,9 +53,25 @@ public abstract class Labeler {
 	 * 
 	 * @param minZoom
 	 *            minimum zoom
+	 * @param color
+	 *            label color
 	 */
-	public Labeler(int minZoom) {
-		this(minZoom, null);
+	public Labeler(int minZoom, Color color) {
+		this(minZoom, color, DEFAULT_TEXT_SIZE);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public Labeler(int minZoom, Color color, double textSize) {
+		this(minZoom, null, color, textSize);
 	}
 
 	/**
@@ -49,9 +81,27 @@ public abstract class Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public Labeler(int minZoom, Integer maxZoom) {
-		this(true, minZoom, maxZoom);
+	public Labeler(int minZoom, Integer maxZoom, Color color) {
+		this(minZoom, maxZoom, color, DEFAULT_TEXT_SIZE);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public Labeler(int minZoom, Integer maxZoom, Color color, double textSize) {
+		this(true, minZoom, maxZoom, color, textSize);
 	}
 
 	/**
@@ -63,11 +113,34 @@ public abstract class Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public Labeler(boolean enabled, int minZoom, Integer maxZoom) {
+	public Labeler(boolean enabled, int minZoom, Integer maxZoom, Color color) {
+		this(enabled, minZoom, maxZoom, color, DEFAULT_TEXT_SIZE);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param enabled
+	 *            enabled labeler
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public Labeler(boolean enabled, int minZoom, Integer maxZoom, Color color,
+			double textSize) {
 		this.enabled = enabled;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+		this.color = color;
+		this.textSize = textSize;
 	}
 
 	/**
@@ -159,6 +232,44 @@ public abstract class Labeler {
 	 */
 	public boolean isWithin(int zoom) {
 		return zoom >= minZoom && (maxZoom == null || zoom <= maxZoom);
+	}
+
+	/**
+	 * Get the label color
+	 * 
+	 * @return label color
+	 */
+	public Color getColor() {
+		return color;
+	}
+
+	/**
+	 * Set the label color
+	 * 
+	 * @param color
+	 *            label color
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	/**
+	 * Get the label text size
+	 * 
+	 * @return label text size
+	 */
+	public double getTextSize() {
+		return textSize;
+	}
+
+	/**
+	 * Set the label text size
+	 * 
+	 * @param textSize
+	 *            label text size
+	 */
+	public void setTextSize(double textSize) {
+		this.textSize = textSize;
 	}
 
 	/**

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.mgrs.MGRS;
+import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GridZone;
@@ -22,9 +23,25 @@ public class ColumnRowLabeler extends Labeler {
 	 * 
 	 * @param minZoom
 	 *            minimum zoom
+	 * @param color
+	 *            label color
 	 */
-	public ColumnRowLabeler(int minZoom) {
-		super(minZoom);
+	public ColumnRowLabeler(int minZoom, Color color) {
+		super(minZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public ColumnRowLabeler(int minZoom, Color color, double textSize) {
+		super(minZoom, color, textSize);
 	}
 
 	/**
@@ -34,9 +51,28 @@ public class ColumnRowLabeler extends Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public ColumnRowLabeler(int minZoom, Integer maxZoom) {
-		super(minZoom, maxZoom);
+	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color) {
+		super(minZoom, maxZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color,
+			double textSize) {
+		super(minZoom, maxZoom, color, textSize);
 	}
 
 	/**
@@ -48,9 +84,31 @@ public class ColumnRowLabeler extends Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom) {
-		super(enabled, minZoom, maxZoom);
+	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+			Color color) {
+		super(enabled, minZoom, maxZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param enabled
+	 *            enabled labeler
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+			Color color, double textSize) {
+		super(enabled, minZoom, maxZoom, color, textSize);
 	}
 
 	/**

@@ -3,6 +3,7 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.grid.Label;
 import mil.nga.mgrs.grid.Labeler;
@@ -19,9 +20,25 @@ public class GZDLabeler extends Labeler {
 	 * 
 	 * @param minZoom
 	 *            minimum zoom
+	 * @param color
+	 *            label color
 	 */
-	public GZDLabeler(int minZoom) {
-		super(minZoom);
+	public GZDLabeler(int minZoom, Color color) {
+		super(minZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public GZDLabeler(int minZoom, Color color, double textSize) {
+		super(minZoom, color, textSize);
 	}
 
 	/**
@@ -31,9 +48,28 @@ public class GZDLabeler extends Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public GZDLabeler(int minZoom, Integer maxZoom) {
-		super(minZoom, maxZoom);
+	public GZDLabeler(int minZoom, Integer maxZoom, Color color) {
+		super(minZoom, maxZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public GZDLabeler(int minZoom, Integer maxZoom, Color color,
+			double textSize) {
+		super(minZoom, maxZoom, color, textSize);
 	}
 
 	/**
@@ -45,9 +81,31 @@ public class GZDLabeler extends Labeler {
 	 *            minimum zoom
 	 * @param maxZoom
 	 *            maximum zoom
+	 * @param color
+	 *            label color
 	 */
-	public GZDLabeler(boolean enabled, int minZoom, Integer maxZoom) {
-		super(enabled, minZoom, maxZoom);
+	public GZDLabeler(boolean enabled, int minZoom, Integer maxZoom,
+			Color color) {
+		super(enabled, minZoom, maxZoom, color);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param enabled
+	 *            enabled labeler
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 */
+	public GZDLabeler(boolean enabled, int minZoom, Integer maxZoom,
+			Color color, double textSize) {
+		super(enabled, minZoom, maxZoom, color, textSize);
 	}
 
 	/**
