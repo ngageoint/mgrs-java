@@ -93,7 +93,10 @@ public class ColumnRowLabeler extends Labeler {
 				double newEasting = easting + precision;
 
 				// Draw cell name
-				labels.add(getLabel(precision, zone, easting, northing));
+				Label label = getLabel(precision, zone, easting, northing);
+				if (label != null) {
+					labels.add(label);
+				}
 
 				easting = newEasting;
 			}
@@ -118,9 +121,10 @@ public class ColumnRowLabeler extends Labeler {
 	private Label getLabel(int precision, GridZone zone, double easting,
 			double northing) {
 
+		Label label = null;
+
 		Bounds bounds = zone.getBounds();
 		int zoneNumber = zone.getNumber();
-		char bandLetter = zone.getLetter();
 		Hemisphere hemisphere = zone.getHemisphere();
 
 		UTM lowerLeftUTM = UTM.from(bounds.getSouthwest(), zoneNumber,
@@ -173,10 +177,6 @@ public class ColumnRowLabeler extends Labeler {
 			newEasting = utm.getEasting();
 		}
 
-		String id = MGRS.get100KId(centerEasting, centerNorthing, zoneNumber);
-		Point center = Point.from(
-				new UTM(zoneNumber, hemisphere, centerEasting, centerNorthing));
-
 		Point l1 = Point
 				.from(new UTM(zoneNumber, hemisphere, easting, newNorthing));
 		Point l2 = Point
@@ -192,10 +192,21 @@ public class ColumnRowLabeler extends Labeler {
 		double minLongitude = Math.max(l1.getLongitude(), l2.getLongitude());
 		double maxLongitude = Math.min(l3.getLongitude(), l4.getLongitude());
 
-		Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
-				maxLongitude, maxLatitude);
+		if (minLongitude <= maxLongitude && minLatitude <= maxLatitude) {
 
-		return new Label(id, center, labelBounds, zoneNumber, bandLetter);
+			String id = MGRS.get100KId(centerEasting, centerNorthing,
+					zoneNumber);
+			Point center = Point.from(new UTM(zoneNumber, hemisphere,
+					centerEasting, centerNorthing));
+
+			Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
+					maxLongitude, maxLatitude);
+
+			label = new Label(id, center, labelBounds, zoneNumber,
+					zone.getLetter());
+		}
+
+		return label;
 	}
 
 }
