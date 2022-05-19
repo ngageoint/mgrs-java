@@ -380,6 +380,17 @@ public class Grids {
 	}
 
 	/**
+	 * Is the grid type enabled
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return true if enabled
+	 */
+	public boolean isEnabled(GridType type) {
+		return getGrid(type).isEnabled();
+	}
+
+	/**
 	 * Enable the grid type
 	 * 
 	 * @param type
@@ -533,6 +544,11 @@ public class Grids {
 	 */
 	public void setZoomRange(Grid grid, int minZoom, Integer maxZoom) {
 
+		if (maxZoom != null && maxZoom < minZoom) {
+			throw new IllegalArgumentException("Min zoom '" + minZoom
+					+ "' can not be larger than max zoom '" + maxZoom + "'");
+		}
+
 		// All grids zoom range
 		final int allGridsMin = zoomGrids.firstKey();
 		final int allGridsMax = zoomGrids.lastKey();
@@ -621,6 +637,144 @@ public class Grids {
 		if (grids != null) {
 			grids.removeGrid(grid);
 		}
+	}
+
+	/**
+	 * Get the labeler for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return labeler or null
+	 */
+	public Labeler getLabeler(GridType type) {
+		return getGrid(type).getLabeler();
+	}
+
+	/**
+	 * Has a labeler for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return true if has labeler
+	 */
+	public boolean hasLabeler(GridType type) {
+		return getGrid(type).hasLabeler();
+	}
+
+	/**
+	 * Set the labeler for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param labeler
+	 *            labeler
+	 */
+	public void setLabeler(GridType type, Labeler labeler) {
+		getGrid(type).setLabeler(labeler);
+	}
+
+	/**
+	 * Is a labeler enabled for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return true if labeler enabled
+	 */
+	public boolean isLabelerEnabled(GridType type) {
+		Labeler labeler = getLabeler(type);
+		return labeler != null && labeler.isEnabled();
+	}
+
+	/**
+	 * Enable the grid type labeler
+	 * 
+	 * @param type
+	 *            grid type
+	 */
+	public void enableLabeler(GridType type) {
+		getRequiredLabeler(type).setEnabled(true);
+	}
+
+	/**
+	 * Disable the grid type labeler
+	 * 
+	 * @param type
+	 *            grid type
+	 */
+	public void disableLabeler(GridType type) {
+		Labeler labeler = getLabeler(type);
+		if (labeler != null) {
+			labeler.setEnabled(false);
+		}
+	}
+
+	/**
+	 * Set the grid minimum zoom
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom
+	 */
+	public void setLabelMinZoom(GridType type, int minZoom) {
+		Labeler labeler = getRequiredLabeler(type);
+		labeler.setMinZoom(minZoom);
+		Integer maxZoom = labeler.getMaxZoom();
+		if (maxZoom != null && maxZoom < minZoom) {
+			labeler.setMaxZoom(minZoom);
+		}
+	}
+
+	/**
+	 * Set the grid maximum zoom
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param maxZoom
+	 *            maximum zoom
+	 */
+	public void setLabelMaxZoom(GridType type, Integer maxZoom) {
+		Labeler labeler = getRequiredLabeler(type);
+		labeler.setMaxZoom(maxZoom);
+		if (maxZoom != null && labeler.getMinZoom() > maxZoom) {
+			labeler.setMinZoom(maxZoom);
+		}
+	}
+
+	/**
+	 * Set the grid zoom range
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 */
+	public void setLabelZoomRange(GridType type, int minZoom, Integer maxZoom) {
+		Labeler labeler = getRequiredLabeler(type);
+		if (maxZoom != null && maxZoom < minZoom) {
+			throw new IllegalArgumentException("Min zoom '" + minZoom
+					+ "' can not be larger than max zoom '" + maxZoom + "'");
+		}
+		labeler.setMinZoom(minZoom);
+		labeler.setMaxZoom(maxZoom);
+	}
+
+	/**
+	 * Get the labeler for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return labeler or null
+	 */
+	private Labeler getRequiredLabeler(GridType type) {
+		Labeler labeler = getLabeler(type);
+		if (labeler == null) {
+			throw new IllegalStateException(
+					"Grid type does not have a labeler: " + type);
+		}
+		return labeler;
 	}
 
 }
