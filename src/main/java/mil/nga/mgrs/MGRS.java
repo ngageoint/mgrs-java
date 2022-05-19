@@ -333,8 +333,8 @@ public class MGRS {
 	}
 
 	/**
-	 * Get the two letter 100k designator for a given UTM easting, northing and
-	 * zone number value.
+	 * Get the two letter column and row 100k designator for a given UTM
+	 * easting, northing and zone number value
 	 *
 	 * @param easting
 	 *            easting
@@ -342,9 +342,10 @@ public class MGRS {
 	 *            northing
 	 * @param zoneNumber
 	 *            zone number
-	 * @return the two letter 100k designator for the given UTM location.
+	 * @return the two letter column and row 100k designator for the given UTM
+	 *         location
 	 */
-	public static String get100KId(double easting, double northing,
+	public static String getColumnRowId(double easting, double northing,
 			int zoneNumber) {
 
 		char columnLetter = getColumnLetter(zoneNumber, easting);

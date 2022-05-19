@@ -194,7 +194,7 @@ public class ColumnRowLabeler extends Labeler {
 
 		if (minLongitude <= maxLongitude && minLatitude <= maxLatitude) {
 
-			String id = MGRS.get100KId(centerEasting, centerNorthing,
+			String id = MGRS.getColumnRowId(centerEasting, centerNorthing,
 					zoneNumber);
 			Point center = Point.from(new UTM(zoneNumber, hemisphere,
 					centerEasting, centerNorthing));
