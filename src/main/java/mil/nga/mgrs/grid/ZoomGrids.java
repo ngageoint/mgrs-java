@@ -1,7 +1,6 @@
 package mil.nga.mgrs.grid;
 
 import java.util.Iterator;
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -19,7 +18,7 @@ public class ZoomGrids implements Iterable<Grid> {
 	/**
 	 * Grids
 	 */
-	private final Set<Grid> grids = new TreeSet<>();
+	private final TreeSet<Grid> grids = new TreeSet<>();
 
 	/**
 	 * Constructor
@@ -45,7 +44,7 @@ public class ZoomGrids implements Iterable<Grid> {
 	 * 
 	 * @return grids
 	 */
-	public Set<Grid> getGrids() {
+	public TreeSet<Grid> getGrids() {
 		return grids;
 	}
 
@@ -87,6 +86,19 @@ public class ZoomGrids implements Iterable<Grid> {
 	 */
 	public boolean removeGrid(Grid grid) {
 		return grids.remove(grid);
+	}
+
+	/**
+	 * Get the grid type precision
+	 * 
+	 * @return grid type precision
+	 */
+	public GridType getPrecision() {
+		GridType type = null;
+		if (hasGrids()) {
+			type = grids.first().getType();
+		}
+		return type;
 	}
 
 	/**

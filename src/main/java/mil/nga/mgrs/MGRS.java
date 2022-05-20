@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZones;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
@@ -17,11 +18,6 @@ import mil.nga.mgrs.utm.UTM;
  * @author osbornb
  */
 public class MGRS {
-
-	/**
-	 * Default easting and northing accuracy
-	 */
-	public static final int DEFAULT_ACCURACY = 5;
 
 	/**
 	 * 100km grid square column (‘e’) letters repeat every third zone
@@ -161,29 +157,53 @@ public class MGRS {
 	}
 
 	/**
-	 * Format to a MGRS string with {@link #DEFAULT_ACCURACY}
+	 * Get the MGRS coordinate with one meter precision
 	 * 
-	 * @return MGRS string
+	 * @return MGRS coordinate
 	 */
-	public String format() {
-		return format(DEFAULT_ACCURACY);
+	public String coordinate() {
+		return coordinate(GridType.METER);
 	}
 
 	/**
-	 * Format to a MGRS string with the accuracy
+	 * Get the MGRS coordinate with specified grid precision
 	 * 
-	 * @param accuracy
-	 *            accuracy
-	 * @return MGRS string
+	 * @param type
+	 *            grid type precision
+	 * @return MGRS coordinate
 	 */
-	public String format(int accuracy) {
-		String easting = String.format(Locale.getDefault(), "%05d",
-				this.easting);
-		String northing = String.format(Locale.getDefault(), "%05d",
-				this.northing);
-		return String.valueOf(zone) + band + column + row
-				+ easting.substring(0, accuracy)
-				+ northing.substring(0, accuracy);
+	public String coordinate(GridType type) {
+
+		StringBuilder mgrs = new StringBuilder();
+
+		if (type != null) {
+
+			mgrs.append(zone);
+			mgrs.append(band);
+
+			if (type != GridType.GZD) {
+
+				mgrs.append(column);
+				mgrs.append(row);
+
+				if (type != GridType.HUNDRED_KILOMETER) {
+
+					int accuracy = 5 - (int) Math.log10(type.getPrecision());
+
+					String easting = String.format(Locale.getDefault(), "%05d",
+							this.easting);
+					String northing = String.format(Locale.getDefault(), "%05d",
+							this.northing);
+
+					mgrs.append(easting.substring(0, accuracy));
+					mgrs.append(northing.substring(0, accuracy));
+				}
+
+			}
+
+		}
+
+		return mgrs.toString();
 	}
 
 	/**
@@ -256,7 +276,7 @@ public class MGRS {
 	 */
 	@Override
 	public String toString() {
-		return format();
+		return coordinate();
 	}
 
 	/**

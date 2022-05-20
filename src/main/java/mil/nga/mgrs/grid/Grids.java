@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.color.Color;
+import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GZDLabeler;
 
 /**
@@ -287,6 +289,68 @@ public class Grids {
 		}
 		zoomGrids.put(zoom, zoomLevelGrids);
 		return zoomLevelGrids;
+	}
+
+	/**
+	 * Get the grid precision for the zoom level
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @return grid type precision
+	 */
+	public GridType getPrecision(int zoom) {
+		return getGrids(zoom).getPrecision();
+	}
+
+	/**
+	 * Get the Military Grid Reference System coordinate for the point in one
+	 * meter precision
+	 * 
+	 * @param point
+	 *            point
+	 * @return MGRS coordinate
+	 */
+	public String getCoordinate(Point point) {
+		return getMGRS(point).coordinate();
+	}
+
+	/**
+	 * Get the Military Grid Reference System coordinate for the point in the
+	 * zoom level precision
+	 * 
+	 * @param point
+	 *            point
+	 * @param zoom
+	 *            zoom level precision
+	 * @return MGRS coordinate
+	 */
+	public String getCoordinate(Point point, int zoom) {
+		return getCoordinate(point, getPrecision(zoom));
+	}
+
+	/**
+	 * Get the Military Grid Reference System coordinate for the point in the
+	 * grid type precision
+	 * 
+	 * @param point
+	 *            point
+	 * @param type
+	 *            grid type precision
+	 * @return MGRS coordinate
+	 */
+	public String getCoordinate(Point point, GridType type) {
+		return getMGRS(point).coordinate(type);
+	}
+
+	/**
+	 * Get the Military Grid Reference System for the point
+	 * 
+	 * @param point
+	 *            point
+	 * @return MGRS
+	 */
+	public MGRS getMGRS(Point point) {
+		return MGRS.from(point);
 	}
 
 	/**

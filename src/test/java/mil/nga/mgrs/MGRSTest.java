@@ -6,6 +6,7 @@ import java.text.ParseException;
 
 import org.junit.Test;
 
+import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.utm.UTM;
 
 /**
@@ -28,7 +29,7 @@ public class MGRSTest {
 		String utmValue = "33 N 474590 8643590";
 
 		MGRS mgrs = MGRS.parse(mgrsValue);
-		assertEquals(mgrsValue, mgrs.format(4));
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.TEN_METER));
 
 		UTM utm = mgrs.getUTM();
 		assertEquals(utmValue, utm.toString());

@@ -339,7 +339,7 @@ public class Grid implements Comparable<Grid> {
 	 */
 	public int getPrecisionCompare() {
 		int precision = getPrecision();
-		if (precision <= 0) {
+		if (precision <= GridType.GZD.getPrecision()) {
 			precision = Integer.MAX_VALUE;
 		}
 		return precision;
