@@ -28,9 +28,18 @@ public class MGRSTest {
 		String utmValue = "33 N 474590 8643590";
 
 		MGRS mgrs = MGRS.parse(mgrsValue);
-		assertEquals(mgrsValue, mgrs.toString());
+		assertEquals(mgrsValue, mgrs.format(4));
 
 		UTM utm = mgrs.getUTM();
+		assertEquals(utmValue, utm.toString());
+
+		mgrsValue = "33X VG 74596 43594";
+		utmValue = "33 N 474596 8643594";
+
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(mgrsValue.replaceAll("\\s", ""), mgrs.toString());
+
+		utm = mgrs.getUTM();
 		assertEquals(utmValue, utm.toString());
 
 	}

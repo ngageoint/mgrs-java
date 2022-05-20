@@ -21,7 +21,7 @@ public class MGRS {
 	/**
 	 * Default easting and northing accuracy
 	 */
-	public static final int DEFAULT_ACCURACY = 4;
+	public static final int DEFAULT_ACCURACY = 5;
 
 	/**
 	 * 100km grid square column (‘e’) letters repeat every third zone
@@ -307,7 +307,7 @@ public class MGRS {
 	 *             upon failure to parse the MGRS string
 	 */
 	public static MGRS parse(String mgrs) throws ParseException {
-		Matcher matcher = mgrsPattern.matcher(mgrs);
+		Matcher matcher = mgrsPattern.matcher(mgrs.replaceAll("\\s", ""));
 		if (!matcher.matches()) {
 			throw new ParseException("Invalid MGRS: " + mgrs, 0);
 		}
