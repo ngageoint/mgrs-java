@@ -10,7 +10,6 @@ import java.util.TreeMap;
 
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.color.ColorConstants;
 import mil.nga.mgrs.gzd.GZDLabeler;
 
 /**
@@ -113,9 +112,9 @@ public class Grids {
 	 */
 	private void createGrids(boolean enabled) {
 
-		Color gzdColor = new Color(239, 83, 80);
-		Color hundKMColor = new Color(76, 175, 80);
-		Color otherKMColor = new Color(ColorConstants.GRAY);
+		Color gzdColor = Color.color(239, 83, 80);
+		Color hundKMColor = Color.color(76, 175, 80);
+		Color otherKMColor = Color.gray();
 
 		final double width = Grid.DEFAULT_WIDTH;
 		final double textSize = Labeler.DEFAULT_TEXT_SIZE;
@@ -690,6 +689,102 @@ public class Grids {
 	}
 
 	/**
+	 * Set all grid line colors
+	 * 
+	 * @param color
+	 *            grid line color
+	 */
+	public void setAllColors(Color color) {
+		setColor(color, GridType.values());
+	}
+
+	/**
+	 * Set the grid line color for the grid types
+	 * 
+	 * @param color
+	 *            grid line color
+	 * @param types
+	 *            grid types
+	 */
+	public void setColor(Color color, GridType... types) {
+		setColor(color, Arrays.asList(types));
+	}
+
+	/**
+	 * Set the grid line color for the grid types
+	 * 
+	 * @param color
+	 *            grid line color
+	 * @param types
+	 *            grid types
+	 */
+	public void setColor(Color color, Collection<GridType> types) {
+		for (GridType type : types) {
+			setColor(type, color);
+		}
+	}
+
+	/**
+	 * Set the grid line color for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(GridType type, Color color) {
+		getGrid(type).setColor(color);
+	}
+
+	/**
+	 * Set all grid line widths
+	 * 
+	 * @param width
+	 *            grid line width
+	 */
+	public void setAllWidths(double width) {
+		setWidth(width, GridType.values());
+	}
+
+	/**
+	 * Set the grid line width for the grid types
+	 * 
+	 * @param width
+	 *            grid line width
+	 * @param types
+	 *            grid types
+	 */
+	public void setWidth(double width, GridType... types) {
+		setWidth(width, Arrays.asList(types));
+	}
+
+	/**
+	 * Set the grid line width for the grid types
+	 * 
+	 * @param width
+	 *            grid line width
+	 * @param types
+	 *            grid types
+	 */
+	public void setWidth(double width, Collection<GridType> types) {
+		for (GridType type : types) {
+			setWidth(type, width);
+		}
+	}
+
+	/**
+	 * Set the grid line width for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(GridType type, double width) {
+		getGrid(type).setWidth(width);
+	}
+
+	/**
 	 * Get the labeler for the grid type
 	 * 
 	 * @param type
@@ -721,6 +816,69 @@ public class Grids {
 	 */
 	public void setLabeler(GridType type, Labeler labeler) {
 		getGrid(type).setLabeler(labeler);
+	}
+
+	/**
+	 * Enable all grid labelers
+	 */
+	public void enableAllLabelers() {
+		for (Grid grid : grids.values()) {
+			Labeler labeler = grid.getLabeler();
+			if (labeler != null) {
+				labeler.setEnabled(true);
+			}
+		}
+	}
+
+	/**
+	 * Disable all grid labelers
+	 */
+	public void disableAllLabelers() {
+		disableLabelers(GridType.values());
+	}
+
+	/**
+	 * Enable the labelers for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void enableLabelers(GridType... types) {
+		enableLabelers(Arrays.asList(types));
+	}
+
+	/**
+	 * Enable the labelers for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void enableLabelers(Collection<GridType> types) {
+		for (GridType type : types) {
+			enableLabeler(type);
+		}
+	}
+
+	/**
+	 * Disable the labelers for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void disableLabelers(GridType... types) {
+		disableLabelers(Arrays.asList(types));
+	}
+
+	/**
+	 * Disable the labelers for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void disableLabelers(Collection<GridType> types) {
+		for (GridType type : types) {
+			disableLabeler(type);
+		}
 	}
 
 	/**
@@ -756,6 +914,22 @@ public class Grids {
 		if (labeler != null) {
 			labeler.setEnabled(false);
 		}
+	}
+
+	/**
+	 * Get the labeler for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return labeler or null
+	 */
+	private Labeler getRequiredLabeler(GridType type) {
+		Labeler labeler = getLabeler(type);
+		if (labeler == null) {
+			throw new IllegalStateException(
+					"Grid type does not have a labeler: " + type);
+		}
+		return labeler;
 	}
 
 	/**
@@ -812,6 +986,47 @@ public class Grids {
 	}
 
 	/**
+	 * Set all label grid zone edge buffers
+	 * 
+	 * @param buffer
+	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
+	 */
+	public void setAllLabelBuffers(double buffer) {
+		for (Grid grid : grids.values()) {
+			Labeler labeler = grid.getLabeler();
+			if (labeler != null) {
+				labeler.setBuffer(buffer);
+			}
+		}
+	}
+
+	/**
+	 * Set the label grid zone edge buffer for the grid types
+	 * 
+	 * @param buffer
+	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelBuffer(double buffer, GridType... types) {
+		setLabelBuffer(buffer, Arrays.asList(types));
+	}
+
+	/**
+	 * Set the label grid zone edge buffer for the grid types
+	 * 
+	 * @param buffer
+	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelBuffer(double buffer, Collection<GridType> types) {
+		for (GridType type : types) {
+			setLabelBuffer(type, buffer);
+		}
+	}
+
+	/**
 	 * Get the label grid zone edge buffer
 	 * 
 	 * @param type
@@ -835,19 +1050,109 @@ public class Grids {
 	}
 
 	/**
-	 * Get the labeler for the grid type
+	 * Set all label colors
+	 * 
+	 * @param color
+	 *            label color
+	 */
+	public void setAllLabelColors(Color color) {
+		for (Grid grid : grids.values()) {
+			Labeler labeler = grid.getLabeler();
+			if (labeler != null) {
+				labeler.setColor(color);
+			}
+		}
+	}
+
+	/**
+	 * Set the label color for the grid types
+	 * 
+	 * @param color
+	 *            label color
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelColor(Color color, GridType... types) {
+		setLabelColor(color, Arrays.asList(types));
+	}
+
+	/**
+	 * Set the label color for the grid types
+	 * 
+	 * @param color
+	 *            label color
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelColor(Color color, Collection<GridType> types) {
+		for (GridType type : types) {
+			setLabelColor(type, color);
+		}
+	}
+
+	/**
+	 * Set the label color
 	 * 
 	 * @param type
 	 *            grid type
-	 * @return labeler or null
+	 * @param color
+	 *            label color
 	 */
-	private Labeler getRequiredLabeler(GridType type) {
-		Labeler labeler = getLabeler(type);
-		if (labeler == null) {
-			throw new IllegalStateException(
-					"Grid type does not have a labeler: " + type);
+	public void setLabelColor(GridType type, Color color) {
+		getRequiredLabeler(type).setColor(color);
+	}
+
+	/**
+	 * Set all label text sizes
+	 * 
+	 * @param textSize
+	 *            label text size
+	 */
+	public void setAllLabelTextSizes(double textSize) {
+		for (Grid grid : grids.values()) {
+			Labeler labeler = grid.getLabeler();
+			if (labeler != null) {
+				labeler.setTextSize(textSize);
+			}
 		}
-		return labeler;
+	}
+
+	/**
+	 * Set the label text size for the grid types
+	 * 
+	 * @param textSize
+	 *            label text size
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelTextSize(double textSize, GridType... types) {
+		setLabelTextSize(textSize, Arrays.asList(types));
+	}
+
+	/**
+	 * Set the label text size for the grid types
+	 * 
+	 * @param textSize
+	 *            label text size
+	 * @param types
+	 *            grid types
+	 */
+	public void setLabelTextSize(double textSize, Collection<GridType> types) {
+		for (GridType type : types) {
+			setLabelTextSize(type, textSize);
+		}
+	}
+
+	/**
+	 * Set the label text size
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param textSize
+	 *            label text size
+	 */
+	public void setLabelTextSize(GridType type, double textSize) {
+		getRequiredLabeler(type).setTextSize(textSize);
 	}
 
 }

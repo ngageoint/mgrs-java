@@ -29,6 +29,360 @@ public class Color {
 	private float opacity = 1.0f;
 
 	/**
+	 * Create a black color
+	 * 
+	 * @return color
+	 */
+	public static Color black() {
+		return color(ColorConstants.BLACK);
+	}
+
+	/**
+	 * Create a blue color
+	 * 
+	 * @return color
+	 */
+	public static Color blue() {
+		return color(ColorConstants.BLUE);
+	}
+
+	/**
+	 * Create a brown color
+	 * 
+	 * @return color
+	 */
+	public static Color brown() {
+		return color(ColorConstants.BROWN);
+	}
+
+	/**
+	 * Create a cyan color
+	 * 
+	 * @return color
+	 */
+	public static Color cyan() {
+		return color(ColorConstants.CYAN);
+	}
+
+	/**
+	 * Create a dark gray color
+	 * 
+	 * @return color
+	 */
+	public static Color darkGray() {
+		return color(ColorConstants.DKGRAY);
+	}
+
+	/**
+	 * Create a gray color
+	 * 
+	 * @return color
+	 */
+	public static Color gray() {
+		return color(ColorConstants.GRAY);
+	}
+
+	/**
+	 * Create a green color
+	 * 
+	 * @return color
+	 */
+	public static Color green() {
+		return color(ColorConstants.GREEN);
+	}
+
+	/**
+	 * Create a light gray color
+	 * 
+	 * @return color
+	 */
+	public static Color lightGray() {
+		return color(ColorConstants.LTGRAY);
+	}
+
+	/**
+	 * Create a magenta color
+	 * 
+	 * @return color
+	 */
+	public static Color magenta() {
+		return color(ColorConstants.MAGENTA);
+	}
+
+	/**
+	 * Create an orange color
+	 * 
+	 * @return color
+	 */
+	public static Color orange() {
+		return color(ColorConstants.ORANGE);
+	}
+
+	/**
+	 * Create a pink color
+	 * 
+	 * @return color
+	 */
+	public static Color pink() {
+		return color(ColorConstants.PINK);
+	}
+
+	/**
+	 * Create a purple color
+	 * 
+	 * @return color
+	 */
+	public static Color purple() {
+		return color(ColorConstants.PURPLE);
+	}
+
+	/**
+	 * Create a red color
+	 * 
+	 * @return color
+	 */
+	public static Color red() {
+		return color(ColorConstants.RED);
+	}
+
+	/**
+	 * Create a violet color
+	 * 
+	 * @return color
+	 */
+	public static Color violet() {
+		return color(ColorConstants.VIOLET);
+	}
+
+	/**
+	 * Create a white color
+	 * 
+	 * @return color
+	 */
+	public static Color white() {
+		return color(ColorConstants.WHITE);
+	}
+
+	/**
+	 * Create a yellow color
+	 * 
+	 * @return color
+	 */
+	public static Color yellow() {
+		return color(ColorConstants.YELLOW);
+	}
+
+	/**
+	 * Create the color in hex
+	 * 
+	 * @param color
+	 *            hex color in format #RRGGBB, RRGGBB, #RGB, RGB, #AARRGGBB,
+	 *            AARRGGBB, #ARGB, or ARGB
+	 * @return color
+	 */
+	public static Color color(String color) {
+		return new Color(color);
+	}
+
+	/**
+	 * Create the color in hex with an opacity
+	 * 
+	 * @param color
+	 *            hex color in format #RRGGBB, RRGGBB, #RGB, RGB, #AARRGGBB,
+	 *            AARRGGBB, #ARGB, or ARGB
+	 * @param opacity
+	 *            opacity float inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(String color, float opacity) {
+		return new Color(color, opacity);
+	}
+
+	/**
+	 * Create the color in hex with an alpha
+	 * 
+	 * @param color
+	 *            hex color in format #RRGGBB, RRGGBB, #RGB, RGB, #AARRGGBB,
+	 *            AARRGGBB, #ARGB, or ARGB
+	 * @param alpha
+	 *            alpha integer color inclusively between 0 and 255
+	 * @return color
+	 */
+	public static Color color(String color, int alpha) {
+		return new Color(color, alpha);
+	}
+
+	/**
+	 * Create the color with individual hex colors
+	 * 
+	 * @param red
+	 *            red hex color in format RR
+	 * @param green
+	 *            green hex color in format GG
+	 * @param blue
+	 *            blue hex color in format BB
+	 * @return color
+	 */
+	public static Color color(String red, String green, String blue) {
+		return new Color(red, green, blue);
+	}
+
+	/**
+	 * Create the color with individual hex colors and alpha
+	 * 
+	 * @param red
+	 *            red hex color in format RR
+	 * @param green
+	 *            green hex color in format GG
+	 * @param blue
+	 *            blue hex color in format BB
+	 * @param alpha
+	 *            alpha hex color in format AA
+	 * @return color
+	 */
+	public static Color color(String red, String green, String blue,
+			String alpha) {
+		return new Color(red, green, blue, alpha);
+	}
+
+	/**
+	 * Create the color with individual hex colors and opacity
+	 * 
+	 * @param red
+	 *            red hex color in format RR
+	 * @param green
+	 *            green hex color in format GG
+	 * @param blue
+	 *            blue hex color in format BB
+	 * @param opacity
+	 *            opacity float inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(String red, String green, String blue,
+			float opacity) {
+		return new Color(red, green, blue, opacity);
+	}
+
+	/**
+	 * Create the color with RGB values
+	 * 
+	 * @param red
+	 *            red integer color inclusively between 0 and 255
+	 * @param green
+	 *            green integer color inclusively between 0 and 255
+	 * @param blue
+	 *            blue integer color inclusively between 0 and 255
+	 * @return color
+	 */
+	public static Color color(int red, int green, int blue) {
+		return new Color(red, green, blue);
+	}
+
+	/**
+	 * Create the color with RGBA values
+	 * 
+	 * @param red
+	 *            red integer color inclusively between 0 and 255
+	 * @param green
+	 *            green integer color inclusively between 0 and 255
+	 * @param blue
+	 *            blue integer color inclusively between 0 and 255
+	 * @param alpha
+	 *            alpha integer color inclusively between 0 and 255
+	 * @return color
+	 */
+	public static Color color(int red, int green, int blue, int alpha) {
+		return new Color(red, green, blue, alpha);
+	}
+
+	/**
+	 * Create the color with RGBA values
+	 * 
+	 * @param red
+	 *            red integer color inclusively between 0 and 255
+	 * @param green
+	 *            green integer color inclusively between 0 and 255
+	 * @param blue
+	 *            blue integer color inclusively between 0 and 255
+	 * @param opacity
+	 *            opacity float inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(int red, int green, int blue, float opacity) {
+		return new Color(red, green, blue, opacity);
+	}
+
+	/**
+	 * Create the color with arithmetic RGB values
+	 * 
+	 * @param red
+	 *            red float color inclusively between 0.0 and 1.0
+	 * @param green
+	 *            green float color inclusively between 0.0 and 1.0
+	 * @param blue
+	 *            blue float color inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(float red, float green, float blue) {
+		return new Color(red, green, blue);
+	}
+
+	/**
+	 * Create the color with arithmetic RGB values
+	 * 
+	 * @param red
+	 *            red float color inclusively between 0.0 and 1.0
+	 * @param green
+	 *            green float color inclusively between 0.0 and 1.0
+	 * @param blue
+	 *            blue float color inclusively between 0.0 and 1.0
+	 * @param opacity
+	 *            opacity float inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(float red, float green, float blue,
+			float opacity) {
+		return new Color(red, green, blue, opacity);
+	}
+
+	/**
+	 * Create the color with HSL (hue, saturation, lightness) or HSL (alpha)
+	 * values
+	 * 
+	 * @param hsl
+	 *            HSL array where: 0 = hue, 1 = saturation, 2 = lightness,
+	 *            optional 3 = alpha
+	 * @return color
+	 */
+	public static Color color(float[] hsl) {
+		return new Color(hsl);
+	}
+
+	/**
+	 * Create the color with HSLA (hue, saturation, lightness, alpha) values
+	 * 
+	 * @param hsl
+	 *            HSL array where: 0 = hue, 1 = saturation, 2 = lightness
+	 * @param alpha
+	 *            alpha inclusively between 0.0 and 1.0
+	 * @return color
+	 */
+	public static Color color(float[] hsl, float alpha) {
+		return new Color(hsl, alpha);
+	}
+
+	/**
+	 * Create the color as a single integer
+	 * 
+	 * @param color
+	 *            color integer
+	 * @return color
+	 */
+	public static Color color(int color) {
+		return new Color(color);
+	}
+
+	/**
 	 * Default color constructor, opaque black
 	 */
 	public Color() {
