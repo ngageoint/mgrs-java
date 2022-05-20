@@ -281,7 +281,7 @@ public class Grids {
 	 * @return grids
 	 */
 	private ZoomGrids createZoomGrids(int zoom) {
-		ZoomGrids zoomLevelGrids = new ZoomGrids(zoom);
+		ZoomGrids zoomLevelGrids = newZoomGrids(zoom);
 		for (Grid grid : grids.values()) {
 			if (grid.isEnabled() && grid.isWithin(zoom)) {
 				zoomLevelGrids.addGrid(grid);
@@ -289,6 +289,17 @@ public class Grids {
 		}
 		zoomGrids.put(zoom, zoomLevelGrids);
 		return zoomLevelGrids;
+	}
+
+	/**
+	 * Create a new zoom grids, override for specialized grids
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @return zoom grids
+	 */
+	protected ZoomGrids newZoomGrids(int zoom) {
+		return new ZoomGrids(zoom);
 	}
 
 	/**
