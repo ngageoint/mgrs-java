@@ -130,7 +130,8 @@ public class Grids {
 		createGrid(GridType.KILOMETER, enabled, 12, 14, otherKMColor, width);
 		createGrid(GridType.HUNDRED_METER, enabled, 15, 17, otherKMColor,
 				width);
-		createGrid(GridType.TEN_METER, enabled, 18, otherKMColor, width);
+		createGrid(GridType.TEN_METER, enabled, 18, 20, otherKMColor, width);
+		createGrid(GridType.METER, enabled, 21, otherKMColor, width);
 
 	}
 

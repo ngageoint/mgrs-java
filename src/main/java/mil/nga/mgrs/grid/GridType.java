@@ -36,7 +36,12 @@ public enum GridType {
 	/**
 	 * Ten Meter
 	 */
-	TEN_METER(10);
+	TEN_METER(10),
+
+	/**
+	 * Meter
+	 */
+	METER(1);
 
 	/**
 	 * Grid precision in meters
