@@ -248,6 +248,7 @@ public class GridZone {
 			int precision) {
 
 		int zoneNumber = getNumber();
+		char bandLetter = getLetter();
 		Hemisphere hemisphere = getHemisphere();
 
 		List<Line> lines = new ArrayList<>();
@@ -260,11 +261,8 @@ public class GridZone {
 				.floor(upperLeftUTM.getEasting() / precision) * precision);
 		double upperLeftNorthing = (Math
 				.ceil(upperLeftUTM.getNorthing() / precision + 1) * precision);
-		if (getLetter() == MGRSConstants.BAND_LETTER_SOUTH) {
-			upperLeftNorthing = 10000000.0;
-			upperLeftUTM = new UTM(upperLeftUTM.getZoneNumber(),
-					Hemisphere.SOUTH, upperLeftUTM.getEasting(),
-					upperLeftUTM.getNorthing());
+		if (bandLetter == MGRSConstants.BAND_LETTER_SOUTH) {
+			upperLeftNorthing = Math.min(10000000.0, upperLeftNorthing);
 		}
 
 		UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(), zoneNumber,
@@ -279,10 +277,10 @@ public class GridZone {
 			while (northing >= lowerRightNorthing) {
 				double newNorthing = northing - precision;
 
-				Point latLng1 = Point.from(new UTM(zoneNumber,
-						upperLeftUTM.getHemisphere(), easting, northing));
-				Point latLng2 = Point.from(new UTM(zoneNumber,
-						lowerRightUTM.getHemisphere(), easting, newNorthing));
+				Point latLng1 = Point.from(
+						new UTM(zoneNumber, hemisphere, easting, northing));
+				Point latLng2 = Point.from(
+						new UTM(zoneNumber, hemisphere, easting, newNorthing));
 				lines.add(Line.line(latLng1, latLng2));
 
 				northing = newNorthing;
@@ -304,6 +302,7 @@ public class GridZone {
 	private List<Line> latitudeLines(Bounds tileBounds, int precision) {
 
 		int zoneNumber = getNumber();
+		char bandLetter = getLetter();
 		Hemisphere hemisphere = getHemisphere();
 
 		List<Line> lines = new ArrayList<>();
@@ -324,8 +323,8 @@ public class GridZone {
 		double upperNorthing = (Math
 				.ceil(upperRightUTM.getNorthing() / precision) * precision)
 				+ precision;
-		if (getLetter() == MGRSConstants.BAND_LETTER_SOUTH) {
-			upperNorthing = 10000000.0;
+		if (bandLetter == MGRSConstants.BAND_LETTER_SOUTH) {
+			upperNorthing = Math.min(10000000.0, upperNorthing);
 		}
 
 		double northing = lowerNorthing;
