@@ -1,6 +1,8 @@
 package mil.nga.mgrs.gzd;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;
@@ -97,21 +99,113 @@ public class GridRange implements Iterable<GridZone> {
 		return new Iterator<GridZone>() {
 
 			/**
+			 * Minimum zone number
+			 */
+			private final int minZoneNumber = zoneNumberRange.getWest();
+
+			/**
+			 * Maximum zone number
+			 */
+			private final int maxZoneNumber = zoneNumberRange.getEast();
+
+			/**
+			 * Minimum band letter
+			 */
+			private final char minBandLetter = bandLetterRange.getSouth();
+
+			/**
+			 * Minimum band letter
+			 */
+			private final char maxBandLetter = bandLetterRange.getNorth();
+
+			/**
 			 * Zone number
 			 */
-			private int zoneNumber = zoneNumberRange.getWest();
+			private int zoneNumber = minZoneNumber;
 
 			/**
 			 * Band letter
 			 */
-			private char bandLetter = bandLetterRange.getSouth();
+			private char bandLetter = minBandLetter;
+
+			/**
+			 * Grid zone
+			 */
+			private GridZone gridZone = null;
+
+			/**
+			 * Additional special case grid zones
+			 */
+			private List<GridZone> additional = new ArrayList<>();
 
 			/**
 			 * {@inheritDoc}
 			 */
 			@Override
 			public boolean hasNext() {
-				return zoneNumber <= zoneNumberRange.getEast();
+
+				while (gridZone == null && zoneNumber <= maxZoneNumber) {
+
+					gridZone = GridZones.getGridZone(zoneNumber, bandLetter);
+
+					// Handle special case grid gaps (Svalbard)
+					if (gridZone == null) {
+
+						// Retrieve the western grid if on the left edge
+						if (zoneNumber == minZoneNumber) {
+							additional.add(GridZones.getGridZone(zoneNumber - 1,
+									bandLetter));
+						}
+
+						// Expand to the eastern grid if on the right edge
+						if (zoneNumber == maxZoneNumber) {
+							additional.add(GridZones.getGridZone(zoneNumber + 1,
+									bandLetter));
+						}
+
+					} else {
+
+						// Handle special case grid zone expansions (Norway)
+						int expand = gridZone.getStripExpand();
+						if (expand != 0) {
+							if (expand > 0) {
+								for (int expandZone = zoneNumber
+										+ expand; expandZone > zoneNumber; expandZone--) {
+									if (expandZone > maxZoneNumber) {
+										additional.add(GridZones.getGridZone(
+												expandZone, bandLetter));
+									} else {
+										break;
+									}
+								}
+							} else {
+								for (int expandZone = zoneNumber
+										+ expand; expandZone < zoneNumber; expandZone++) {
+									if (expandZone < minZoneNumber) {
+										additional.add(GridZones.getGridZone(
+												expandZone, bandLetter));
+									} else {
+										break;
+									}
+								}
+							}
+						}
+
+					}
+
+					bandLetter = MGRSUtils.nextBandLetter(bandLetter);
+					if (bandLetter > maxBandLetter) {
+						zoneNumber++;
+						bandLetter = minBandLetter;
+					}
+
+				}
+
+				if (gridZone == null && !additional.isEmpty()) {
+					gridZone = additional.remove(0);
+				}
+
+				return gridZone != null;
 			}
 
 			/**
@@ -119,14 +213,9 @@ public class GridRange implements Iterable<GridZone> {
 			 */
 			@Override
 			public GridZone next() {
-				GridZone gridZone = GridZones.getGridZone(zoneNumber,
-						bandLetter);
-				bandLetter = MGRSUtils.nextBandLetter(bandLetter);
-				if (bandLetter > bandLetterRange.getNorth()) {
-					zoneNumber++;
-					bandLetter = bandLetterRange.getSouth();
-				}
-				return gridZone;
+				GridZone next = gridZone;
+				gridZone = null;
+				return next;
 			}
 
 		};

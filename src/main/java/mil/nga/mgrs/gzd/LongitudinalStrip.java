@@ -23,6 +23,11 @@ public class LongitudinalStrip {
 	private double east;
 
 	/**
+	 * Expansion for range iterations over neighboring strips
+	 */
+	private int expand;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param number
@@ -33,9 +38,26 @@ public class LongitudinalStrip {
 	 *            eastern longitude
 	 */
 	public LongitudinalStrip(int number, double west, double east) {
+		this(number, west, east, 0);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param number
+	 *            zone number
+	 * @param west
+	 *            western longitude
+	 * @param east
+	 *            eastern longitude
+	 * @param expand
+	 *            expansion for range iterations over neighboring strips
+	 */
+	public LongitudinalStrip(int number, double west, double east, int expand) {
 		this.number = number;
 		this.west = west;
 		this.east = east;
+		this.expand = expand;
 	}
 
 	/**
@@ -93,6 +115,27 @@ public class LongitudinalStrip {
 	 */
 	public void setEast(double east) {
 		this.east = east;
+	}
+
+	/**
+	 * Get expand, number of additional neighbors to iterate over in combination
+	 * with this strip
+	 * 
+	 * @return neighbor iteration expansion
+	 */
+	public int getExpand() {
+		return expand;
+	}
+
+	/**
+	 * Set the expand, number of additional neighbors to iterate over in
+	 * combination with this strip
+	 * 
+	 * @param expand
+	 *            neighbor iteration expansion
+	 */
+	public void setExpand(int expand) {
+		this.expand = expand;
 	}
 
 }

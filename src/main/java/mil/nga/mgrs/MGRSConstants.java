@@ -97,4 +97,34 @@ public class MGRSConstants {
 	 */
 	public static final int MAX_MAP_ZOOM_LEVEL = 21;
 
+	/**
+	 * Min zone number in Svalbard grid zones
+	 */
+	public static final int MIN_SVALBARD_ZONE_NUMBER = 31;
+
+	/**
+	 * Max zone number in Svalbard grid zones
+	 */
+	public static final int MAX_SVALBARD_ZONE_NUMBER = 37;
+
+	/**
+	 * Band letter in Svalbard grid zones
+	 */
+	public static final char SVALBARD_BAND_LETTER = MAX_BAND_LETTER;
+
+	/**
+	 * Min zone number in Norway grid zones
+	 */
+	public static final int MIN_NORWAY_ZONE_NUMBER = 31;
+
+	/**
+	 * Max zone number in Norway grid zones
+	 */
+	public static final int MAX_NORWAY_ZONE_NUMBER = 32;
+
+	/**
+	 * Band letter in Norway grid zones
+	 */
+	public static final char NORWAY_BAND_LETTER = 'V';
+
 }

@@ -59,11 +59,29 @@ public class GridZones {
 
 		// Create grid zones
 		for (LongitudinalStrip strip : strips.values()) {
+
+			int zoneNumber = strip.getNumber();
+
 			Map<Character, GridZone> stripGridZones = new HashMap<>();
 			for (LatitudeBand band : bands.values()) {
-				stripGridZones.put(band.getLetter(), new GridZone(strip, band));
+
+				char bandLetter = band.getLetter();
+
+				LongitudinalStrip gridZoneStrip = strip;
+
+				if (isSvalbard(zoneNumber, bandLetter)) {
+					gridZoneStrip = getSvalbardStrip(strip);
+				} else if (isNorway(zoneNumber, bandLetter)) {
+					gridZoneStrip = getNorwayStrip(strip);
+				}
+
+				if (gridZoneStrip != null) {
+					stripGridZones.put(bandLetter,
+							new GridZone(gridZoneStrip, band));
+				}
+
 			}
-			gridZones.put(strip.getNumber(), stripGridZones);
+			gridZones.put(zoneNumber, stripGridZones);
 		}
 
 	}
@@ -342,6 +360,89 @@ public class GridZones {
 		char letter = MGRSConstants.MIN_BAND_LETTER;
 		letter += bands;
 		return letter;
+	}
+
+	/**
+	 * Is the zone number and band letter a Svalbard GZD (31X - 37X)
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param bandLetter
+	 *            band letter
+	 * @return true if a Svalbard GZD
+	 */
+	public static boolean isSvalbard(int zoneNumber, char bandLetter) {
+		return bandLetter == MGRSConstants.SVALBARD_BAND_LETTER
+				&& zoneNumber >= MGRSConstants.MIN_SVALBARD_ZONE_NUMBER
+				&& zoneNumber <= MGRSConstants.MAX_SVALBARD_ZONE_NUMBER;
+	}
+
+	/**
+	 * Get the Svalbard longitudinal strip from the strip
+	 * 
+	 * @param strip
+	 *            longitudinal strip
+	 * @return Svalbard strip or null for empty strips
+	 */
+	private static LongitudinalStrip getSvalbardStrip(LongitudinalStrip strip) {
+
+		LongitudinalStrip svalbardStrip = null;
+
+		int number = strip.getNumber();
+		if (number % 2 == 1) {
+			double west = strip.getWest();
+			double east = strip.getEast();
+			double halfWidth = (east - west) / 2.0;
+			if (number > 31) {
+				west -= halfWidth;
+			}
+			if (number < 37) {
+				east += halfWidth;
+			}
+			svalbardStrip = new LongitudinalStrip(number, west, east);
+		}
+
+		return svalbardStrip;
+	}
+
+	/**
+	 * Is the zone number and band letter a Norway GZD (31V or 32V)
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param bandLetter
+	 *            band letter
+	 * @return true if a Norway GZD
+	 */
+	private static boolean isNorway(int zoneNumber, char bandLetter) {
+		return bandLetter == MGRSConstants.NORWAY_BAND_LETTER
+				&& zoneNumber >= MGRSConstants.MIN_NORWAY_ZONE_NUMBER
+				&& zoneNumber <= MGRSConstants.MAX_NORWAY_ZONE_NUMBER;
+	}
+
+	/**
+	 * Get the Norway longitudinal strip from the strip
+	 * 
+	 * @param strip
+	 *            longitudinal strip
+	 * @return Norway strip
+	 */
+	private static LongitudinalStrip getNorwayStrip(LongitudinalStrip strip) {
+
+		int number = strip.getNumber();
+		double west = strip.getWest();
+		double east = strip.getEast();
+		double halfWidth = (east - west) / 2.0;
+
+		int expand = 0;
+		if (number == MGRSConstants.MIN_NORWAY_ZONE_NUMBER) {
+			east -= halfWidth;
+			expand++;
+		} else if (number == MGRSConstants.MAX_NORWAY_ZONE_NUMBER) {
+			west -= halfWidth;
+		}
+
+		return new LongitudinalStrip(number, west, east, expand);
 	}
 
 }

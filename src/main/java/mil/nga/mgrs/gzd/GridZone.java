@@ -127,6 +127,16 @@ public class GridZone {
 	}
 
 	/**
+	 * Get the longitudinal strip expansion, number of additional neighbors to
+	 * iterate over in combination with this strip
+	 * 
+	 * @return longitudinal strip neighbor iteration expansion
+	 */
+	public int getStripExpand() {
+		return strip.getExpand();
+	}
+
+	/**
 	 * Get the grid zone lines
 	 * 
 	 * @param precision
