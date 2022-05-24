@@ -8,6 +8,7 @@ import java.util.Map;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;
+import mil.nga.mgrs.features.Point;
 
 /**
  * Grid Zones, Longitudinal Strips, and Latitude Bands
@@ -230,6 +231,40 @@ public class GridZones {
 	}
 
 	/**
+	 * Get the zone number of the point
+	 * 
+	 * @param point
+	 *            point
+	 * @return zone number
+	 */
+	public static int getZoneNumber(Point point) {
+		point = point.toDegrees();
+		return getZoneNumber(point.getLongitude(), point.getLatitude());
+	}
+
+	/**
+	 * Get the zone number of the longitude and latitude
+	 * 
+	 * @param longitude
+	 *            longitude
+	 * @param latitude
+	 *            latitude
+	 * @return zone number
+	 */
+	public static int getZoneNumber(double longitude, double latitude) {
+		int zoneNumber = getZoneNumber(longitude);
+		if (isSvalbardZone(zoneNumber) || isNorwayZone(zoneNumber)) {
+			char bandLetter = getBandLetter(latitude);
+			if (isSvalbardLetter(bandLetter)) {
+				zoneNumber = getSvalbardZone(longitude);
+			} else if (isNorwayLetter(bandLetter)) {
+				zoneNumber = getNorwayZone(longitude);
+			}
+		}
+		return zoneNumber;
+	}
+
+	/**
 	 * Get the zone number of the longitude (degrees between
 	 * {@link MGRSConstants#MIN_LON} and {@link MGRSConstants#MAX_LON}). Eastern
 	 * zone number on borders.
@@ -372,8 +407,29 @@ public class GridZones {
 	 * @return true if a Svalbard GZD
 	 */
 	public static boolean isSvalbard(int zoneNumber, char bandLetter) {
-		return bandLetter == MGRSConstants.SVALBARD_BAND_LETTER
-				&& zoneNumber >= MGRSConstants.MIN_SVALBARD_ZONE_NUMBER
+		return isSvalbardLetter(bandLetter) && isSvalbardZone(zoneNumber);
+	}
+
+	/**
+	 * Is the band letter a Svalbard GZD (X)
+	 * 
+	 * @param bandLetter
+	 *            band letter
+	 * @return true if a Svalbard GZD
+	 */
+	public static boolean isSvalbardLetter(char bandLetter) {
+		return bandLetter == MGRSConstants.SVALBARD_BAND_LETTER;
+	}
+
+	/**
+	 * Is the zone number a Svalbard GZD (31 - 37)
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return true if a Svalbard GZD
+	 */
+	public static boolean isSvalbardZone(int zoneNumber) {
+		return zoneNumber >= MGRSConstants.MIN_SVALBARD_ZONE_NUMBER
 				&& zoneNumber <= MGRSConstants.MAX_SVALBARD_ZONE_NUMBER;
 	}
 
@@ -406,6 +462,25 @@ public class GridZones {
 	}
 
 	/**
+	 * Get the Svalbard zone number from the longitude
+	 * 
+	 * @param longitude
+	 *            longitude
+	 * @return zone number
+	 */
+	private static int getSvalbardZone(double longitude) {
+		double minimumLongitude = getWestLongitude(
+				MGRSConstants.MIN_SVALBARD_ZONE_NUMBER);
+		double zoneValue = MGRSConstants.MIN_SVALBARD_ZONE_NUMBER
+				+ ((longitude - minimumLongitude) / MGRSConstants.ZONE_WIDTH);
+		int zone = (int) Math.round(zoneValue);
+		if (zone % 2 == 0) {
+			zone--;
+		}
+		return zone;
+	}
+
+	/**
 	 * Is the zone number and band letter a Norway GZD (31V or 32V)
 	 * 
 	 * @param zoneNumber
@@ -415,8 +490,29 @@ public class GridZones {
 	 * @return true if a Norway GZD
 	 */
 	private static boolean isNorway(int zoneNumber, char bandLetter) {
-		return bandLetter == MGRSConstants.NORWAY_BAND_LETTER
-				&& zoneNumber >= MGRSConstants.MIN_NORWAY_ZONE_NUMBER
+		return isNorwayLetter(bandLetter) && isNorwayZone(zoneNumber);
+	}
+
+	/**
+	 * Is the band letter a Norway GZD (V)
+	 * 
+	 * @param bandLetter
+	 *            band letter
+	 * @return true if a Norway GZD band letter
+	 */
+	private static boolean isNorwayLetter(char bandLetter) {
+		return bandLetter == MGRSConstants.NORWAY_BAND_LETTER;
+	}
+
+	/**
+	 * Is the zone number a Norway GZD (31 or 32)
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @return true if a Norway GZD zone number
+	 */
+	private static boolean isNorwayZone(int zoneNumber) {
+		return zoneNumber >= MGRSConstants.MIN_NORWAY_ZONE_NUMBER
 				&& zoneNumber <= MGRSConstants.MAX_NORWAY_ZONE_NUMBER;
 	}
 
@@ -443,6 +539,23 @@ public class GridZones {
 		}
 
 		return new LongitudinalStrip(number, west, east, expand);
+	}
+
+	/**
+	 * Get the Norway zone number from the longitude
+	 * 
+	 * @param longitude
+	 *            longitude
+	 * @return zone number
+	 */
+	private static int getNorwayZone(double longitude) {
+		double minimumLongitude = getWestLongitude(
+				MGRSConstants.MIN_NORWAY_ZONE_NUMBER);
+		int zone = MGRSConstants.MIN_NORWAY_ZONE_NUMBER;
+		if (longitude >= minimumLongitude + (MGRSConstants.ZONE_WIDTH / 2.0)) {
+			zone++;
+		}
+		return zone;
 	}
 
 }

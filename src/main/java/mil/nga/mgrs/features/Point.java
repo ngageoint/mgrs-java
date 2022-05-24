@@ -314,7 +314,7 @@ public class Point {
 	 * @return zone number
 	 */
 	public int getZoneNumber() {
-		return GridZones.getZoneNumber(toDegrees().getLongitude());
+		return GridZones.getZoneNumber(this);
 	}
 
 	/**
