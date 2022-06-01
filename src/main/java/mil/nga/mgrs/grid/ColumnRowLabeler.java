@@ -245,20 +245,23 @@ public class ColumnRowLabeler extends Labeler {
 				.from(new UTM(zoneNumber, hemisphere, newEasting, newNorthing));
 
 		double minLatitude = Math.max(l1.getLatitude(), l4.getLatitude());
+		minLatitude = Math.max(minLatitude, bounds.getMinLatitude());
 		double maxLatitude = Math.min(l2.getLatitude(), l3.getLatitude());
+		maxLatitude = Math.min(maxLatitude, bounds.getMaxLatitude());
 
 		double minLongitude = Math.max(l1.getLongitude(), l2.getLongitude());
+		minLongitude = Math.max(minLongitude, bounds.getMinLongitude());
 		double maxLongitude = Math.min(l3.getLongitude(), l4.getLongitude());
+		maxLongitude = Math.min(maxLongitude, bounds.getMaxLongitude());
 
 		if (minLongitude <= maxLongitude && minLatitude <= maxLatitude) {
 
 			String id = MGRS.getColumnRowId(centerEasting, centerNorthing,
 					zoneNumber);
-			Point center = Point.from(new UTM(zoneNumber, hemisphere,
-					centerEasting, centerNorthing));
 
 			Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
 					maxLongitude, maxLatitude);
+			Point center = labelBounds.getCenter();
 
 			label = new Label(id, center, labelBounds, zoneNumber,
 					zone.getLetter());
