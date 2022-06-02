@@ -94,6 +94,27 @@ public class MGRS {
 	}
 
 	/**
+	 * Constructor
+	 * 
+	 * @param zone
+	 *            zone number
+	 * @param band
+	 *            band letter
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 */
+	public MGRS(int zone, char band, long easting, long northing) {
+		this.zone = zone;
+		this.band = band;
+		this.column = getColumnLetter(zone, easting);
+		this.row = getRowLetter(zone, northing);
+		this.easting = easting;
+		this.northing = northing;
+	}
+
+	/**
 	 * Get the zone number
 	 * 
 	 * @return zone number
@@ -204,6 +225,15 @@ public class MGRS {
 		}
 
 		return mgrs.toString();
+	}
+
+	/**
+	 * Convert to a point
+	 * 
+	 * @return point
+	 */
+	public Point toPoint() {
+		return Point.from(this);
 	}
 
 	/**

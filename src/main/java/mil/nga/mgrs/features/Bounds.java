@@ -584,6 +584,15 @@ public class Bounds {
 	}
 
 	/**
+	 * Determine if the bounds are empty
+	 * 
+	 * @return true if empty
+	 */
+	public boolean isEmpty() {
+		return getWidth() <= 0.0 || getHeight() <= 0.0;
+	}
+
+	/**
 	 * Get the southwest coordinate
 	 * 
 	 * @return southwest coordinate

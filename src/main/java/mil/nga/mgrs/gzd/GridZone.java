@@ -3,7 +3,6 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
@@ -164,195 +163,58 @@ public class GridZone {
 			// if precision is 0, draw the zone bounds
 			lines = bounds.getLines();
 		} else {
+
 			tileBounds = tileBounds.toDegrees();
-			lines = new ArrayList<>();
-			lines.addAll(longitudeLines(tileBounds, precision));
-			lines.addAll(latitudeLines(tileBounds, precision));
-		}
+			tileBounds = tileBounds.overlap(bounds);
 
-		return lines;
-	}
+			if (!tileBounds.isEmpty()) {
 
-	/**
-	 * Get the grid zone longitude lines
-	 * 
-	 * @param tileBounds
-	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
-	 * @return lines
-	 */
-	private List<Line> longitudeLines(Bounds tileBounds, int precision) {
-		if (getHemisphere() == Hemisphere.NORTH) {
-			return northernLongitudeLines(tileBounds, precision);
-		} else {
-			return southernLongitudeLines(tileBounds, precision);
-		}
-	}
+				lines = new ArrayList<>();
 
-	/**
-	 * Get the grid zone northern longitude lines
-	 * 
-	 * @param tileBounds
-	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
-	 * @return lines
-	 */
-	private List<Line> northernLongitudeLines(Bounds tileBounds,
-			int precision) {
+				int zoneNumber = getNumber();
+				Hemisphere hemisphere = getHemisphere();
 
-		int zoneNumber = getNumber();
-		Hemisphere hemisphere = getHemisphere();
+				UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(),
+						zoneNumber, hemisphere);
+				UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(),
+						zoneNumber, hemisphere);
+				UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(),
+						zoneNumber, hemisphere);
+				UTM upperRightUTM = UTM.from(tileBounds.getNortheast(),
+						zoneNumber, hemisphere);
 
-		List<Line> lines = new ArrayList<>();
+				double leftEasting = Math
+						.floor(Math.min(upperLeftUTM.getEasting(),
+								lowerLeftUTM.getEasting()) / precision)
+						* precision;
+				double lowerNorthing = Math
+						.floor(Math.min(lowerLeftUTM.getNorthing(),
+								lowerRightUTM.getNorthing()) / precision)
+						* precision;
+				double rightEasting = Math
+						.ceil(Math.max(lowerRightUTM.getEasting(),
+								upperRightUTM.getEasting()) / precision)
+						* precision;
+				double upperNorthing = Math
+						.ceil(Math.max(upperRightUTM.getNorthing(),
+								upperLeftUTM.getNorthing()) / precision)
+						* precision;
 
-		tileBounds = tileBounds.overlap(bounds);
+				for (double easting = leftEasting; easting <= rightEasting; easting += precision) {
+					for (double northing = lowerNorthing; northing <= upperNorthing; northing += precision) {
+						Point latLng1 = Point.from(new UTM(zoneNumber,
+								hemisphere, easting, northing));
+						Point latLng2 = Point.from(new UTM(zoneNumber,
+								hemisphere, easting, northing + precision));
+						Point latLng3 = Point.from(new UTM(zoneNumber,
+								hemisphere, easting + precision, northing));
+						lines.add(Line.line(latLng1, latLng2));
+						lines.add(Line.line(latLng1, latLng3));
+					}
+				}
 
-		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
-				hemisphere);
-		double lowerLeftEasting = (Math
-				.floor(lowerLeftUTM.getEasting() / precision) * precision);
-		double lowerLeftNorthing = (Math
-				.floor(lowerLeftUTM.getNorthing() / precision) * precision);
-
-		UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
-				hemisphere);
-		double endEasting = (Math.ceil(upperRightUTM.getEasting() / precision)
-				* precision);
-		double endNorthing = (Math.ceil(upperRightUTM.getNorthing() / precision)
-				* precision);
-
-		double easting = lowerLeftEasting;
-		while (easting <= endEasting) {
-			double newEasting = easting + precision;
-			double northing = lowerLeftNorthing;
-			while (northing <= endNorthing) {
-				double newNorthing = northing + precision;
-
-				Point latLng1 = Point.from(
-						new UTM(zoneNumber, hemisphere, easting, northing));
-				Point latLng2 = Point.from(
-						new UTM(zoneNumber, hemisphere, easting, newNorthing));
-				lines.add(Line.line(latLng1, latLng2));
-
-				northing = newNorthing;
 			}
 
-			easting = newEasting;
-		}
-
-		return lines;
-	}
-
-	/**
-	 * Get the grid zone southern longitude lines
-	 * 
-	 * @param tileBounds
-	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
-	 * @return lines
-	 */
-	private List<Line> southernLongitudeLines(Bounds tileBounds,
-			int precision) {
-
-		int zoneNumber = getNumber();
-		char bandLetter = getLetter();
-		Hemisphere hemisphere = getHemisphere();
-
-		List<Line> lines = new ArrayList<>();
-
-		tileBounds = tileBounds.overlap(bounds);
-
-		UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(), zoneNumber,
-				hemisphere);
-		double upperLeftEasting = (Math
-				.floor(upperLeftUTM.getEasting() / precision) * precision);
-		double upperLeftNorthing = (Math
-				.ceil(upperLeftUTM.getNorthing() / precision + 1) * precision);
-		if (bandLetter == MGRSConstants.BAND_LETTER_SOUTH) {
-			upperLeftNorthing = Math.min(10000000.0, upperLeftNorthing);
-		}
-
-		UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(), zoneNumber,
-				hemisphere);
-		double lowerRightEasting = (Math
-				.ceil(lowerRightUTM.getEasting() / precision) * precision);
-		double lowerRightNorthing = (Math
-				.floor(lowerRightUTM.getNorthing() / precision) * precision);
-
-		for (double easting = upperLeftEasting; easting <= lowerRightEasting; easting += precision) {
-			double northing = upperLeftNorthing;
-			while (northing >= lowerRightNorthing) {
-				double newNorthing = northing - precision;
-
-				Point latLng1 = Point.from(
-						new UTM(zoneNumber, hemisphere, easting, northing));
-				Point latLng2 = Point.from(
-						new UTM(zoneNumber, hemisphere, easting, newNorthing));
-				lines.add(Line.line(latLng1, latLng2));
-
-				northing = newNorthing;
-			}
-		}
-
-		return lines;
-	}
-
-	/**
-	 * Get the grid zone latitude lines
-	 * 
-	 * @param tileBounds
-	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
-	 * @return lines
-	 */
-	private List<Line> latitudeLines(Bounds tileBounds, int precision) {
-
-		int zoneNumber = getNumber();
-		char bandLetter = getLetter();
-		Hemisphere hemisphere = getHemisphere();
-
-		List<Line> lines = new ArrayList<>();
-
-		tileBounds = tileBounds.overlap(bounds);
-
-		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
-				hemisphere);
-		double lowerEasting = (Math.floor(lowerLeftUTM.getEasting() / precision)
-				* precision) - precision;
-		double lowerNorthing = (Math
-				.floor(lowerLeftUTM.getNorthing() / precision) * precision);
-
-		UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
-				hemisphere);
-		double upperEasting = (Math.ceil(upperRightUTM.getEasting() / precision)
-				* precision) + precision;
-		double upperNorthing = (Math
-				.ceil(upperRightUTM.getNorthing() / precision) * precision)
-				+ precision;
-		if (bandLetter == MGRSConstants.BAND_LETTER_SOUTH) {
-			upperNorthing = Math.min(10000000.0, upperNorthing);
-		}
-
-		double northing = lowerNorthing;
-		while (northing < upperNorthing) {
-			double easting = lowerEasting;
-			double newNorthing = northing + precision;
-			while (easting < upperEasting) {
-				double newEasting = easting + precision;
-				Point latLng1 = Point.from(
-						new UTM(zoneNumber, hemisphere, easting, northing));
-				Point latLng2 = Point.from(
-						new UTM(zoneNumber, hemisphere, newEasting, northing));
-				lines.add(Line.line(latLng1, latLng2));
-
-				easting = newEasting;
-			}
-
-			northing = newNorthing;
 		}
 
 		return lines;

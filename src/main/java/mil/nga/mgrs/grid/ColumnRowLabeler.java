@@ -118,48 +118,54 @@ public class ColumnRowLabeler extends Labeler {
 	public List<Label> getLabels(Bounds tileBounds, int precision,
 			GridZone zone) {
 
-		List<Label> labels = new ArrayList<>();
-
-		int zoneNumber = zone.getNumber();
-		Hemisphere hemisphere = zone.getHemisphere();
+		List<Label> labels = null;
 
 		tileBounds = tileBounds.toDegrees();
-
 		tileBounds = tileBounds.overlap(zone.getBounds());
 
-		UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
-				hemisphere);
-		double lowerEasting = (Math.floor(lowerLeftUTM.getEasting() / precision)
-				* precision) - precision;
-		double lowerNorthing = (Math
-				.ceil(lowerLeftUTM.getNorthing() / precision) * precision);
+		if (!tileBounds.isEmpty()) {
 
-		UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
-				hemisphere);
-		double upperEasting = (Math
-				.floor(upperRightUTM.getEasting() / precision) * precision)
-				+ precision;
-		double upperNorthing = (Math
-				.ceil(upperRightUTM.getNorthing() / precision) * precision)
-				+ precision;
+			labels = new ArrayList<>();
 
-		double northing = lowerNorthing;
-		while (northing < upperNorthing) {
-			double easting = lowerEasting;
-			double newNorthing = northing + precision;
-			while (easting < upperEasting) {
-				double newEasting = easting + precision;
+			int zoneNumber = zone.getNumber();
+			Hemisphere hemisphere = zone.getHemisphere();
 
-				// Draw cell name
-				Label label = getLabel(precision, zone, easting, northing);
-				if (label != null) {
-					labels.add(label);
+			UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
+					hemisphere);
+			double lowerEasting = (Math
+					.floor(lowerLeftUTM.getEasting() / precision) * precision)
+					- precision;
+			double lowerNorthing = (Math
+					.ceil(lowerLeftUTM.getNorthing() / precision) * precision);
+
+			UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
+					hemisphere);
+			double upperEasting = (Math
+					.floor(upperRightUTM.getEasting() / precision) * precision)
+					+ precision;
+			double upperNorthing = (Math
+					.ceil(upperRightUTM.getNorthing() / precision) * precision)
+					+ precision;
+
+			double northing = lowerNorthing;
+			while (northing < upperNorthing) {
+				double easting = lowerEasting;
+				double newNorthing = northing + precision;
+				while (easting < upperEasting) {
+					double newEasting = easting + precision;
+
+					// Draw cell name
+					Label label = getLabel(precision, zone, easting, northing);
+					if (label != null) {
+						labels.add(label);
+					}
+
+					easting = newEasting;
 				}
 
-				easting = newEasting;
+				northing = newNorthing;
 			}
 
-			northing = newNorthing;
 		}
 
 		return labels;

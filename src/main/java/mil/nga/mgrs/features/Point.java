@@ -370,6 +370,17 @@ public class Point {
 	}
 
 	/**
+	 * Parse a MGRS value to a coordinate
+	 * 
+	 * @param mgrs
+	 *            MGRS value
+	 * @return coordinate
+	 */
+	public static Point from(MGRS mgrs) {
+		return from(mgrs.getUTM());
+	}
+
+	/**
 	 * Parse a MGRS string value to a coordinate
 	 * 
 	 * @param mgrs
@@ -379,8 +390,7 @@ public class Point {
 	 *             upon failure to parse the MGRS value
 	 */
 	public static Point parse(String mgrs) throws ParseException {
-		UTM utm = MGRS.parse(mgrs).getUTM();
-		return from(utm);
+		return from(MGRS.parse(mgrs));
 	}
 
 }
