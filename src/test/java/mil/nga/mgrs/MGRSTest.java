@@ -6,6 +6,7 @@ import java.text.ParseException;
 
 import org.junit.Test;
 
+import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.utm.UTM;
 
@@ -42,6 +43,25 @@ public class MGRSTest {
 
 		utm = mgrs.getUTM();
 		assertEquals(utmValue, utm.toString());
+
+	}
+
+	/**
+	 * Test parsing a MGRS string value
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testCoordinate() throws ParseException {
+
+		double latitude = 63.98863;
+		double longitude = 29.06757;
+
+		Point point = new Point(longitude, latitude);
+
+		MGRS mgrs = MGRS.from(point);
+		assertEquals("35VPL0115797388", mgrs.toString());
 
 	}
 

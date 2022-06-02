@@ -253,11 +253,13 @@ public class GridZones {
 	 */
 	public static int getZoneNumber(double longitude, double latitude) {
 		int zoneNumber = getZoneNumber(longitude);
-		if (isSvalbardZone(zoneNumber) || isNorwayZone(zoneNumber)) {
+		boolean svalbardZone = isSvalbardZone(zoneNumber);
+		boolean norwayZone = isNorwayZone(zoneNumber);
+		if (svalbardZone || norwayZone) {
 			char bandLetter = getBandLetter(latitude);
-			if (isSvalbardLetter(bandLetter)) {
+			if (svalbardZone && isSvalbardLetter(bandLetter)) {
 				zoneNumber = getSvalbardZone(longitude);
-			} else if (isNorwayLetter(bandLetter)) {
+			} else if (norwayZone && isNorwayLetter(bandLetter)) {
 				zoneNumber = getNorwayZone(longitude);
 			}
 		}
