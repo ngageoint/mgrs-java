@@ -19,6 +19,13 @@ import mil.nga.mgrs.utm.UTM;
 public class ColumnRowLabeler extends Labeler {
 
 	/**
+	 * Default Constructor
+	 */
+	public ColumnRowLabeler() {
+		super();
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param minZoom
@@ -42,6 +49,24 @@ public class ColumnRowLabeler extends Labeler {
 	 */
 	public ColumnRowLabeler(int minZoom, Color color, double textSize) {
 		super(minZoom, color, textSize);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public ColumnRowLabeler(int minZoom, Color color, double textSize,
+			double buffer) {
+		super(minZoom, color, textSize, buffer);
 	}
 
 	/**
@@ -78,6 +103,26 @@ public class ColumnRowLabeler extends Labeler {
 	/**
 	 * Constructor
 	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color,
+			double textSize, double buffer) {
+		super(minZoom, maxZoom, color, textSize, buffer);
+	}
+
+	/**
+	 * Constructor
+	 * 
 	 * @param enabled
 	 *            enabled labeler
 	 * @param minZoom
@@ -109,6 +154,28 @@ public class ColumnRowLabeler extends Labeler {
 	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color, double textSize) {
 		super(enabled, minZoom, maxZoom, color, textSize);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param enabled
+	 *            enabled labeler
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+			Color color, double textSize, double buffer) {
+		super(enabled, minZoom, maxZoom, color, textSize, buffer);
 	}
 
 	/**

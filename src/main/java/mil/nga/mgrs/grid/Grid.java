@@ -6,6 +6,8 @@ import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.gzd.GridZone;
+import mil.nga.mgrs.property.MGRSProperties;
+import mil.nga.mgrs.property.PropertyConstants;
 import mil.nga.mgrs.tile.MGRSTile;
 
 /**
@@ -19,7 +21,8 @@ public class Grid implements Comparable<Grid> {
 	/**
 	 * Default line width
 	 */
-	public static final double DEFAULT_WIDTH = 2.0;
+	public static final double DEFAULT_WIDTH = MGRSProperties
+			.getDoubleProperty(PropertyConstants.GRID, PropertyConstants.WIDTH);
 
 	/**
 	 * Grid type

@@ -13,6 +13,8 @@ import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GZDLabeler;
+import mil.nga.mgrs.property.MGRSProperties;
+import mil.nga.mgrs.property.PropertyConstants;
 
 /**
  * Grids
@@ -114,104 +116,124 @@ public class Grids {
 	 */
 	private void createGrids(boolean enabled) {
 
-		Color gzdColor = Color.color(239, 83, 80);
-		Color hundKMColor = Color.color(76, 175, 80);
-		Color otherKMColor = Color.gray();
-
-		final double width = Grid.DEFAULT_WIDTH;
-		final double textSize = Labeler.DEFAULT_TEXT_SIZE;
-
-		Labeler gzdLabels = new GZDLabeler(4, gzdColor.copy(), textSize);
-		Labeler hundKMLabels = new ColumnRowLabeler(6, hundKMColor.copy(),
-				textSize);
-
-		createGrid(GridType.GZD, enabled, 0, gzdColor, width, gzdLabels);
-		createGrid(GridType.HUNDRED_KILOMETER, enabled, 5, hundKMColor, width,
-				hundKMLabels);
-		createGrid(GridType.TEN_KILOMETER, enabled, 9, 11, otherKMColor, width);
-		createGrid(GridType.KILOMETER, enabled, 12, 14, otherKMColor, width);
-		createGrid(GridType.HUNDRED_METER, enabled, 15, 17, otherKMColor,
-				width);
-		createGrid(GridType.TEN_METER, enabled, 18, 20, otherKMColor, width);
-		createGrid(GridType.METER, enabled, 21, otherKMColor, width);
+		createGrid(GridType.GZD, new GZDLabeler());
+		createGrid(GridType.HUNDRED_KILOMETER, new ColumnRowLabeler());
+		createGrid(GridType.TEN_KILOMETER);
+		createGrid(GridType.KILOMETER);
+		createGrid(GridType.HUNDRED_METER);
+		createGrid(GridType.TEN_METER);
+		createGrid(GridType.METER);
 
 	}
 
 	/**
-	 * Create a grid
+	 * Create the grid
 	 * 
 	 * @param type
 	 *            grid type
-	 * @param enabled
-	 *            flag
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param color
-	 *            grid line colors
 	 */
-	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Color color, double width) {
-		createGrid(type, enabled, minZoom, null, color, width, null);
+	private void createGrid(GridType type) {
+		createGrid(type, null);
 	}
 
 	/**
-	 * Create a grid
+	 * Create the grid
 	 * 
 	 * @param type
 	 *            grid type
-	 * @param enabled
-	 *            flag
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param color
-	 *            grid line colors
 	 * @param labeler
 	 *            grid labeler
 	 */
-	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Color color, double width, Labeler labeler) {
-		createGrid(type, enabled, minZoom, null, color, width, labeler);
+	private void createGrid(GridType type, Labeler labeler) {
+
+		String gridKey = type.name().toLowerCase();
+
+		Boolean enabled = MGRSProperties.getBooleanProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.ENABLED);
+		if (enabled == null) {
+			enabled = true;
+		}
+
+		Integer minZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.MIN_ZOOM);
+		if (minZoom == null) {
+			minZoom = 0;
+		}
+
+		Integer maxZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.MAX_ZOOM);
+
+		String colorProperty = MGRSProperties.getProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.COLOR);
+		Color color = colorProperty != null ? Color.color(colorProperty)
+				: Color.black();
+
+		Double width = MGRSProperties.getDoubleProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.WIDTH);
+		if (width == null) {
+			width = Grid.DEFAULT_WIDTH;
+		}
+
+		if (labeler != null) {
+			loadLabeler(labeler, gridKey);
+		}
+
+		grids.put(type, newGrid(type, enabled, minZoom, maxZoom, color, width,
+				labeler));
 	}
 
 	/**
-	 * Create a grid
+	 * Load the labeler from properties for the grid type
 	 * 
-	 * @param type
-	 *            grid type
-	 * @param enabled
-	 *            flag
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param maxZoom
-	 *            maximum zoom
-	 * @param color
-	 *            grid line colors
-	 */
-	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom, Color color, double width) {
-		createGrid(type, enabled, minZoom, maxZoom, color, width, null);
-	}
-
-	/**
-	 * Create a grid
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param enabled
-	 *            flag
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param maxZoom
-	 *            maximum zoom
-	 * @param color
-	 *            grid line colors
 	 * @param labeler
-	 *            grid labeler
+	 *            labeler
+	 * @param gridKey
+	 *            grid property key
 	 */
-	private void createGrid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom, Color color, double width, Labeler labeler) {
-		grids.put(type, newGrid(type, enabled, minZoom, maxZoom, color.copy(),
-				width, labeler));
+	private void loadLabeler(Labeler labeler, String gridKey) {
+
+		Boolean enabled = MGRSProperties.getBooleanProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.ENABLED);
+		if (enabled != null) {
+			labeler.setEnabled(enabled);
+		}
+
+		Integer minZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.MIN_ZOOM);
+		if (minZoom != null) {
+			labeler.setMinZoom(minZoom);
+		}
+
+		Integer maxZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.MAX_ZOOM);
+		if (maxZoom != null) {
+			labeler.setMaxZoom(maxZoom);
+		}
+
+		String color = MGRSProperties.getProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.COLOR);
+		if (color != null) {
+			labeler.setColor(Color.color(color));
+		}
+
+		Double textSize = MGRSProperties.getDoubleProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.TEXT_SIZE);
+		if (textSize != null) {
+			labeler.setTextSize(textSize);
+		}
+
+		Double buffer = MGRSProperties.getDoubleProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
+				PropertyConstants.BUFFER);
+		if (buffer != null) {
+			labeler.setBuffer(buffer);
+		}
+
 	}
 
 	/**

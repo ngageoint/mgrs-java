@@ -5,6 +5,8 @@ import java.util.List;
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.gzd.GridZone;
+import mil.nga.mgrs.property.MGRSProperties;
+import mil.nga.mgrs.property.PropertyConstants;
 
 /**
  * Grid Labeler
@@ -16,7 +18,16 @@ public abstract class Labeler {
 	/**
 	 * Default text size
 	 */
-	public static final double DEFAULT_TEXT_SIZE = 24.0;
+	public static final double DEFAULT_TEXT_SIZE = MGRSProperties
+			.getDoubleProperty(PropertyConstants.LABELER,
+					PropertyConstants.TEXT_SIZE);
+
+	/**
+	 * Default buffer size
+	 */
+	public static final double DEFAULT_BUFFER = MGRSProperties
+			.getDoubleProperty(PropertyConstants.LABELER,
+					PropertyConstants.BUFFER);
 
 	/**
 	 * Enabled labeler
@@ -46,7 +57,18 @@ public abstract class Labeler {
 	/**
 	 * Grid zone edge buffer (greater than or equal to 0.0 and less than 0.5)
 	 */
-	private double buffer = 0.05;
+	private double buffer;
+
+	/**
+	 * Default Constructor
+	 */
+	public Labeler() {
+		enabled = true;
+		minZoom = 0;
+		color = Color.black();
+		textSize = DEFAULT_TEXT_SIZE;
+		buffer = DEFAULT_BUFFER;
+	}
 
 	/**
 	 * Constructor
@@ -71,7 +93,24 @@ public abstract class Labeler {
 	 *            label text size
 	 */
 	public Labeler(int minZoom, Color color, double textSize) {
-		this(minZoom, null, color, textSize);
+		this(minZoom, color, textSize, DEFAULT_BUFFER);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public Labeler(int minZoom, Color color, double textSize, double buffer) {
+		this(minZoom, null, color, textSize, buffer);
 	}
 
 	/**
@@ -101,7 +140,27 @@ public abstract class Labeler {
 	 *            label text size
 	 */
 	public Labeler(int minZoom, Integer maxZoom, Color color, double textSize) {
-		this(true, minZoom, maxZoom, color, textSize);
+		this(minZoom, maxZoom, color, textSize, DEFAULT_BUFFER);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public Labeler(int minZoom, Integer maxZoom, Color color, double textSize,
+			double buffer) {
+		this(true, minZoom, maxZoom, color, textSize, buffer);
 	}
 
 	/**
@@ -136,11 +195,34 @@ public abstract class Labeler {
 	 */
 	public Labeler(boolean enabled, int minZoom, Integer maxZoom, Color color,
 			double textSize) {
+		this(enabled, minZoom, maxZoom, color, textSize, DEFAULT_BUFFER);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param enabled
+	 *            enabled labeler
+	 * @param minZoom
+	 *            minimum zoom
+	 * @param maxZoom
+	 *            maximum zoom
+	 * @param color
+	 *            label color
+	 * @param textSize
+	 *            label text size
+	 * @param buffer
+	 *            grid zone edge buffer (greater than or equal to 0.0 and less
+	 *            than 0.5)
+	 */
+	public Labeler(boolean enabled, int minZoom, Integer maxZoom, Color color,
+			double textSize, double buffer) {
 		this.enabled = enabled;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
 		this.color = color;
 		this.textSize = textSize;
+		this.buffer = buffer;
 	}
 
 	/**
