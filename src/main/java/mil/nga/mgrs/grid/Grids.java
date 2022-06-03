@@ -74,10 +74,10 @@ public class Grids {
 	}
 
 	/**
-	 * Constructor, all grid types enabled
+	 * Constructor, all grid types enabled per property configurations
 	 */
 	public Grids() {
-		createGrids(true);
+		createGrids();
 		createZoomGrids();
 	}
 
@@ -110,19 +110,26 @@ public class Grids {
 
 	/**
 	 * Create the grids
+	 */
+	private void createGrids() {
+		createGrids(null);
+	}
+
+	/**
+	 * Create the grids
 	 * 
 	 * @param enabled
 	 *            enable created grids
 	 */
-	private void createGrids(boolean enabled) {
+	private void createGrids(Boolean enabled) {
 
-		createGrid(GridType.GZD, new GZDLabeler());
-		createGrid(GridType.HUNDRED_KILOMETER, new ColumnRowLabeler());
-		createGrid(GridType.TEN_KILOMETER);
-		createGrid(GridType.KILOMETER);
-		createGrid(GridType.HUNDRED_METER);
-		createGrid(GridType.TEN_METER);
-		createGrid(GridType.METER);
+		createGrid(GridType.GZD, enabled, new GZDLabeler());
+		createGrid(GridType.HUNDRED_KILOMETER, enabled, new ColumnRowLabeler());
+		createGrid(GridType.TEN_KILOMETER, enabled);
+		createGrid(GridType.KILOMETER, enabled);
+		createGrid(GridType.HUNDRED_METER, enabled);
+		createGrid(GridType.TEN_METER, enabled);
+		createGrid(GridType.METER, enabled);
 
 	}
 
@@ -131,9 +138,11 @@ public class Grids {
 	 * 
 	 * @param type
 	 *            grid type
+	 * @param enabled
+	 *            enable created grids
 	 */
-	private void createGrid(GridType type) {
-		createGrid(type, null);
+	private void createGrid(GridType type, Boolean enabled) {
+		createGrid(type, enabled, null);
 	}
 
 	/**
@@ -141,17 +150,22 @@ public class Grids {
 	 * 
 	 * @param type
 	 *            grid type
+	 * @param enabled
+	 *            enable created grids
 	 * @param labeler
 	 *            grid labeler
 	 */
-	private void createGrid(GridType type, Labeler labeler) {
+	private void createGrid(GridType type, Boolean enabled, Labeler labeler) {
 
 		String gridKey = type.name().toLowerCase();
 
-		Boolean enabled = MGRSProperties.getBooleanProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.ENABLED);
 		if (enabled == null) {
-			enabled = true;
+			enabled = MGRSProperties.getBooleanProperty(false,
+					PropertyConstants.GRIDS, gridKey,
+					PropertyConstants.ENABLED);
+			if (enabled == null) {
+				enabled = true;
+			}
 		}
 
 		Integer minZoom = MGRSProperties.getIntegerProperty(false,
