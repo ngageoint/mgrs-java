@@ -91,6 +91,15 @@ public class UTM {
 	}
 
 	/**
+	 * Convert to a point
+	 * 
+	 * @return point
+	 */
+	public Point toPoint() {
+		return Point.from(this);
+	}
+
+	/**
 	 * Format to a UTM string
 	 * 
 	 * @return UTM string
