@@ -10,7 +10,6 @@ import java.util.TreeMap;
 
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GZDLabeler;
 import mil.nga.mgrs.property.MGRSProperties;
 import mil.nga.mgrs.property.PropertyConstants;
@@ -346,46 +345,6 @@ public class Grids {
 	 */
 	public GridType getPrecision(int zoom) {
 		return getGrids(zoom).getPrecision();
-	}
-
-	/**
-	 * Get the Military Grid Reference System coordinate for the point in one
-	 * meter precision
-	 * 
-	 * @param point
-	 *            point
-	 * @return MGRS coordinate
-	 */
-	public String getCoordinate(Point point) {
-		return point.toMGRS().coordinate();
-	}
-
-	/**
-	 * Get the Military Grid Reference System coordinate for the point in the
-	 * zoom level precision
-	 * 
-	 * @param point
-	 *            point
-	 * @param zoom
-	 *            zoom level precision
-	 * @return MGRS coordinate
-	 */
-	public String getCoordinate(Point point, int zoom) {
-		return getCoordinate(point, getPrecision(zoom));
-	}
-
-	/**
-	 * Get the Military Grid Reference System coordinate for the point in the
-	 * grid type precision
-	 * 
-	 * @param point
-	 *            point
-	 * @param type
-	 *            grid type precision
-	 * @return MGRS coordinate
-	 */
-	public String getCoordinate(Point point, GridType type) {
-		return point.toMGRS().coordinate(type);
 	}
 
 	/**
