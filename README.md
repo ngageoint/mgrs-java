@@ -17,11 +17,80 @@ Software source code previously released under an open source license and then m
 
 View the latest [Javadoc](http://ngageoint.github.io/mgrs-java/docs/api/)
 
-#### Example ####
+#### Coordinates ####
 
 ```java
 
-// TODO
+MGRS mgrs = MGRS.parse("33XVG74594359");
+Point point = mgrs.toPoint();
+Point pointMeters = point.toMeters();
+UTM utm = mgrs.toUTM();
+String utmCoordinate = utm.toString();
+Point point2 = utm.toPoint();
+
+MGRS mgrs2 = MGRS.parse("33X VG 74596 43594");
+
+double latitude = 63.98862388;
+double longitude = 29.06755082;
+Point point3 = Point.create(longitude, latitude);
+MGRS mgrs3 = point3.toMGRS();
+String mgrsCoordinate = mgrs3.toString();
+String mgrsGZD = mgrs3.coordinate(GridType.GZD);
+String mgrs100k = mgrs3.coordinate(GridType.HUNDRED_KILOMETER);
+String mgrs10k = mgrs3.coordinate(GridType.TEN_KILOMETER);
+String mgrs1k = mgrs3.coordinate(GridType.KILOMETER);
+String mgrs100m = mgrs3.coordinate(GridType.HUNDRED_METER);
+String mgrs10m = mgrs3.coordinate(GridType.TEN_METER);
+String mgrs1m = mgrs3.coordinate(GridType.METER);
+
+UTM utm2 = point3.toUTM();
+MGRS mgrs4 = utm2.toMGRS();
+
+```
+
+#### Draw Tile Template ####
+
+```java
+
+// MGRSTile tile = ...;
+
+Grids grids = Grids.create();
+
+ZoomGrids zoomGrids = grids.getGrids(tile.getZoom());
+if (zoomGrids.hasGrids()) {
+
+  GridRange gridRange = GridZones.getGridRange(tile.getBounds());
+
+  for (Grid grid : zoomGrids) {
+
+    // draw this grid for each zone
+    for (GridZone zone : gridRange) {
+
+      List<Line> lines = grid.getLines(tile, zone);
+      if (lines != null) {
+        PixelRange pixelRange = zone.getBounds()
+            .getPixelRange(tile);
+        for (Line line : lines) {
+          Pixel pixel1 = line.getPoint1().getPixel(tile);
+          Pixel pixel2 = line.getPoint2().getPixel(tile);
+          // Draw line
+        }
+      }
+
+      List<Label> labels = grid.getLabels(tile, zone);
+      if (labels != null) {
+        for (Label label : labels) {
+          PixelRange pixelRange = label.getBounds()
+              .getPixelRange(tile);
+          Pixel centerPixel = label.getCenter()
+              .getPixel(tile);
+          // Draw label
+        }
+      }
+
+    }
+  }
+}
 
 ```
 
