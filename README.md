@@ -50,6 +50,8 @@ MGRS mgrs4 = utm2.toMGRS();
 
 #### Draw Tile Template ####
 
+See [mgrs-android](https://github.com/ngageoint/mgrs-android) for a concrete example
+
 ```java
 
 // MGRSTile tile = ...;
