@@ -165,7 +165,7 @@ public class MGRSUtils {
 			Unit toUnit) {
 		Point point = null;
 		if (fromUnit == toUnit) {
-			point = Point.point(longitude, latitude, toUnit);
+			point = Point.create(longitude, latitude, toUnit);
 		} else {
 			point = toUnit(longitude, latitude, toUnit);
 		}

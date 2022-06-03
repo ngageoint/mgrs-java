@@ -202,12 +202,12 @@ public class GridZone {
 
 				for (double easting = leftEasting; easting <= rightEasting; easting += precision) {
 					for (double northing = lowerNorthing; northing <= upperNorthing; northing += precision) {
-						Point latLng1 = Point.from(new UTM(zoneNumber,
-								hemisphere, easting, northing));
-						Point latLng2 = Point.from(new UTM(zoneNumber,
-								hemisphere, easting, northing + precision));
-						Point latLng3 = Point.from(new UTM(zoneNumber,
-								hemisphere, easting + precision, northing));
+						Point latLng1 = Point.create(zoneNumber, hemisphere,
+								easting, northing);
+						Point latLng2 = Point.create(zoneNumber, hemisphere,
+								easting, northing + precision);
+						Point latLng3 = Point.create(zoneNumber, hemisphere,
+								easting + precision, northing);
 						lines.add(Line.line(latLng1, latLng2));
 						lines.add(Line.line(latLng1, latLng3));
 					}

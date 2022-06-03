@@ -270,16 +270,16 @@ public class ColumnRowLabeler extends Labeler {
 		double centerEasting = easting + (precision / 2);
 
 		if (newNorthing < lowerLeftUTM.getNorthing()) {
-			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
-					centerEasting, lowerLeftUTM.getNorthing()));
+			Point currentLatLng = Point.create(zoneNumber, hemisphere,
+					centerEasting, lowerLeftUTM.getNorthing());
 			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
 					bounds.getSouth()), zoneNumber, hemisphere);
 			centerNorthing = ((northing - lowerLeftUTM.getNorthing()) / 2)
 					+ lowerLeftUTM.getNorthing();
 			newNorthing = utm.getNorthing();
 		} else if (northing > upperRightUTM.getNorthing()) {
-			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
-					centerEasting, upperRightUTM.getNorthing()));
+			Point currentLatLng = Point.create(zoneNumber, hemisphere,
+					centerEasting, upperRightUTM.getNorthing());
 			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
 					bounds.getNorth()), zoneNumber, hemisphere);
 			centerNorthing = ((upperRightUTM.getNorthing() - newNorthing) / 2)
@@ -288,8 +288,8 @@ public class ColumnRowLabeler extends Labeler {
 		}
 
 		if (easting < lowerLeftUTM.getEasting()) {
-			Point currentLatLng = Point.from(new UTM(zoneNumber, hemisphere,
-					newEasting, centerNorthing));
+			Point currentLatLng = Point.create(zoneNumber, hemisphere,
+					newEasting, centerNorthing);
 			UTM utm = UTM.from(
 					Point.degrees(bounds.getWest(),
 							currentLatLng.getLatitude()),
@@ -298,8 +298,8 @@ public class ColumnRowLabeler extends Labeler {
 					+ ((newEasting - utm.getEasting()) / 2);
 			easting = utm.getEasting();
 		} else if (newEasting > upperRightUTM.getEasting()) {
-			Point currentLatLng = Point.from(
-					new UTM(zoneNumber, hemisphere, easting, centerNorthing));
+			Point currentLatLng = Point.create(zoneNumber, hemisphere, easting,
+					centerNorthing);
 			UTM utm = UTM.from(
 					Point.degrees(bounds.getEast(),
 							currentLatLng.getLatitude()),
@@ -308,14 +308,11 @@ public class ColumnRowLabeler extends Labeler {
 			newEasting = utm.getEasting();
 		}
 
-		Point l1 = Point
-				.from(new UTM(zoneNumber, hemisphere, easting, newNorthing));
-		Point l2 = Point
-				.from(new UTM(zoneNumber, hemisphere, easting, northing));
-		Point l3 = Point
-				.from(new UTM(zoneNumber, hemisphere, newEasting, northing));
-		Point l4 = Point
-				.from(new UTM(zoneNumber, hemisphere, newEasting, newNorthing));
+		Point l1 = Point.create(zoneNumber, hemisphere, easting, newNorthing);
+		Point l2 = Point.create(zoneNumber, hemisphere, easting, northing);
+		Point l3 = Point.create(zoneNumber, hemisphere, newEasting, northing);
+		Point l4 = Point.create(zoneNumber, hemisphere, newEasting,
+				newNorthing);
 
 		double minLatitude = Math.max(l1.getLatitude(), l4.getLatitude());
 		minLatitude = Math.max(minLatitude, bounds.getMinLatitude());

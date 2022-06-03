@@ -34,6 +34,19 @@ public class Point {
 	private Unit unit;
 
 	/**
+	 * Create a point with default degree unit
+	 * 
+	 * @param longitude
+	 *            longitude
+	 * @param latitude
+	 *            latitude
+	 * @return point
+	 */
+	public static Point create(double longitude, double latitude) {
+		return degrees(longitude, latitude);
+	}
+
+	/**
 	 * Create a point
 	 * 
 	 * @param longitude
@@ -44,7 +57,7 @@ public class Point {
 	 *            unit
 	 * @return point
 	 */
-	public static Point point(double longitude, double latitude, Unit unit) {
+	public static Point create(double longitude, double latitude, Unit unit) {
 		return new Point(longitude, latitude, unit);
 	}
 
@@ -58,7 +71,7 @@ public class Point {
 	 * @return point in degrees
 	 */
 	public static Point degrees(double longitude, double latitude) {
-		return point(longitude, latitude, Unit.DEGREE);
+		return create(longitude, latitude, Unit.DEGREE);
 	}
 
 	/**
@@ -71,7 +84,7 @@ public class Point {
 	 * @return point in meters
 	 */
 	public static Point meters(double longitude, double latitude) {
-		return point(longitude, latitude, Unit.METER);
+		return create(longitude, latitude, Unit.METER);
 	}
 
 	/**
@@ -131,6 +144,24 @@ public class Point {
 	 */
 	public static Point metersToDegrees(double longitude, double latitude) {
 		return toUnit(Unit.METER, longitude, latitude, Unit.DEGREE);
+	}
+
+	/**
+	 * Create a point from UTM values
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param hemisphere
+	 *            hemisphere
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 * @return point
+	 */
+	public static Point create(int zoneNumber, Hemisphere hemisphere,
+			double easting, double northing) {
+		return UTM.create(zoneNumber, hemisphere, easting, northing).toPoint();
 	}
 
 	/**
@@ -283,6 +314,24 @@ public class Point {
 	}
 
 	/**
+	 * Convert to a MGRS coordinate
+	 * 
+	 * @return MGRS
+	 */
+	public MGRS toMGRS() {
+		return MGRS.from(this);
+	}
+
+	/**
+	 * Convert to UTM coordinate
+	 * 
+	 * @return UTM
+	 */
+	public UTM toUTM() {
+		return UTM.from(this);
+	}
+
+	/**
 	 * Get the pixel where the point fits into tile
 	 * 
 	 * @param tile
@@ -377,7 +426,7 @@ public class Point {
 	 * @return coordinate
 	 */
 	public static Point from(MGRS mgrs) {
-		return from(mgrs.getUTM());
+		return mgrs.toUTM().toPoint();
 	}
 
 	/**
@@ -390,7 +439,7 @@ public class Point {
 	 *             upon failure to parse the MGRS value
 	 */
 	public static Point parse(String mgrs) throws ParseException {
-		return from(MGRS.parse(mgrs));
+		return MGRS.parse(mgrs).toPoint();
 	}
 
 }

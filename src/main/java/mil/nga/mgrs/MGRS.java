@@ -68,6 +68,46 @@ public class MGRS {
 	private long northing;
 
 	/**
+	 * Create
+	 * 
+	 * @param zone
+	 *            zone number
+	 * @param band
+	 *            band letter
+	 * @param column
+	 *            column letter
+	 * @param row
+	 *            row letter
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 * @return MGRS
+	 */
+	public static MGRS create(int zone, char band, char column, char row,
+			long easting, long northing) {
+		return new MGRS(zone, band, column, row, easting, northing);
+	}
+
+	/**
+	 * Create
+	 * 
+	 * @param zone
+	 *            zone number
+	 * @param band
+	 *            band letter
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 * @return MGRS
+	 */
+	public static MGRS create(int zone, char band, long easting,
+			long northing) {
+		return new MGRS(zone, band, easting, northing);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param zone
@@ -106,12 +146,8 @@ public class MGRS {
 	 *            northing
 	 */
 	public MGRS(int zone, char band, long easting, long northing) {
-		this.zone = zone;
-		this.band = band;
-		this.column = getColumnLetter(zone, easting);
-		this.row = getRowLetter(zone, northing);
-		this.easting = easting;
-		this.northing = northing;
+		this(zone, band, getColumnLetter(zone, easting),
+				getRowLetter(zone, northing), easting, northing);
 	}
 
 	/**
@@ -241,13 +277,13 @@ public class MGRS {
 	 * 
 	 * @return UTM
 	 */
-	public UTM getUTM() {
+	public UTM toUTM() {
 
 		double easting = getUTMEasting();
 		double northing = getUTMNorthing();
 		Hemisphere hemisphere = getHemisphere();
 
-		return new UTM(zone, hemisphere, easting, northing);
+		return UTM.create(zone, hemisphere, easting, northing);
 	}
 
 	/**
@@ -286,7 +322,7 @@ public class MGRS {
 		// (100km square boundaries are aligned with 100km UTM northing
 		// intervals)
 
-		double latBandNorthing = UTM.from(Point.degrees(0, latBand))
+		double latBandNorthing = Point.degrees(0, latBand).toUTM()
 				.getNorthing();
 		double nBand = Math.floor(latBandNorthing / 100000) * 100000;
 
@@ -331,7 +367,7 @@ public class MGRS {
 
 		latLng = latLng.toDegrees();
 
-		UTM utm = UTM.from(latLng);
+		UTM utm = latLng.toUTM();
 
 		char bandLetter = latLng.getBandLetter();
 
@@ -343,7 +379,7 @@ public class MGRS {
 		long easting = Math.round(utm.getEasting() % 100000);
 		long northing = Math.round(utm.getNorthing() % 100000);
 
-		return new MGRS(utm.getZoneNumber(), bandLetter, columnLetter,
+		return MGRS.create(utm.getZoneNumber(), bandLetter, columnLetter,
 				rowLetter, easting, northing);
 	}
 
@@ -379,7 +415,7 @@ public class MGRS {
 		long northing = (long) (Double.parseDouble(numericLocations[1])
 				* multiplier);
 
-		return new MGRS(zone, band, column, row, easting, northing);
+		return MGRS.create(zone, band, column, row, easting, northing);
 	}
 
 	/**

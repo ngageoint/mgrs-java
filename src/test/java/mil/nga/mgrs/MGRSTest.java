@@ -32,7 +32,7 @@ public class MGRSTest {
 		MGRS mgrs = MGRS.parse(mgrsValue);
 		assertEquals(mgrsValue, mgrs.coordinate(GridType.TEN_METER));
 
-		UTM utm = mgrs.getUTM();
+		UTM utm = mgrs.toUTM();
 		assertEquals(utmValue, utm.toString());
 
 		mgrsValue = "33X VG 74596 43594";
@@ -41,7 +41,7 @@ public class MGRSTest {
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(mgrsValue.replaceAll("\\s", ""), mgrs.toString());
 
-		utm = mgrs.getUTM();
+		utm = mgrs.toUTM();
 		assertEquals(utmValue, utm.toString());
 
 	}
@@ -58,9 +58,9 @@ public class MGRSTest {
 		double latitude = 63.98863;
 		double longitude = 29.06757;
 
-		Point point = new Point(longitude, latitude);
+		Point point = Point.create(longitude, latitude);
 
-		MGRS mgrs = MGRS.from(point);
+		MGRS mgrs = point.toMGRS();
 		assertEquals("35VPL0115797388", mgrs.toString());
 
 	}

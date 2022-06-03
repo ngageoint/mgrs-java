@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Point;
@@ -358,7 +357,7 @@ public class Grids {
 	 * @return MGRS coordinate
 	 */
 	public String getCoordinate(Point point) {
-		return getMGRS(point).coordinate();
+		return point.toMGRS().coordinate();
 	}
 
 	/**
@@ -386,18 +385,7 @@ public class Grids {
 	 * @return MGRS coordinate
 	 */
 	public String getCoordinate(Point point, GridType type) {
-		return getMGRS(point).coordinate(type);
-	}
-
-	/**
-	 * Get the Military Grid Reference System for the point
-	 * 
-	 * @param point
-	 *            point
-	 * @return MGRS
-	 */
-	public MGRS getMGRS(Point point) {
-		return MGRS.from(point);
+		return point.toMGRS().coordinate(type);
 	}
 
 	/**

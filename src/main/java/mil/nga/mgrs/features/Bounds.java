@@ -598,7 +598,7 @@ public class Bounds {
 	 * @return southwest coordinate
 	 */
 	public Point getSouthwest() {
-		return Point.point(getWest(), getSouth(), unit);
+		return Point.create(getWest(), getSouth(), unit);
 	}
 
 	/**
@@ -607,7 +607,7 @@ public class Bounds {
 	 * @return northwest coordinate
 	 */
 	public Point getNorthwest() {
-		return Point.point(getWest(), getNorth(), unit);
+		return Point.create(getWest(), getNorth(), unit);
 	}
 
 	/**
@@ -616,7 +616,7 @@ public class Bounds {
 	 * @return southeast coordinate
 	 */
 	public Point getSoutheast() {
-		return Point.point(getEast(), getSouth(), unit);
+		return Point.create(getEast(), getSouth(), unit);
 	}
 
 	/**
@@ -625,7 +625,7 @@ public class Bounds {
 	 * @return northeast coordinate
 	 */
 	public Point getNortheast() {
-		return Point.point(getEast(), getNorth(), unit);
+		return Point.create(getEast(), getNorth(), unit);
 	}
 
 	/**

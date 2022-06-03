@@ -35,6 +35,24 @@ public class UTM {
 	private double northing;
 
 	/**
+	 * Create
+	 * 
+	 * @param zoneNumber
+	 *            zone number
+	 * @param hemisphere
+	 *            hemisphere
+	 * @param easting
+	 *            easting
+	 * @param northing
+	 *            northing
+	 * @return UTM
+	 */
+	public static UTM create(int zoneNumber, Hemisphere hemisphere,
+			double easting, double northing) {
+		return new UTM(zoneNumber, hemisphere, easting, northing);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param zoneNumber
@@ -100,6 +118,15 @@ public class UTM {
 	}
 
 	/**
+	 * Convert to a MGRS coordinate
+	 * 
+	 * @return MGRS
+	 */
+	public MGRS toMGRS() {
+		return toPoint().toMGRS();
+	}
+
+	/**
 	 * Format to a UTM string
 	 * 
 	 * @return UTM string
@@ -139,7 +166,7 @@ public class UTM {
 	 *             upon failure to parse MGRS value
 	 */
 	public static UTM parse(String mgrs) throws ParseException {
-		return MGRS.parse(mgrs).getUTM();
+		return MGRS.parse(mgrs).toUTM();
 	}
 
 	/**
@@ -199,7 +226,7 @@ public class UTM {
 
 		northing = Math.round(northing * 100) * 0.01;
 
-		return new UTM(zone, hemisphere, easting, northing);
+		return UTM.create(zone, hemisphere, easting, northing);
 	}
 
 }
