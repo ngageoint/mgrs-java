@@ -1116,9 +1116,8 @@ public class Grids {
 	 */
 	public void setAllLabelColors(Color color) {
 		for (Grid grid : grids.values()) {
-			Labeler labeler = grid.getLabeler();
-			if (labeler != null) {
-				labeler.setColor(color);
+			if (grid.hasLabeler()) {
+				setLabelColor(grid.getType(), color);
 			}
 		}
 	}
@@ -1169,9 +1168,8 @@ public class Grids {
 	 */
 	public void setAllLabelTextSizes(double textSize) {
 		for (Grid grid : grids.values()) {
-			Labeler labeler = grid.getLabeler();
-			if (labeler != null) {
-				labeler.setTextSize(textSize);
+			if (grid.hasLabeler()) {
+				setLabelTextSize(grid.getType(), textSize);
 			}
 		}
 	}
