@@ -155,6 +155,8 @@ public class Grids {
 	 */
 	private void createGrid(GridType type, Boolean enabled, Labeler labeler) {
 
+		Grid grid = newGrid(type);
+
 		String gridKey = type.name().toLowerCase();
 
 		if (enabled == null) {
@@ -165,33 +167,48 @@ public class Grids {
 				enabled = true;
 			}
 		}
+		grid.setEnabled(enabled);
 
 		Integer minZoom = MGRSProperties.getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.MIN_ZOOM);
 		if (minZoom == null) {
 			minZoom = 0;
 		}
+		grid.setMinZoom(minZoom);
 
 		Integer maxZoom = MGRSProperties.getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.MAX_ZOOM);
+		grid.setMaxZoom(maxZoom);
+
+		Integer minLinesZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
+				PropertyConstants.MIN_ZOOM);
+		grid.setMinLinesZoom(minLinesZoom);
+
+		Integer maxLinesZoom = MGRSProperties.getIntegerProperty(false,
+				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
+				PropertyConstants.MAX_ZOOM);
+		grid.setMaxLinesZoom(maxLinesZoom);
 
 		String colorProperty = MGRSProperties.getProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.COLOR);
 		Color color = colorProperty != null ? Color.color(colorProperty)
 				: Color.black();
+		grid.setColor(color);
 
 		Double width = MGRSProperties.getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.WIDTH);
 		if (width == null) {
 			width = Grid.DEFAULT_WIDTH;
 		}
+		grid.setWidth(width);
 
 		if (labeler != null) {
 			loadLabeler(labeler, gridKey);
 		}
+		grid.setLabeler(labeler);
 
-		grids.put(type, newGrid(type, enabled, minZoom, maxZoom, color, width,
-				labeler));
+		grids.put(type, grid);
 	}
 
 	/**
@@ -253,23 +270,10 @@ public class Grids {
 	 * 
 	 * @param type
 	 *            grid type
-	 * @param enabled
-	 *            flag
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param maxZoom
-	 *            maximum zoom
-	 * @param color
-	 *            grid line colors
-	 * @param width
-	 *            grid line width
-	 * @param labeler
-	 *            grid labeler
 	 * @return grid
 	 */
-	protected Grid newGrid(GridType type, boolean enabled, int minZoom,
-			Integer maxZoom, Color color, double width, Labeler labeler) {
-		return new Grid(type, enabled, minZoom, maxZoom, color, width, labeler);
+	protected Grid newGrid(GridType type) {
+		return new Grid(type);
 	}
 
 	/**

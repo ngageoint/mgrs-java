@@ -67,4 +67,9 @@ public class PropertyConstants {
 	 */
 	public static final String COLOR = "color";
 
+	/**
+	 * Lines
+	 */
+	public static final String LINES = "lines";
+
 }

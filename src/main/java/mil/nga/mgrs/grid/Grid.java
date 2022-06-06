@@ -45,6 +45,16 @@ public class Grid implements Comparable<Grid> {
 	private Integer maxZoom;
 
 	/**
+	 * Minimum zoom level override for drawing grid lines
+	 */
+	private Integer minLinesZoom;
+
+	/**
+	 * Maximum zoom level override for drawing grid lines
+	 */
+	private Integer maxLinesZoom;
+
+	/**
 	 * Grid line color
 	 */
 	private Color color;
@@ -64,28 +74,9 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @param type
 	 *            grid type
-	 * @param enabled
-	 *            enabled grid
-	 * @param minZoom
-	 *            minimum zoom level
-	 * @param maxZoom
-	 *            maximum zoom level
-	 * @param color
-	 *            grid line color
-	 * @param width
-	 *            grid line width
-	 * @param labeler
-	 *            grid labeler
 	 */
-	protected Grid(GridType type, boolean enabled, int minZoom, Integer maxZoom,
-			Color color, double width, Labeler labeler) {
+	protected Grid(GridType type) {
 		this.type = type;
-		this.enabled = enabled;
-		this.minZoom = minZoom;
-		this.maxZoom = maxZoom;
-		this.color = color;
-		this.width = width;
-		this.labeler = labeler;
 	}
 
 	/**
@@ -195,6 +186,74 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
+	 * Get the minimum zoom level override for drawing grid lines
+	 * 
+	 * @return minimum zoom level or null if not set
+	 */
+	public Integer getMinLinesZoom() {
+		return minLinesZoom;
+	}
+
+	/**
+	 * Has a minimum zoom level override for drawing grid lines
+	 * 
+	 * @return true if has a minimum, false if not overridden
+	 */
+	public boolean hasMinLinesZoom() {
+		return minLinesZoom != null;
+	}
+
+	/**
+	 * Set the minimum level override for drawing grid lines
+	 * 
+	 * @param minLinesZoom
+	 *            minimum zoom level or null to remove
+	 */
+	public void setMinLinesZoom(Integer minLinesZoom) {
+		this.minLinesZoom = minLinesZoom;
+	}
+
+	/**
+	 * Get the maximum zoom level override for drawing grid lines
+	 * 
+	 * @return maximum zoom level or null if not set
+	 */
+	public Integer getMaxLinesZoom() {
+		return maxLinesZoom;
+	}
+
+	/**
+	 * Has a maximum zoom level override for drawing grid lines
+	 * 
+	 * @return true if has a maximum, false if not overridden
+	 */
+	public boolean hasMaxLinesZoom() {
+		return minLinesZoom != null;
+	}
+
+	/**
+	 * Set the maximum level override for drawing grid lines
+	 * 
+	 * @param maxLinesZoom
+	 *            maximum zoom level or null to remove
+	 */
+	public void setMaxLinesZoom(Integer maxLinesZoom) {
+		this.maxLinesZoom = maxLinesZoom;
+	}
+
+	/**
+	 * Is the zoom level within the grid lines zoom range
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @return true if within range
+	 */
+	public boolean isLinesWithin(int zoom) {
+		return (minLinesZoom == null || zoom >= minLinesZoom)
+				&& (maxLinesZoom == null || zoom <= maxLinesZoom);
+	}
+
+	/**
 	 * Get the grid line color
 	 * 
 	 * @return grid line color
@@ -270,7 +329,26 @@ public class Grid implements Comparable<Grid> {
 	 * @return lines
 	 */
 	public List<Line> getLines(MGRSTile tile, GridZone zone) {
-		return getLines(tile.getBounds(), zone);
+		return getLines(tile.getZoom(), tile.getBounds(), zone);
+	}
+
+	/**
+	 * Get the lines for the zoom, tile bounds, and zone
+	 * 
+	 * @param zoom
+	 *            zoom level
+	 * @param tileBounds
+	 *            tile bounds
+	 * @param zone
+	 *            grid zone
+	 * @return lines
+	 */
+	public List<Line> getLines(int zoom, Bounds tileBounds, GridZone zone) {
+		List<Line> lines = null;
+		if (isLinesWithin(zoom)) {
+			lines = getLines(tileBounds, zone);
+		}
+		return lines;
 	}
 
 	/**
