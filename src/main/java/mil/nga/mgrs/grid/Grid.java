@@ -47,12 +47,12 @@ public class Grid implements Comparable<Grid> {
 	/**
 	 * Minimum zoom level override for drawing grid lines
 	 */
-	private Integer minLinesZoom;
+	private Integer linesMinZoom;
 
 	/**
 	 * Maximum zoom level override for drawing grid lines
 	 */
-	private Integer maxLinesZoom;
+	private Integer linesMaxZoom;
 
 	/**
 	 * Grid line color
@@ -190,8 +190,8 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @return minimum zoom level or null if not set
 	 */
-	public Integer getMinLinesZoom() {
-		return minLinesZoom;
+	public Integer getLinesMinZoom() {
+		return linesMinZoom;
 	}
 
 	/**
@@ -199,18 +199,18 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @return true if has a minimum, false if not overridden
 	 */
-	public boolean hasMinLinesZoom() {
-		return minLinesZoom != null;
+	public boolean hasLinesMinZoom() {
+		return linesMinZoom != null;
 	}
 
 	/**
 	 * Set the minimum level override for drawing grid lines
 	 * 
-	 * @param minLinesZoom
+	 * @param linesMinZoom
 	 *            minimum zoom level or null to remove
 	 */
-	public void setMinLinesZoom(Integer minLinesZoom) {
-		this.minLinesZoom = minLinesZoom;
+	public void setLinesMinZoom(Integer linesMinZoom) {
+		this.linesMinZoom = linesMinZoom;
 	}
 
 	/**
@@ -218,8 +218,8 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @return maximum zoom level or null if not set
 	 */
-	public Integer getMaxLinesZoom() {
-		return maxLinesZoom;
+	public Integer getLinesMaxZoom() {
+		return linesMaxZoom;
 	}
 
 	/**
@@ -227,18 +227,18 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @return true if has a maximum, false if not overridden
 	 */
-	public boolean hasMaxLinesZoom() {
-		return minLinesZoom != null;
+	public boolean hasLinesMaxZoom() {
+		return linesMaxZoom != null;
 	}
 
 	/**
 	 * Set the maximum level override for drawing grid lines
 	 * 
-	 * @param maxLinesZoom
+	 * @param linesMaxZoom
 	 *            maximum zoom level or null to remove
 	 */
-	public void setMaxLinesZoom(Integer maxLinesZoom) {
-		this.maxLinesZoom = maxLinesZoom;
+	public void setLinesMaxZoom(Integer linesMaxZoom) {
+		this.linesMaxZoom = linesMaxZoom;
 	}
 
 	/**
@@ -249,8 +249,8 @@ public class Grid implements Comparable<Grid> {
 	 * @return true if within range
 	 */
 	public boolean isLinesWithin(int zoom) {
-		return (minLinesZoom == null || zoom >= minLinesZoom)
-				&& (maxLinesZoom == null || zoom <= maxLinesZoom);
+		return (linesMinZoom == null || zoom >= linesMinZoom)
+				&& (linesMaxZoom == null || zoom <= linesMaxZoom);
 	}
 
 	/**

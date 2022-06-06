@@ -180,15 +180,15 @@ public class Grids {
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.MAX_ZOOM);
 		grid.setMaxZoom(maxZoom);
 
-		Integer minLinesZoom = MGRSProperties.getIntegerProperty(false,
+		Integer linesMinZoom = MGRSProperties.getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
 				PropertyConstants.MIN_ZOOM);
-		grid.setMinLinesZoom(minLinesZoom);
+		grid.setLinesMinZoom(linesMinZoom);
 
-		Integer maxLinesZoom = MGRSProperties.getIntegerProperty(false,
+		Integer linesMaxZoom = MGRSProperties.getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
 				PropertyConstants.MAX_ZOOM);
-		grid.setMaxLinesZoom(maxLinesZoom);
+		grid.setLinesMaxZoom(linesMaxZoom);
 
 		String colorProperty = MGRSProperties.getProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.COLOR);
@@ -749,6 +749,30 @@ public class Grids {
 		if (grids != null) {
 			grids.removeGrid(grid);
 		}
+	}
+
+	/**
+	 * Set the grid minimum level override for drawing grid lines
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param minZoom
+	 *            minimum zoom level or null to remove
+	 */
+	public void setLinesMinZoom(GridType type, Integer minZoom) {
+		getGrid(type).setLinesMinZoom(minZoom);
+	}
+
+	/**
+	 * Set the grid maximum level override for drawing grid lines
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param maxZoom
+	 *            maximum zoom level or null to remove
+	 */
+	public void setLinesMaxZoom(GridType type, Integer maxZoom) {
+		getGrid(type).setLinesMaxZoom(maxZoom);
 	}
 
 	/**
