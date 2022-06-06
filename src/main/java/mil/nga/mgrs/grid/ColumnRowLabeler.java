@@ -3,13 +3,11 @@ package mil.nga.mgrs.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.utm.Hemisphere;
-import mil.nga.mgrs.utm.UTM;
 
 /**
  * MGRS Column and Row labeler for 100 kilometer square
@@ -187,50 +185,25 @@ public class ColumnRowLabeler extends Labeler {
 
 		List<Label> labels = null;
 
-		tileBounds = tileBounds.toDegrees();
-		tileBounds = tileBounds.overlap(zone.getBounds());
+		Bounds drawBounds = zone.getDrawBounds(tileBounds, precision);
 
-		if (!tileBounds.isEmpty()) {
+		if (drawBounds != null) {
 
 			labels = new ArrayList<>();
 
-			int zoneNumber = zone.getNumber();
-			Hemisphere hemisphere = zone.getHemisphere();
+			for (double easting = drawBounds
+					.getMinLongitude(); easting <= drawBounds
+							.getMaxLongitude(); easting += precision) {
+				for (double northing = drawBounds
+						.getMinLatitude(); northing <= drawBounds
+								.getMaxLatitude(); northing += precision) {
 
-			UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
-					hemisphere);
-			double lowerEasting = (Math
-					.floor(lowerLeftUTM.getEasting() / precision) * precision)
-					- precision;
-			double lowerNorthing = (Math
-					.ceil(lowerLeftUTM.getNorthing() / precision) * precision);
-
-			UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
-					hemisphere);
-			double upperEasting = (Math
-					.floor(upperRightUTM.getEasting() / precision) * precision)
-					+ precision;
-			double upperNorthing = (Math
-					.ceil(upperRightUTM.getNorthing() / precision) * precision)
-					+ precision;
-
-			double northing = lowerNorthing;
-			while (northing < upperNorthing) {
-				double easting = lowerEasting;
-				double newNorthing = northing + precision;
-				while (easting < upperEasting) {
-					double newEasting = easting + precision;
-
-					// Draw cell name
 					Label label = getLabel(precision, zone, easting, northing);
 					if (label != null) {
 						labels.add(label);
 					}
 
-					easting = newEasting;
 				}
-
-				northing = newNorthing;
 			}
 
 		}
@@ -258,80 +231,36 @@ public class ColumnRowLabeler extends Labeler {
 		int zoneNumber = zone.getNumber();
 		Hemisphere hemisphere = zone.getHemisphere();
 
-		UTM lowerLeftUTM = UTM.from(bounds.getSouthwest(), zoneNumber,
-				hemisphere);
-		UTM upperRightUTM = UTM.from(bounds.getNortheast(), zoneNumber,
-				hemisphere);
+		Point northwest = Point.create(zoneNumber, hemisphere, easting,
+				northing + precision);
+		Point southwest = Point.create(zoneNumber, hemisphere, easting,
+				northing);
+		Point southeast = Point.create(zoneNumber, hemisphere,
+				easting + precision, northing);
+		Point northeast = Point.create(zoneNumber, hemisphere,
+				easting + precision, northing + precision);
 
-		double newNorthing = northing - precision;
-		double centerNorthing = northing - (precision / 2);
-
-		double newEasting = easting + precision;
-		double centerEasting = easting + (precision / 2);
-
-		if (newNorthing < lowerLeftUTM.getNorthing()) {
-			Point currentLatLng = Point.create(zoneNumber, hemisphere,
-					centerEasting, lowerLeftUTM.getNorthing());
-			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
-					bounds.getSouth()), zoneNumber, hemisphere);
-			centerNorthing = ((northing - lowerLeftUTM.getNorthing()) / 2)
-					+ lowerLeftUTM.getNorthing();
-			newNorthing = utm.getNorthing();
-		} else if (northing > upperRightUTM.getNorthing()) {
-			Point currentLatLng = Point.create(zoneNumber, hemisphere,
-					centerEasting, upperRightUTM.getNorthing());
-			UTM utm = UTM.from(Point.degrees(currentLatLng.getLongitude(),
-					bounds.getNorth()), zoneNumber, hemisphere);
-			centerNorthing = ((upperRightUTM.getNorthing() - newNorthing) / 2)
-					+ newNorthing;
-			northing = utm.getNorthing();
-		}
-
-		if (easting < lowerLeftUTM.getEasting()) {
-			Point currentLatLng = Point.create(zoneNumber, hemisphere,
-					newEasting, centerNorthing);
-			UTM utm = UTM.from(
-					Point.degrees(bounds.getWest(),
-							currentLatLng.getLatitude()),
-					zoneNumber, hemisphere);
-			centerEasting = utm.getEasting()
-					+ ((newEasting - utm.getEasting()) / 2);
-			easting = utm.getEasting();
-		} else if (newEasting > upperRightUTM.getEasting()) {
-			Point currentLatLng = Point.create(zoneNumber, hemisphere, easting,
-					centerNorthing);
-			UTM utm = UTM.from(
-					Point.degrees(bounds.getEast(),
-							currentLatLng.getLatitude()),
-					zoneNumber, hemisphere);
-			centerEasting = easting + ((utm.getEasting() - easting) / 2);
-			newEasting = utm.getEasting();
-		}
-
-		Point l1 = Point.create(zoneNumber, hemisphere, easting, newNorthing);
-		Point l2 = Point.create(zoneNumber, hemisphere, easting, northing);
-		Point l3 = Point.create(zoneNumber, hemisphere, newEasting, northing);
-		Point l4 = Point.create(zoneNumber, hemisphere, newEasting,
-				newNorthing);
-
-		double minLatitude = Math.max(l1.getLatitude(), l4.getLatitude());
+		double minLatitude = Math.max(southwest.getLatitude(),
+				southeast.getLatitude());
 		minLatitude = Math.max(minLatitude, bounds.getMinLatitude());
-		double maxLatitude = Math.min(l2.getLatitude(), l3.getLatitude());
+		double maxLatitude = Math.min(northwest.getLatitude(),
+				northeast.getLatitude());
 		maxLatitude = Math.min(maxLatitude, bounds.getMaxLatitude());
 
-		double minLongitude = Math.max(l1.getLongitude(), l2.getLongitude());
+		double minLongitude = Math.max(southwest.getLongitude(),
+				northwest.getLongitude());
 		minLongitude = Math.max(minLongitude, bounds.getMinLongitude());
-		double maxLongitude = Math.min(l3.getLongitude(), l4.getLongitude());
+		double maxLongitude = Math.min(southeast.getLongitude(),
+				northeast.getLongitude());
 		maxLongitude = Math.min(maxLongitude, bounds.getMaxLongitude());
 
 		if (minLongitude <= maxLongitude && minLatitude <= maxLatitude) {
 
-			String id = MGRS.getColumnRowId(centerEasting, centerNorthing,
-					zoneNumber);
-
 			Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
 					maxLongitude, maxLatitude);
 			Point center = labelBounds.getCenter();
+
+			String id = center.toMGRS().getColumnRowId();
 
 			label = new Label(id, center, labelBounds, zoneNumber,
 					zone.getLetter());

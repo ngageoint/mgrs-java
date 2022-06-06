@@ -164,52 +164,32 @@ public class GridZone {
 			lines = bounds.getLines();
 		} else {
 
-			tileBounds = tileBounds.toDegrees();
-			tileBounds = tileBounds.overlap(bounds);
+			Bounds drawBounds = getDrawBounds(tileBounds, precision);
 
-			if (!tileBounds.isEmpty()) {
+			if (drawBounds != null) {
 
 				lines = new ArrayList<>();
 
 				int zoneNumber = getNumber();
 				Hemisphere hemisphere = getHemisphere();
 
-				UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(),
-						zoneNumber, hemisphere);
-				UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(),
-						zoneNumber, hemisphere);
-				UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(),
-						zoneNumber, hemisphere);
-				UTM upperRightUTM = UTM.from(tileBounds.getNortheast(),
-						zoneNumber, hemisphere);
+				for (double easting = drawBounds
+						.getMinLongitude(); easting <= drawBounds
+								.getMaxLongitude(); easting += precision) {
+					for (double northing = drawBounds
+							.getMinLatitude(); northing <= drawBounds
+									.getMaxLatitude(); northing += precision) {
 
-				double leftEasting = Math
-						.floor(Math.min(upperLeftUTM.getEasting(),
-								lowerLeftUTM.getEasting()) / precision)
-						* precision;
-				double lowerNorthing = Math
-						.floor(Math.min(lowerLeftUTM.getNorthing(),
-								lowerRightUTM.getNorthing()) / precision)
-						* precision;
-				double rightEasting = Math
-						.ceil(Math.max(lowerRightUTM.getEasting(),
-								upperRightUTM.getEasting()) / precision)
-						* precision;
-				double upperNorthing = Math
-						.ceil(Math.max(upperRightUTM.getNorthing(),
-								upperLeftUTM.getNorthing()) / precision)
-						* precision;
-
-				for (double easting = leftEasting; easting <= rightEasting; easting += precision) {
-					for (double northing = lowerNorthing; northing <= upperNorthing; northing += precision) {
-						Point latLng1 = Point.create(zoneNumber, hemisphere,
+						Point southwest = Point.create(zoneNumber, hemisphere,
 								easting, northing);
-						Point latLng2 = Point.create(zoneNumber, hemisphere,
+						Point northwest = Point.create(zoneNumber, hemisphere,
 								easting, northing + precision);
-						Point latLng3 = Point.create(zoneNumber, hemisphere,
+						Point southeast = Point.create(zoneNumber, hemisphere,
 								easting + precision, northing);
-						lines.add(Line.line(latLng1, latLng2));
-						lines.add(Line.line(latLng1, latLng3));
+
+						lines.add(Line.line(southwest, northwest));
+						lines.add(Line.line(southwest, southeast));
+
 					}
 				}
 
@@ -218,6 +198,58 @@ public class GridZone {
 		}
 
 		return lines;
+	}
+
+	/**
+	 * Get the draw bounds of easting and northing in meters
+	 * 
+	 * @param tileBounds
+	 *            tile bounds
+	 * @param precision
+	 *            precision in meters
+	 * @return draw bounds or null
+	 */
+	public Bounds getDrawBounds(Bounds tileBounds, int precision) {
+
+		Bounds drawBounds = null;
+
+		tileBounds = tileBounds.toDegrees().overlap(bounds);
+
+		if (!tileBounds.isEmpty()) {
+
+			int zoneNumber = getNumber();
+			Hemisphere hemisphere = getHemisphere();
+
+			UTM upperLeftUTM = UTM.from(tileBounds.getNorthwest(), zoneNumber,
+					hemisphere);
+			UTM lowerLeftUTM = UTM.from(tileBounds.getSouthwest(), zoneNumber,
+					hemisphere);
+			UTM lowerRightUTM = UTM.from(tileBounds.getSoutheast(), zoneNumber,
+					hemisphere);
+			UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
+					hemisphere);
+
+			double leftEasting = Math.floor(Math.min(upperLeftUTM.getEasting(),
+					lowerLeftUTM.getEasting()) / precision) * precision;
+			double lowerNorthing = Math
+					.floor(Math.min(lowerLeftUTM.getNorthing(),
+							lowerRightUTM.getNorthing()) / precision)
+					* precision;
+			double rightEasting = Math
+					.ceil(Math.max(lowerRightUTM.getEasting(),
+							upperRightUTM.getEasting()) / precision)
+					* precision;
+			double upperNorthing = Math
+					.ceil(Math.max(upperRightUTM.getNorthing(),
+							upperLeftUTM.getNorthing()) / precision)
+					* precision;
+
+			drawBounds = Bounds.meters(leftEasting, lowerNorthing, rightEasting,
+					upperNorthing);
+
+		}
+
+		return drawBounds;
 	}
 
 }

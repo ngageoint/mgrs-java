@@ -264,6 +264,15 @@ public class MGRS {
 	}
 
 	/**
+	 * Get the two letter column and row 100k designator
+	 *
+	 * @return the two letter column and row 100k designator
+	 */
+	public String getColumnRowId() {
+		return String.valueOf(column) + row;
+	}
+
+	/**
 	 * Convert to a point
 	 * 
 	 * @return point
@@ -428,8 +437,7 @@ public class MGRS {
 	 *            northing
 	 * @param zoneNumber
 	 *            zone number
-	 * @return the two letter column and row 100k designator for the given UTM
-	 *         location
+	 * @return the two letter column and row 100k designator
 	 */
 	public static String getColumnRowId(double easting, double northing,
 			int zoneNumber) {
