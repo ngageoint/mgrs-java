@@ -264,6 +264,19 @@ public class MGRS {
 	}
 
 	/**
+	 * Get the MGRS coordinate with the accuracy number of digits in the easting
+	 * and northing values. Accuracy must be inclusively between 0
+	 * ({@link GridType#HUNDRED_KILOMETER}) and 5 ({@link GridType#METER}).
+	 * 
+	 * @param accuracy
+	 *            accuracy digits between 0 (inclusive) and 5 (inclusive)
+	 * @return MGRS coordinate
+	 */
+	public String coordinate(int accuracy) {
+		return coordinate(GridType.withAccuracy(accuracy));
+	}
+
+	/**
 	 * Get the two letter column and row 100k designator
 	 *
 	 * @return the two letter column and row 100k designator
@@ -385,8 +398,8 @@ public class MGRS {
 		char rowLetter = getRowLetter(utm);
 
 		// truncate easting/northing to within 100km grid square
-		long easting = Math.round(utm.getEasting() % 100000);
-		long northing = Math.round(utm.getNorthing() % 100000);
+		long easting = (long) (utm.getEasting() % 100000);
+		long northing = (long) (utm.getNorthing() % 100000);
 
 		return MGRS.create(utm.getZoneNumber(), bandLetter, columnLetter,
 				rowLetter, easting, northing);

@@ -54,7 +54,7 @@ public class MGRSProperties {
 			value = null;
 		}
 		if (value == null && required) {
-			throw new RuntimeException("Property not found: " + key);
+			throw new IllegalArgumentException("Property not found: " + key);
 		}
 		return value;
 	}

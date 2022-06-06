@@ -67,4 +67,32 @@ public enum GridType {
 		return precision;
 	}
 
+	/**
+	 * Get the Grid Type accuracy number of digits in the easting and northing
+	 * values
+	 * 
+	 * @return accuracy digits
+	 */
+	public int getAccuracy() {
+		return Math.max(ordinal() - 1, 0);
+	}
+
+	/**
+	 * Get the Grid Type with the accuracy number of digits in the easting and
+	 * northing values. Accuracy must be inclusively between 0
+	 * ({@link GridType#HUNDRED_KILOMETER}) and 5 ({@link GridType#METER}).
+	 * 
+	 * @param accuracy
+	 *            accuracy digits between 0 (inclusive) and 5 (inclusive)
+	 * @return grid type
+	 */
+	public static GridType withAccuracy(int accuracy) {
+		if (accuracy < 0 || accuracy > 5) {
+			throw new IllegalArgumentException(
+					"Grid Type accuracy digits must be >= 0 and <= 5. accuracy digits: "
+							+ accuracy);
+		}
+		return values()[accuracy + 1];
+	}
+
 }
