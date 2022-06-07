@@ -2,6 +2,8 @@ package mil.nga.mgrs.utm;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.features.Point;
@@ -17,7 +19,7 @@ public class UTM {
 	/**
 	 * Zone number
 	 */
-	private int zoneNumber;
+	private int zone;
 
 	/**
 	 * Hemisphere
@@ -35,9 +37,15 @@ public class UTM {
 	private double northing;
 
 	/**
+	 * UTM string pattern
+	 */
+	private static final Pattern utmPattern = Pattern.compile(
+			"^(\\d{1,2})\\s*([N|S])\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)$");
+
+	/**
 	 * Create
 	 * 
-	 * @param zoneNumber
+	 * @param zone
 	 *            zone number
 	 * @param hemisphere
 	 *            hemisphere
@@ -47,15 +55,15 @@ public class UTM {
 	 *            northing
 	 * @return UTM
 	 */
-	public static UTM create(int zoneNumber, Hemisphere hemisphere,
-			double easting, double northing) {
-		return new UTM(zoneNumber, hemisphere, easting, northing);
+	public static UTM create(int zone, Hemisphere hemisphere, double easting,
+			double northing) {
+		return new UTM(zone, hemisphere, easting, northing);
 	}
 
 	/**
 	 * Constructor
 	 * 
-	 * @param zoneNumber
+	 * @param zone
 	 *            zone number
 	 * @param hemisphere
 	 *            hemisphere
@@ -64,9 +72,9 @@ public class UTM {
 	 * @param northing
 	 *            northing
 	 */
-	public UTM(int zoneNumber, Hemisphere hemisphere, double easting,
+	public UTM(int zone, Hemisphere hemisphere, double easting,
 			double northing) {
-		this.zoneNumber = zoneNumber;
+		this.zone = zone;
 		this.hemisphere = hemisphere;
 		this.easting = easting;
 		this.northing = northing;
@@ -77,8 +85,8 @@ public class UTM {
 	 * 
 	 * @return zone number
 	 */
-	public int getZoneNumber() {
-		return zoneNumber;
+	public int getZone() {
+		return zone;
 	}
 
 	/**
@@ -135,9 +143,9 @@ public class UTM {
 
 		StringBuilder value = new StringBuilder();
 
-		DecimalFormat formatter = new DecimalFormat("0");
+		DecimalFormat formatter = new DecimalFormat("0.##");
 
-		value.append(String.format("%02d", zoneNumber));
+		value.append(String.format("%02d", zone));
 		value.append(" ");
 		value.append(hemisphere == Hemisphere.NORTH ? "N" : "S");
 		value.append(" ");
@@ -157,16 +165,27 @@ public class UTM {
 	}
 
 	/**
-	 * Parse a MGRS value
+	 * Parse a UTM value (Zone N|S Easting Northing)
 	 * 
-	 * @param mgrs
-	 *            MGRS value
+	 * @param utm
+	 *            UTM value
 	 * @return UTM
 	 * @throws ParseException
-	 *             upon failure to parse MGRS value
+	 *             upon failure to parse UTM value
 	 */
-	public static UTM parse(String mgrs) throws ParseException {
-		return MGRS.parse(mgrs).toUTM();
+	public static UTM parse(String utm) throws ParseException {
+		Matcher matcher = utmPattern.matcher(utm);
+		if (!matcher.matches()) {
+			throw new ParseException("Invalid UTM: " + utm, 0);
+		}
+
+		int zone = Integer.parseInt(matcher.group(1));
+		Hemisphere hemisphere = matcher.group(2).equals("N") ? Hemisphere.NORTH
+				: Hemisphere.SOUTH;
+		double easting = Double.parseDouble(matcher.group(3));
+		double northing = Double.parseDouble(matcher.group(4));
+
+		return UTM.create(zone, hemisphere, easting, northing);
 	}
 
 	/**

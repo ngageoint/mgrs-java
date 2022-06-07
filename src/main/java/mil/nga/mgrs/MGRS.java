@@ -401,8 +401,8 @@ public class MGRS {
 		long easting = (long) (utm.getEasting() % 100000);
 		long northing = (long) (utm.getNorthing() % 100000);
 
-		return MGRS.create(utm.getZoneNumber(), bandLetter, columnLetter,
-				rowLetter, easting, northing);
+		return MGRS.create(utm.getZone(), bandLetter, columnLetter, rowLetter,
+				easting, northing);
 	}
 
 	/**
@@ -470,7 +470,7 @@ public class MGRS {
 	 * @return column letter
 	 */
 	public static char getColumnLetter(UTM utm) {
-		return getColumnLetter(utm.getZoneNumber(), utm.getEasting());
+		return getColumnLetter(utm.getZone(), utm.getEasting());
 	}
 
 	/**
@@ -498,7 +498,7 @@ public class MGRS {
 	 * @return row letter
 	 */
 	public static char getRowLetter(UTM utm) {
-		return getRowLetter(utm.getZoneNumber(), utm.getNorthing());
+		return getRowLetter(utm.getZone(), utm.getNorthing());
 	}
 
 	/**

@@ -399,7 +399,7 @@ public class Point {
 			north -= 10000000.0;
 		}
 
-		int zone = utm.getZoneNumber();
+		int zone = utm.getZone();
 
 		double easting = utm.getEasting();
 

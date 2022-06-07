@@ -46,6 +46,9 @@ String mgrs1m = mgrs3.coordinate(GridType.METER);
 UTM utm2 = point3.toUTM();
 MGRS mgrs4 = utm2.toMGRS();
 
+UTM utm3 = UTM.parse("18 N 585628 4511322");
+MGRS mgrs5 = utm3.toMGRS();
+
 ```
 
 #### Draw Tile Template ####
