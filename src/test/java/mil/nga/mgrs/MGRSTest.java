@@ -56,50 +56,128 @@ public class MGRSTest {
 	@Test
 	public void testCoordinate() throws ParseException {
 
-		double latitude = 63.98863;
-		double longitude = 29.06757;
+		testCoordinate(29.06757, 63.98863, "35VPL0115697387");
+		testCoordinateMeters(3235787.09, 9346877.48, "35VPL0115697387");
 
+		testCoordinate(53.51, 12.40, "39PYP7290672069");
+		testCoordinateMeters(5956705.95, 1391265.16, "39PYP7290672069");
+
+		testCoordinate(-157.916861, 21.309444, "4QFJ1234056781");
+		testCoordinateMeters(-17579224.55, 2428814.96, "4QFJ1234056781");
+
+	}
+
+	/**
+	 * Test the WGS84 coordinate with expected MGSR coordinate
+	 * 
+	 * @param longitude
+	 *            longitude in degrees
+	 * @param latitude
+	 *            latitude in degrees
+	 * @param value
+	 *            MGRS value
+	 */
+	private void testCoordinate(double longitude, double latitude,
+			String value) {
 		Point point = Point.create(longitude, latitude);
+		testCoordinate(point, value);
+		testCoordinate(point.toMeters(), value);
+	}
+
+	/**
+	 * Test the WGS84 coordinate with expected MGSR coordinate
+	 * 
+	 * @param longitude
+	 *            longitude in degrees
+	 * @param latitude
+	 *            latitude in degrees
+	 * @param value
+	 *            MGRS value
+	 */
+	private void testCoordinateMeters(double longitude, double latitude,
+			String value) {
+		Point point = Point.meters(longitude, latitude);
+		testCoordinate(point, value);
+		testCoordinate(point.toDegrees(), value);
+	}
+
+	/**
+	 * Test the coordinate with expected MGSR coordinate
+	 * 
+	 * @param point
+	 *            point
+	 * @param value
+	 *            MGRS value
+	 */
+	private void testCoordinate(Point point, String value) {
 
 		MGRS mgrs = point.toMGRS();
-		String mgrsValue = "35VPL0115697387";
-		assertEquals(mgrsValue, mgrs.toString());
-		assertEquals(mgrsValue, mgrs.coordinate());
+		assertEquals(value, mgrs.toString());
+		assertEquals(value, mgrs.coordinate());
 
-		double latitude2 = 12.40;
-		double longitude2 = 53.51;
+		assertEquals(accuracyValue(value, -1), mgrs.coordinate(GridType.GZD));
 
-		Point point2 = Point.create(longitude2, latitude2);
-		MGRS mgrs2 = point2.toMGRS();
-		String mgrsValue2 = "39PYP7290672069";
-		assertEquals(mgrsValue2, mgrs2.toString());
-		assertEquals(mgrsValue2, mgrs2.coordinate());
+		String hundredKilometer = mgrs.coordinate(GridType.HUNDRED_KILOMETER);
+		assertEquals(accuracyValue(value, 0), hundredKilometer);
+		assertEquals(hundredKilometer, mgrs.coordinate(0));
 
-		assertEquals("39P", mgrs2.coordinate(GridType.GZD));
+		String tenKilometer = mgrs.coordinate(GridType.TEN_KILOMETER);
+		assertEquals(accuracyValue(value, 1), tenKilometer);
+		assertEquals(tenKilometer, mgrs.coordinate(1));
 
-		String hundredKilometer = mgrs2.coordinate(GridType.HUNDRED_KILOMETER);
-		assertEquals("39PYP", hundredKilometer);
-		assertEquals(hundredKilometer, mgrs2.coordinate(0));
+		String kilometer = mgrs.coordinate(GridType.KILOMETER);
+		assertEquals(accuracyValue(value, 2), kilometer);
+		assertEquals(kilometer, mgrs.coordinate(2));
 
-		String tenKilometer = mgrs2.coordinate(GridType.TEN_KILOMETER);
-		assertEquals("39PYP77", tenKilometer);
-		assertEquals(tenKilometer, mgrs2.coordinate(1));
+		String hundredMeter = mgrs.coordinate(GridType.HUNDRED_METER);
+		assertEquals(accuracyValue(value, 3), hundredMeter);
+		assertEquals(hundredMeter, mgrs.coordinate(3));
 
-		String kilometer = mgrs2.coordinate(GridType.KILOMETER);
-		assertEquals("39PYP7272", kilometer);
-		assertEquals(kilometer, mgrs2.coordinate(2));
+		String tenMeter = mgrs.coordinate(GridType.TEN_METER);
+		assertEquals(accuracyValue(value, 4), tenMeter);
+		assertEquals(tenMeter, mgrs.coordinate(4));
 
-		String hundredMeter = mgrs2.coordinate(GridType.HUNDRED_METER);
-		assertEquals("39PYP729720", hundredMeter);
-		assertEquals(hundredMeter, mgrs2.coordinate(3));
+		String meter = mgrs.coordinate(GridType.METER);
+		assertEquals(meter, value);
+		assertEquals(accuracyValue(value, 5), meter);
+		assertEquals(meter, mgrs.coordinate(5));
 
-		String tenMeter = mgrs2.coordinate(GridType.TEN_METER);
-		assertEquals("39PYP72907206", tenMeter);
-		assertEquals(tenMeter, mgrs2.coordinate(4));
+	}
 
-		assertEquals(mgrsValue2, mgrs2.coordinate(GridType.METER));
-		assertEquals(mgrsValue2, mgrs2.coordinate(5));
+	/**
+	 * Get the MGRS value in the accuracy digits
+	 * 
+	 * @param value
+	 *            MGRS value
+	 * @param accuracy
+	 *            accuracy digits (-1 for GZD)
+	 * @return MGRS in accuracy
+	 */
+	private String accuracyValue(String value, int accuracy) {
 
+		int gzdLength = value.length() % 2 == 1 ? 3 : 2;
+		String accuracyValue = value.substring(0, gzdLength);
+
+		if (accuracy >= 0) {
+
+			accuracyValue += value.substring(gzdLength, gzdLength + 2);
+
+			if (accuracy > 0) {
+
+				String eastingNorthing = value
+						.substring(accuracyValue.length());
+				int currentAccuracy = eastingNorthing.length() / 2;
+				String easting = eastingNorthing.substring(0, currentAccuracy);
+				String northing = eastingNorthing.substring(currentAccuracy);
+
+				accuracyValue += easting.substring(0, accuracy);
+				accuracyValue += northing.substring(0, accuracy);
+
+			}
+
+		}
+
+		return accuracyValue;
 	}
 
 }
