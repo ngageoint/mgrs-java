@@ -34,8 +34,8 @@ public class MGRS {
 	/**
 	 * MGRS string pattern
 	 */
-	private static final Pattern mgrsPattern = Pattern
-			.compile("^(\\d{1,2})([^ABIOYZabioyz])([A-Za-z]{2})([0-9][0-9]+$)");
+	private static final Pattern mgrsPattern = Pattern.compile(
+			"^(\\d{1,2})([^ABIOYZabioyz])(?:([^IOio][^IOWXYZiowxyz])((\\d{2}){0,5}))?$");
 
 	/**
 	 * Zone number
@@ -422,22 +422,37 @@ public class MGRS {
 
 		int zone = Integer.parseInt(matcher.group(1));
 		char band = matcher.group(2).toUpperCase().charAt(0);
-		char column = matcher.group(3).toUpperCase().charAt(0);
-		char row = matcher.group(3).toUpperCase().charAt(1);
 
-		String numericLocation = matcher.group(4);
-		int precision = numericLocation.length() / 2;
-		String[] numericLocations = { numericLocation.substring(0, precision),
-				numericLocation.substring(precision) };
+		MGRS mgrsValue = null;
 
-		// parse easting & northing
-		double multiplier = Math.pow(10.0, 5 - precision);
-		long easting = (long) (Double.parseDouble(numericLocations[0])
-				* multiplier);
-		long northing = (long) (Double.parseDouble(numericLocations[1])
-				* multiplier);
+		String columnRow = matcher.group(3);
+		if (columnRow != null) {
 
-		return MGRS.create(zone, band, column, row, easting, northing);
+			columnRow = columnRow.toUpperCase();
+			char column = columnRow.charAt(0);
+			char row = columnRow.charAt(1);
+
+			// parse easting & northing
+			long easting = 0;
+			long northing = 0;
+			String location = matcher.group(4);
+			if (!location.isEmpty()) {
+				int precision = location.length() / 2;
+				double multiplier = Math.pow(10.0, 5 - precision);
+				easting = (long) (Double.parseDouble(
+						location.substring(0, precision)) * multiplier);
+				northing = (long) (Double.parseDouble(
+						location.substring(precision)) * multiplier);
+			}
+
+			mgrsValue = MGRS.create(zone, band, column, row, easting, northing);
+
+		} else {
+			mgrsValue = GridZones.getGridZone(zone, band).getBounds()
+					.getSouthwest().toMGRS();
+		}
+
+		return mgrsValue;
 	}
 
 	/**
