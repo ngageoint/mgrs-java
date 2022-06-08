@@ -172,12 +172,14 @@ public class GridZone {
 
 				int zoneNumber = getNumber();
 				Hemisphere hemisphere = getHemisphere();
+				double minLon = bounds.getMinLongitude();
+				double maxLon = bounds.getMaxLongitude();
 
 				for (double easting = drawBounds
-						.getMinLongitude(); easting <= drawBounds
+						.getMinLongitude(); easting < drawBounds
 								.getMaxLongitude(); easting += precision) {
 					for (double northing = drawBounds
-							.getMinLatitude(); northing <= drawBounds
+							.getMinLatitude(); northing < drawBounds
 									.getMaxLatitude(); northing += precision) {
 
 						Point southwest = Point.create(zoneNumber, hemisphere,
@@ -186,6 +188,20 @@ public class GridZone {
 								easting, northing + precision);
 						Point southeast = Point.create(zoneNumber, hemisphere,
 								easting + precision, northing);
+
+						// For points outside the tile grid longitude bounds,
+						// get a bound just outside the bounds
+						if (precision > 1) {
+							if (southwest.getLongitude() < minLon) {
+								southwest = getWestBoundsPoint(easting,
+										northing, southwest, southeast,
+										precision);
+							} else if (southeast.getLongitude() > maxLon) {
+								southeast = getEastBoundsPoint(easting,
+										northing, southwest, southeast,
+										precision);
+							}
+						}
 
 						lines.add(Line.line(southwest, northwest));
 						lines.add(Line.line(southwest, southeast));
@@ -198,6 +214,101 @@ public class GridZone {
 		}
 
 		return lines;
+	}
+
+	/**
+	 * Get a point west of the horizontal bounds at one meter precision
+	 * 
+	 * @param easting
+	 *            easting value
+	 * @param northing
+	 *            northing value
+	 * @param west
+	 *            west point
+	 * @param east
+	 *            east point
+	 * @param precision
+	 *            precision in meters
+	 * @return higher precision point
+	 */
+	private Point getWestBoundsPoint(double easting, double northing,
+			Point west, Point east, int precision) {
+		return getBoundsPoint(easting, northing, west, east, precision, false);
+	}
+
+	/**
+	 * Get a point east of the horizontal bounds at one meter precision
+	 * 
+	 * @param easting
+	 *            easting value
+	 * @param northing
+	 *            northing value
+	 * @param west
+	 *            west point
+	 * @param east
+	 *            east point
+	 * @param precision
+	 *            precision in meters
+	 * @return higher precision point
+	 */
+	private Point getEastBoundsPoint(double easting, double northing,
+			Point west, Point east, int precision) {
+		return getBoundsPoint(easting, northing, west, east, precision, true);
+	}
+
+	/**
+	 * Get a point outside of the horizontal bounds at one meter precision
+	 * 
+	 * @param easting
+	 *            easting value
+	 * @param northing
+	 *            northing value
+	 * @param west
+	 *            west point
+	 * @param east
+	 *            east point
+	 * @param precision
+	 *            precision in meters
+	 * @param eastern
+	 *            true if east of the eastern bounds, false if west of the
+	 *            western bounds
+	 * @return higher precision point
+	 */
+	private Point getBoundsPoint(double easting, double northing, Point west,
+			Point east, int precision, boolean eastern) {
+
+		Line line = Line.line(west, east);
+
+		Line boundsLine;
+		if (eastern) {
+			boundsLine = bounds.getEastLine();
+		} else {
+			boundsLine = bounds.getWestLine();
+		}
+
+		int zoneNumber = getNumber();
+		Hemisphere hemisphere = getHemisphere();
+
+		// Intersection between the horizontal line and vertical bounds line
+		Point intersection = MGRSUtils.intersection(line, boundsLine);
+
+		// Intersection easting
+		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
+		double intersectionEasting = intersectionUTM.getEasting();
+
+		// One meter precision just outside the bounds
+		double boundsEasting = intersectionEasting - easting;
+		if (eastern) {
+			boundsEasting = Math.ceil(boundsEasting);
+		} else {
+			boundsEasting = Math.floor(boundsEasting);
+		}
+
+		// Higher precision point just outside of the bounds
+		Point boundsPoint = Point.create(zoneNumber, hemisphere,
+				easting + boundsEasting, northing);
+
+		return boundsPoint;
 	}
 
 	/**

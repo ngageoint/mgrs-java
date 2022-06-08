@@ -668,6 +668,42 @@ public class Bounds {
 	}
 
 	/**
+	 * Get the western line
+	 * 
+	 * @return west line
+	 */
+	public Line getWestLine() {
+		return Line.line(getNorthwest(), getSouthwest());
+	}
+
+	/**
+	 * Get the southern line
+	 * 
+	 * @return south line
+	 */
+	public Line getSouthLine() {
+		return Line.line(getSouthwest(), getSoutheast());
+	}
+
+	/**
+	 * Get the eastern line
+	 * 
+	 * @return east line
+	 */
+	public Line getEastLine() {
+		return Line.line(getSoutheast(), getNortheast());
+	}
+
+	/**
+	 * Get the northern line
+	 * 
+	 * @return north line
+	 */
+	public Line getNorthLine() {
+		return Line.line(getNortheast(), getNorthwest());
+	}
+
+	/**
 	 * Get the pixel range where the bounds fit into the tile
 	 * 
 	 * @param tile
