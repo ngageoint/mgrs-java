@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;
@@ -187,6 +188,17 @@ public class GridZones {
 		MGRSUtils.validateZoneNumber(zoneNumber);
 		MGRSUtils.validateBandLetter(bandLetter);
 		return gridZones.get(zoneNumber).get(bandLetter);
+	}
+
+	/**
+	 * Get the grid zone by MGRS
+	 * 
+	 * @param mgrs
+	 *            mgrs coordinate
+	 * @return grid zone
+	 */
+	public static GridZone getGridZone(MGRS mgrs) {
+		return getGridZone(mgrs.getZone(), mgrs.getBand());
 	}
 
 	/**

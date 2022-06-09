@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
+import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
@@ -312,6 +313,15 @@ public class MGRS {
 	 */
 	public String getColumnRowId() {
 		return String.valueOf(column) + row;
+	}
+
+	/**
+	 * Get the GZD grid zone
+	 * 
+	 * @return GZD grid zone
+	 */
+	public GridZone getGridZone() {
+		return GridZones.getGridZone(this);
 	}
 
 	/**
