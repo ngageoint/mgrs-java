@@ -495,6 +495,52 @@ public class MGRS {
 	}
 
 	/**
+	 * Parse the MGRS string for the precision
+	 * 
+	 * @param mgrs
+	 *            MGRS string
+	 * @return grid type precision
+	 * @throws ParseException
+	 *             upon failure to parse the MGRS string
+	 */
+	public static GridType precision(String mgrs) throws ParseException {
+		Matcher matcher = mgrsMatcher(mgrs);
+		if (!matcher.matches()) {
+			throw new ParseException("Invalid MGRS: " + mgrs, 0);
+		}
+
+		GridType precision = null;
+
+		if (matcher.group(3) != null) {
+
+			String location = matcher.group(4);
+			if (!location.isEmpty()) {
+				precision = GridType.withAccuracy(location.length() / 2);
+			} else {
+				precision = GridType.HUNDRED_KILOMETER;
+			}
+
+		} else {
+			precision = GridType.GZD;
+		}
+
+		return precision;
+	}
+
+	/**
+	 * Get the MGRS coordinate accuracy number of digits
+	 * 
+	 * @param mgrs
+	 *            MGRS string
+	 * @return accuracy digits
+	 * @throws ParseException
+	 *             upon failure to parse the MGRS string
+	 */
+	public static int accuracy(String mgrs) throws ParseException {
+		return precision(mgrs).getAccuracy();
+	}
+
+	/**
 	 * Get the two letter column and row 100k designator for a given UTM
 	 * easting, northing and zone number value
 	 *
