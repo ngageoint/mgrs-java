@@ -277,6 +277,34 @@ public class MGRS {
 	}
 
 	/**
+	 * Get the MGRS coordinate grid precision
+	 * 
+	 * @return grid type precision
+	 */
+	public GridType precision() {
+		return GridType.withAccuracy(accuracy());
+	}
+
+	/**
+	 * Get the MGRS coordinate accuracy number of digits
+	 * 
+	 * @return accuracy digits
+	 */
+	public int accuracy() {
+
+		int accuracy = 5;
+
+		for (int accuracyLevel = 10; accuracyLevel <= 100000; accuracyLevel *= 10) {
+			if (easting % accuracyLevel != 0 || northing % accuracyLevel != 0) {
+				break;
+			}
+			accuracy--;
+		}
+
+		return accuracy;
+	}
+
+	/**
 	 * Get the two letter column and row 100k designator
 	 *
 	 * @return the two letter column and row 100k designator
