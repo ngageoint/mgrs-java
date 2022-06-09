@@ -46,7 +46,7 @@ public class MGRSTest {
 		utmValue = "33 N 474596 8643594";
 
 		assertTrue(MGRS.isMGRS(mgrsValue));
-		mgrs = MGRS.parse(mgrsValue);
+		mgrs = MGRS.parse(mgrsValue.toLowerCase());
 		assertEquals(GridType.METER, MGRS.precision(mgrsValue));
 		assertEquals(5, MGRS.accuracy(mgrsValue));
 		assertEquals(mgrsValue.replaceAll("\\s", ""), mgrs.toString());
@@ -64,7 +64,7 @@ public class MGRSTest {
 		utmValue = "33 N 474596.26 8643594.54";
 
 		assertTrue(UTM.isUTM(utmValue));
-		utm = UTM.parse(utmValue);
+		utm = UTM.parse(utmValue.toLowerCase());
 		assertEquals(utmValue, utm.toString());
 
 		mgrs = utm.toMGRS();

@@ -35,7 +35,8 @@ public class MGRS {
 	 * MGRS string pattern
 	 */
 	private static final Pattern mgrsPattern = Pattern.compile(
-			"^(\\d{1,2})([^ABIOYZabioyz])(?:([^IOio][^IOWXYZiowxyz])((\\d{2}){0,5}))?$");
+			"^(\\d{1,2})([C-HJ-NP-X])(?:([A-HJ-NP-Z][A-HJ-NP-V])((\\d{2}){0,5}))?$",
+			Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Zone number

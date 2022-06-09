@@ -40,7 +40,8 @@ public class UTM {
 	 * UTM string pattern
 	 */
 	private static final Pattern utmPattern = Pattern.compile(
-			"^(\\d{1,2})\\s*([N|S])\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)$");
+			"^(\\d{1,2})\\s*([N|S])\\s*(\\d+\\.?\\d*)\\s*(\\d+\\.?\\d*)$",
+			Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Create
@@ -191,7 +192,8 @@ public class UTM {
 		}
 
 		int zone = Integer.parseInt(matcher.group(1));
-		Hemisphere hemisphere = matcher.group(2).equals("N") ? Hemisphere.NORTH
+		Hemisphere hemisphere = matcher.group(2).equalsIgnoreCase("N")
+				? Hemisphere.NORTH
 				: Hemisphere.SOUTH;
 		double easting = Double.parseDouble(matcher.group(3));
 		double northing = Double.parseDouble(matcher.group(4));
