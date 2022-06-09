@@ -229,6 +229,9 @@ public class MGRSTest {
 		testCoordinate(-157.916861, 21.309444, "4QFJ1234056781");
 		testCoordinateMeters(-17579224.55, 2428814.96, "4QFJ1234056781");
 
+		testCoordinate(17.3714337, 8.1258235, "33PYJ6132198972");
+		testCoordinateMeters(1933779.15, 907610.20, "33PYJ6132198972");
+
 	}
 
 	/**

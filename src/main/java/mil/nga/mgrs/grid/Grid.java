@@ -186,12 +186,12 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
-	 * Get the minimum zoom level override for drawing grid lines
+	 * Get the minimum zoom level for drawing grid lines
 	 * 
-	 * @return minimum zoom level or null if not set
+	 * @return minimum zoom level
 	 */
-	public Integer getLinesMinZoom() {
-		return linesMinZoom;
+	public int getLinesMinZoom() {
+		return linesMinZoom != null ? linesMinZoom : getMinZoom();
 	}
 
 	/**
@@ -214,12 +214,12 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
-	 * Get the maximum zoom level override for drawing grid lines
+	 * Get the maximum zoom level for drawing grid lines
 	 * 
-	 * @return maximum zoom level or null if not set
+	 * @return maximum zoom level
 	 */
 	public Integer getLinesMaxZoom() {
-		return linesMaxZoom;
+		return linesMaxZoom != null ? linesMaxZoom : getMaxZoom();
 	}
 
 	/**
