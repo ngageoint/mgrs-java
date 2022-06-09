@@ -375,7 +375,18 @@ public class MGRS {
 	 * @return true if MGRS string is valid, false otherwise
 	 */
 	public static boolean isMGRS(String mgrs) {
-		return mgrsPattern.matcher(mgrs).matches();
+		return mgrsMatcher(mgrs).matches();
+	}
+
+	/**
+	 * Get a MGRS pattern matcher
+	 * 
+	 * @param mgrs
+	 *            MGRS string
+	 * @return matcher
+	 */
+	private static Matcher mgrsMatcher(String mgrs) {
+		return mgrsPattern.matcher(mgrs.replaceAll("\\s", ""));
 	}
 
 	/**
@@ -415,7 +426,7 @@ public class MGRS {
 	 *             upon failure to parse the MGRS string
 	 */
 	public static MGRS parse(String mgrs) throws ParseException {
-		Matcher matcher = mgrsPattern.matcher(mgrs.replaceAll("\\s", ""));
+		Matcher matcher = mgrsMatcher(mgrs);
 		if (!matcher.matches()) {
 			throw new ParseException("Invalid MGRS: " + mgrs, 0);
 		}

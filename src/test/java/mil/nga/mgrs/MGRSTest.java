@@ -1,6 +1,7 @@
 package mil.nga.mgrs;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 
@@ -29,6 +30,7 @@ public class MGRSTest {
 		String mgrsValue = "33XVG74594359";
 		String utmValue = "33 N 474590 8643590";
 
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		MGRS mgrs = MGRS.parse(mgrsValue);
 		assertEquals(mgrsValue, mgrs.coordinate(GridType.TEN_METER));
 		assertEquals(mgrsValue, mgrs.coordinate(4));
@@ -39,12 +41,14 @@ public class MGRSTest {
 		mgrsValue = "33X VG 74596 43594";
 		utmValue = "33 N 474596 8643594";
 
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(mgrsValue.replaceAll("\\s", ""), mgrs.toString());
 
 		utm = mgrs.toUTM();
 		assertEquals(utmValue, utm.toString());
 
+		assertTrue(UTM.isUTM(utmValue));
 		utm = UTM.parse(utmValue);
 		assertEquals(utmValue, utm.toString());
 
@@ -53,13 +57,16 @@ public class MGRSTest {
 
 		utmValue = "33 N 474596.26 8643594.54";
 
+		assertTrue(UTM.isUTM(utmValue));
 		utm = UTM.parse(utmValue);
 		assertEquals(utmValue, utm.toString());
 
 		mgrs = utm.toMGRS();
 		assertEquals(mgrsValue.replaceAll("\\s", ""), mgrs.toString());
 
-		mgrs = MGRS.parse("33X");
+		mgrsValue = "33X";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
 		assertEquals('T', mgrs.getColumn());
@@ -73,6 +80,7 @@ public class MGRSTest {
 		assertEquals(72.0, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -88,6 +96,7 @@ public class MGRSTest {
 		assertEquals(77.4454720, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG74";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -103,6 +112,7 @@ public class MGRSTest {
 		assertEquals(77.8324735, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG7443";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -118,6 +128,7 @@ public class MGRSTest {
 		assertEquals(77.8600782, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG745435";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -133,6 +144,7 @@ public class MGRSTest {
 		assertEquals(77.8646415, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG74594359";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -148,6 +160,7 @@ public class MGRSTest {
 		assertEquals(77.8654628, point.getLatitude(), 0.0001);
 
 		mgrsValue = "33XVG7459743593";
+		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);
 		assertEquals(33, mgrs.getZone());
 		assertEquals('X', mgrs.getBand());
@@ -241,12 +254,14 @@ public class MGRSTest {
 
 		String gzd = mgrs.coordinate(GridType.GZD);
 		assertEquals(accuracyValue(value, -1), gzd);
+		assertTrue(MGRS.isMGRS(gzd));
 		MGRS gzdMGRS = MGRS.parse(gzd);
 		assertEquals(gzd, gzdMGRS.coordinate(GridType.GZD));
 
 		String hundredKilometer = mgrs.coordinate(GridType.HUNDRED_KILOMETER);
 		assertEquals(accuracyValue(value, 0), hundredKilometer);
 		assertEquals(hundredKilometer, mgrs.coordinate(0));
+		assertTrue(MGRS.isMGRS(hundredKilometer));
 		MGRS hundredKilometerMGRS = MGRS.parse(hundredKilometer);
 		assertEquals(hundredKilometer,
 				hundredKilometerMGRS.coordinate(GridType.HUNDRED_KILOMETER));
@@ -256,6 +271,7 @@ public class MGRSTest {
 		String tenKilometer = mgrs.coordinate(GridType.TEN_KILOMETER);
 		assertEquals(accuracyValue(value, 1), tenKilometer);
 		assertEquals(tenKilometer, mgrs.coordinate(1));
+		assertTrue(MGRS.isMGRS(tenKilometer));
 		MGRS tenKilometerMGRS = MGRS.parse(tenKilometer);
 		assertEquals(tenKilometer,
 				tenKilometerMGRS.coordinate(GridType.TEN_KILOMETER));
@@ -267,6 +283,7 @@ public class MGRSTest {
 		String kilometer = mgrs.coordinate(GridType.KILOMETER);
 		assertEquals(accuracyValue(value, 2), kilometer);
 		assertEquals(kilometer, mgrs.coordinate(2));
+		assertTrue(MGRS.isMGRS(kilometer));
 		MGRS kilometerMGRS = MGRS.parse(kilometer);
 		assertEquals(kilometer, kilometerMGRS.coordinate(GridType.KILOMETER));
 		assertEquals(getEasting(kilometer, 2), kilometerMGRS.getEasting());
@@ -275,6 +292,7 @@ public class MGRSTest {
 		String hundredMeter = mgrs.coordinate(GridType.HUNDRED_METER);
 		assertEquals(accuracyValue(value, 3), hundredMeter);
 		assertEquals(hundredMeter, mgrs.coordinate(3));
+		assertTrue(MGRS.isMGRS(hundredMeter));
 		MGRS hundredMeterMGRS = MGRS.parse(hundredMeter);
 		assertEquals(hundredMeter,
 				hundredMeterMGRS.coordinate(GridType.HUNDRED_METER));
@@ -286,6 +304,7 @@ public class MGRSTest {
 		String tenMeter = mgrs.coordinate(GridType.TEN_METER);
 		assertEquals(accuracyValue(value, 4), tenMeter);
 		assertEquals(tenMeter, mgrs.coordinate(4));
+		assertTrue(MGRS.isMGRS(tenMeter));
 		MGRS tenMeterMGRS = MGRS.parse(tenMeter);
 		assertEquals(tenMeter, tenMeterMGRS.coordinate(GridType.TEN_METER));
 		assertEquals(getEasting(tenMeter, 4), tenMeterMGRS.getEasting());
@@ -295,6 +314,7 @@ public class MGRSTest {
 		assertEquals(meter, value);
 		assertEquals(accuracyValue(value, 5), meter);
 		assertEquals(meter, mgrs.coordinate(5));
+		assertTrue(MGRS.isMGRS(meter));
 		MGRS meterMGRS = MGRS.parse(meter);
 		assertEquals(meter, meterMGRS.coordinate(GridType.METER));
 		assertEquals(getEasting(meter, 5), meterMGRS.getEasting());

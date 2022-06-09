@@ -165,6 +165,17 @@ public class UTM {
 	}
 
 	/**
+	 * Return whether the given string is valid UTM string
+	 *
+	 * @param utm
+	 *            potential UTM string
+	 * @return true if UTM string is valid, false otherwise
+	 */
+	public static boolean isUTM(String utm) {
+		return utmPattern.matcher(utm).matches();
+	}
+
+	/**
 	 * Parse a UTM value (Zone N|S Easting Northing)
 	 * 
 	 * @param utm
