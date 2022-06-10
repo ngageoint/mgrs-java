@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
@@ -499,24 +500,41 @@ public class MGRS {
 
 			if (location.isEmpty()) {
 
-				Point southwest = mgrsValue.toPoint();
-				Point gridSouthwest = mgrsValue.getGridZone().getBounds()
-						.getSouthwest();
+				Point point = mgrsValue.toPoint().toDegrees();
+				GridZone gridZone = mgrsValue.getGridZone();
+				Point gridSouthwest = gridZone.getBounds().getSouthwest()
+						.toDegrees();
 
-				boolean westBounds = southwest.getLongitude() < gridSouthwest
+				boolean westBounds = point.getLongitude() < gridSouthwest
 						.getLongitude();
-				boolean southBounds = southwest.getLatitude() < gridSouthwest
+				boolean southBounds = point.getLatitude() < gridSouthwest
 						.getLatitude();
 
 				if (westBounds || southBounds) {
-					if (westBounds) {
-						easting = 99999;
+
+					if (westBounds && southBounds) {
+						mgrsValue = Point.degrees(gridSouthwest.getLongitude(),
+								gridSouthwest.getLatitude()).toMGRS();
+					} else if (westBounds) {
+						Point east = MGRS
+								.create(zone, band, column, row,
+										GridType.HUNDRED_KILOMETER
+												.getPrecision(),
+										northing)
+								.toPoint();
+						Point intersection = getWesternBoundsPoint(gridZone,
+								point, east);
+						mgrsValue = intersection.toMGRS();
+					} else if (southBounds) {
+						Point northwest = MGRS.create(zone, band, column, row,
+								easting,
+								GridType.HUNDRED_KILOMETER.getPrecision())
+								.toPoint();
+						Point intersection = getSouthernBoundsPoint(gridZone,
+								point, northwest);
+						mgrsValue = intersection.toMGRS();
 					}
-					if (southBounds) {
-						northing = 99999;
-					}
-					mgrsValue = MGRS.create(zone, band, column, row, easting,
-							northing);
+
 				}
 
 			}
@@ -527,6 +545,90 @@ public class MGRS {
 		}
 
 		return mgrsValue;
+	}
+
+	/**
+	 * Get the point on the western grid zone bounds point between the western
+	 * and eastern points
+	 * 
+	 * @param gridZone
+	 *            grid zone
+	 * @param west
+	 *            western point
+	 * @param east
+	 *            eastern point
+	 * @return western grid bounds point
+	 */
+	private static Point getWesternBoundsPoint(GridZone gridZone, Point west,
+			Point east) {
+
+		UTM eastUTM = east.toUTM();
+		double northing = eastUTM.getNorthing();
+
+		int zoneNumber = gridZone.getNumber();
+		Hemisphere hemisphere = gridZone.getHemisphere();
+
+		Line line = Line.line(west, east);
+		Line boundsLine = gridZone.getBounds().getWestLine();
+
+		Point intersection = MGRSUtils.intersection(line, boundsLine);
+
+		// Intersection easting
+		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
+		double intersectionEasting = intersectionUTM.getEasting();
+
+		// One meter precision just inside the bounds
+		double boundsEasting = Math.ceil(intersectionEasting);
+
+		// Higher precision point just inside of the bounds
+		Point boundsPoint = Point.create(zoneNumber, hemisphere, boundsEasting,
+				northing);
+
+		boundsPoint.setLongitude(boundsLine.getPoint1().getLongitude());
+
+		return boundsPoint;
+	}
+
+	/**
+	 * Get the point on the southern grid zone bounds point between the southern
+	 * and northern points
+	 * 
+	 * @param gridZone
+	 *            grid zone
+	 * @param south
+	 *            southern point
+	 * @param north
+	 *            northern point
+	 * @return southern grid bounds point
+	 */
+	private static Point getSouthernBoundsPoint(GridZone gridZone, Point south,
+			Point north) {
+
+		UTM northUTM = north.toUTM();
+		double easting = northUTM.getEasting();
+
+		int zoneNumber = gridZone.getNumber();
+		Hemisphere hemisphere = gridZone.getHemisphere();
+
+		Line line = Line.line(south, north);
+		Line boundsLine = gridZone.getBounds().getSouthLine();
+
+		Point intersection = MGRSUtils.intersection(line, boundsLine);
+
+		// Intersection northing
+		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
+		double intersectionNorthing = intersectionUTM.getNorthing();
+
+		// One meter precision just inside the bounds
+		double boundsNorthing = Math.ceil(intersectionNorthing);
+
+		// Higher precision point just inside of the bounds
+		Point boundsPoint = Point.create(zoneNumber, hemisphere, easting,
+				boundsNorthing);
+
+		boundsPoint.setLatitude(boundsLine.getPoint1().getLatitude());
+
+		return boundsPoint;
 	}
 
 	/**
