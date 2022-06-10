@@ -194,12 +194,10 @@ public class GridZone {
 						if (precision > 1) {
 							if (southwest.getLongitude() < minLon) {
 								southwest = getWestBoundsPoint(easting,
-										northing, southwest, southeast,
-										precision);
+										northing, southwest, southeast);
 							} else if (southeast.getLongitude() > maxLon) {
 								southeast = getEastBoundsPoint(easting,
-										northing, southwest, southeast,
-										precision);
+										northing, southwest, southeast);
 							}
 						}
 
@@ -227,13 +225,11 @@ public class GridZone {
 	 *            west point
 	 * @param east
 	 *            east point
-	 * @param precision
-	 *            precision in meters
 	 * @return higher precision point
 	 */
 	private Point getWestBoundsPoint(double easting, double northing,
-			Point west, Point east, int precision) {
-		return getBoundsPoint(easting, northing, west, east, precision, false);
+			Point west, Point east) {
+		return getBoundsPoint(easting, northing, west, east, false);
 	}
 
 	/**
@@ -247,13 +243,11 @@ public class GridZone {
 	 *            west point
 	 * @param east
 	 *            east point
-	 * @param precision
-	 *            precision in meters
 	 * @return higher precision point
 	 */
 	private Point getEastBoundsPoint(double easting, double northing,
-			Point west, Point east, int precision) {
-		return getBoundsPoint(easting, northing, west, east, precision, true);
+			Point west, Point east) {
+		return getBoundsPoint(easting, northing, west, east, true);
 	}
 
 	/**
@@ -267,15 +261,13 @@ public class GridZone {
 	 *            west point
 	 * @param east
 	 *            east point
-	 * @param precision
-	 *            precision in meters
 	 * @param eastern
 	 *            true if east of the eastern bounds, false if west of the
 	 *            western bounds
 	 * @return higher precision point
 	 */
 	private Point getBoundsPoint(double easting, double northing, Point west,
-			Point east, int precision, boolean eastern) {
+			Point east, boolean eastern) {
 
 		Line line = Line.line(west, east);
 
