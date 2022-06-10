@@ -212,6 +212,149 @@ public class MGRSTest {
 	}
 
 	/**
+	 * Test parsing a 100k MGRS string value that falls outside grid zone bounds
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testParse100kBounds() throws ParseException {
+
+		String mgrsValue = "32VJN";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		MGRS mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(32, mgrs.getZone());
+		assertEquals('V', mgrs.getBand());
+		assertEquals('J', mgrs.getColumn());
+		assertEquals('N', mgrs.getRow());
+		assertEquals("JN", mgrs.getColumnRowId());
+		assertEquals(99999, mgrs.getEasting());
+		assertEquals(0, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("32VJN9999900000", mgrs.coordinate());
+		Point point = mgrs.toPoint();
+		assertEquals(3.5639364, point.getLongitude(), 0.0001);
+		assertEquals(60.3251296, point.getLatitude(), 0.0001);
+		Point comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+		mgrsValue = "32VKS";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(32, mgrs.getZone());
+		assertEquals('V', mgrs.getBand());
+		assertEquals('K', mgrs.getColumn());
+		assertEquals('S', mgrs.getRow());
+		assertEquals("KS", mgrs.getColumnRowId());
+		assertEquals(99999, mgrs.getEasting());
+		assertEquals(0, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("32VKS9999900000", mgrs.coordinate());
+		point = mgrs.toPoint();
+		assertEquals(4.913375, point.getLongitude(), 0.0001);
+		assertEquals(63.9692467, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+		mgrsValue = "32VJH";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(32, mgrs.getZone());
+		assertEquals('V', mgrs.getBand());
+		assertEquals('J', mgrs.getColumn());
+		assertEquals('H', mgrs.getRow());
+		assertEquals("JH", mgrs.getColumnRowId());
+		assertEquals(99999, mgrs.getEasting());
+		assertEquals(99999, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("32VJH9999999999", mgrs.coordinate());
+		point = mgrs.toPoint();
+		assertEquals(4.0923589, point.getLongitude(), 0.0001);
+		assertEquals(56.7471825, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+		mgrsValue = "38KNU";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(38, mgrs.getZone());
+		assertEquals('K', mgrs.getBand());
+		assertEquals('N', mgrs.getColumn());
+		assertEquals('U', mgrs.getRow());
+		assertEquals("NU", mgrs.getColumnRowId());
+		assertEquals(0, mgrs.getEasting());
+		assertEquals(99999, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("38KNU0000099999", mgrs.coordinate());
+		point = mgrs.toPoint();
+		assertEquals(45.0, point.getLongitude(), 0.0001);
+		assertEquals(-23.5102039, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+		mgrsValue = "38KNU";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(38, mgrs.getZone());
+		assertEquals('K', mgrs.getBand());
+		assertEquals('N', mgrs.getColumn());
+		assertEquals('U', mgrs.getRow());
+		assertEquals("NU", mgrs.getColumnRowId());
+		assertEquals(0, mgrs.getEasting());
+		assertEquals(99999, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("38KNU0000099999", mgrs.coordinate());
+		point = mgrs.toPoint();
+		assertEquals(45.0, point.getLongitude(), 0.0001);
+		assertEquals(-23.5102039, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+		mgrsValue = "38KRU";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		assertEquals(GridType.HUNDRED_KILOMETER, MGRS.precision(mgrsValue));
+		assertEquals(0, MGRS.accuracy(mgrsValue));
+		assertEquals(38, mgrs.getZone());
+		assertEquals('K', mgrs.getBand());
+		assertEquals('R', mgrs.getColumn());
+		assertEquals('U', mgrs.getRow());
+		assertEquals("RU", mgrs.getColumnRowId());
+		assertEquals(0, mgrs.getEasting());
+		assertEquals(99999, mgrs.getNorthing());
+		assertEquals(mgrsValue, mgrs.coordinate(GridType.HUNDRED_KILOMETER));
+		assertEquals("38KRU0000099999", mgrs.coordinate());
+		point = mgrs.toPoint();
+		assertEquals(47.9370189, point.getLongitude(), 0.0001);
+		assertEquals(-23.4825119, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+		assertEquals(GridType.METER, mgrs.precision());
+
+	}
+
+	/**
 	 * Test parsing a MGRS string value
 	 * 
 	 * @throws ParseException
@@ -229,8 +372,8 @@ public class MGRSTest {
 		testCoordinate(-157.916861, 21.309444, "4QFJ1234056781");
 		testCoordinateMeters(-17579224.55, 2428814.96, "4QFJ1234056781");
 
-		testCoordinate(17.3714337, 8.1258235, "33PYJ6132198972");
-		testCoordinateMeters(1933779.15, 907610.20, "33PYJ6132198972");
+		testCoordinate(17.3714337, 8.1258235, "33PYJ6132198972", false);
+		testCoordinateMeters(1933779.15, 907610.20, "33PYJ6132198972", false);
 
 	}
 
@@ -248,9 +391,28 @@ public class MGRSTest {
 	 */
 	private void testCoordinate(double longitude, double latitude, String value)
 			throws ParseException {
+		testCoordinate(longitude, latitude, value, true);
+	}
+
+	/**
+	 * Test the WGS84 coordinate with expected MGSR coordinate
+	 * 
+	 * @param longitude
+	 *            longitude in degrees
+	 * @param latitude
+	 *            latitude in degrees
+	 * @param value
+	 *            MGRS value
+	 * @param test100k
+	 *            set false when falls outside the grid zone
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	private void testCoordinate(double longitude, double latitude, String value,
+			boolean test100k) throws ParseException {
 		Point point = Point.create(longitude, latitude);
-		testCoordinate(point, value);
-		testCoordinate(point.toMeters(), value);
+		testCoordinate(point, value, test100k);
+		testCoordinate(point.toMeters(), value, test100k);
 	}
 
 	/**
@@ -267,9 +429,28 @@ public class MGRSTest {
 	 */
 	private void testCoordinateMeters(double longitude, double latitude,
 			String value) throws ParseException {
+		testCoordinateMeters(longitude, latitude, value, true);
+	}
+
+	/**
+	 * Test the WGS84 coordinate with expected MGSR coordinate
+	 * 
+	 * @param longitude
+	 *            longitude in degrees
+	 * @param latitude
+	 *            latitude in degrees
+	 * @param value
+	 *            MGRS value
+	 * @param test100k
+	 *            set false when falls outside the grid zone
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	private void testCoordinateMeters(double longitude, double latitude,
+			String value, boolean test100k) throws ParseException {
 		Point point = Point.meters(longitude, latitude);
-		testCoordinate(point, value);
-		testCoordinate(point.toDegrees(), value);
+		testCoordinate(point, value, test100k);
+		testCoordinate(point.toDegrees(), value, test100k);
 	}
 
 	/**
@@ -279,10 +460,12 @@ public class MGRSTest {
 	 *            point
 	 * @param value
 	 *            MGRS value
+	 * @param test100k
+	 *            set false when falls outside the grid zone
 	 * @throws ParseException
 	 *             upon failure to parse
 	 */
-	private void testCoordinate(Point point, String value)
+	private void testCoordinate(Point point, String value, boolean test100k)
 			throws ParseException {
 
 		MGRS mgrs = point.toMGRS();
@@ -307,11 +490,13 @@ public class MGRSTest {
 		assertEquals(0, MGRS.accuracy(hundredKilometer));
 		assertEquals(hundredKilometer,
 				hundredKilometerMGRS.coordinate(GridType.HUNDRED_KILOMETER));
-		assertEquals(0, hundredKilometerMGRS.getEasting());
-		assertEquals(0, hundredKilometerMGRS.getNorthing());
-		assertEquals(GridType.HUNDRED_KILOMETER,
-				hundredKilometerMGRS.precision());
-		assertEquals(0, hundredKilometerMGRS.accuracy());
+		if (test100k) {
+			assertEquals(0, hundredKilometerMGRS.getEasting());
+			assertEquals(0, hundredKilometerMGRS.getNorthing());
+			assertEquals(GridType.HUNDRED_KILOMETER,
+					hundredKilometerMGRS.precision());
+			assertEquals(0, hundredKilometerMGRS.accuracy());
+		}
 
 		String tenKilometer = mgrs.coordinate(GridType.TEN_KILOMETER);
 		assertEquals(accuracyValue(value, 1), tenKilometer);

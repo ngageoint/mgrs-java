@@ -497,6 +497,30 @@ public class MGRS {
 
 			mgrsValue = MGRS.create(zone, band, column, row, easting, northing);
 
+			if (location.isEmpty()) {
+
+				Point southwest = mgrsValue.toPoint();
+				Point gridSouthwest = mgrsValue.getGridZone().getBounds()
+						.getSouthwest();
+
+				boolean westBounds = southwest.getLongitude() < gridSouthwest
+						.getLongitude();
+				boolean southBounds = southwest.getLatitude() < gridSouthwest
+						.getLatitude();
+
+				if (westBounds || southBounds) {
+					if (westBounds) {
+						easting = 99999;
+					}
+					if (southBounds) {
+						northing = 99999;
+					}
+					mgrsValue = MGRS.create(zone, band, column, row, easting,
+							northing);
+				}
+
+			}
+
 		} else {
 			mgrsValue = GridZones.getGridZone(zone, band).getBounds()
 					.getSouthwest().toMGRS();
