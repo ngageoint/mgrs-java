@@ -240,6 +240,16 @@ public class MGRSTest {
 		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
 		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
 
+		mgrsValue = "32VJR";
+		assertTrue(MGRS.isMGRS(mgrsValue));
+		mgrs = MGRS.parse(mgrsValue);
+		point = mgrs.toPoint();
+		assertEquals(3.0, point.getLongitude(), 0.0001);
+		assertEquals(63.0020546, point.getLatitude(), 0.0001);
+		comparePoint = MGRS.parse(mgrs.coordinate()).toPoint();
+		assertEquals(comparePoint.getLongitude(), point.getLongitude(), 0.0001);
+		assertEquals(comparePoint.getLatitude(), point.getLatitude(), 0.0001);
+
 		mgrsValue = "32VJH";
 		assertTrue(MGRS.isMGRS(mgrsValue));
 		mgrs = MGRS.parse(mgrsValue);

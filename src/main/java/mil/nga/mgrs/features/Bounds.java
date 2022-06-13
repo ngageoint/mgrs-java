@@ -668,6 +668,21 @@ public class Bounds {
 	}
 
 	/**
+	 * Determine if contains the point
+	 *
+	 * @param point
+	 *            point
+	 * @return true if contains
+	 */
+	public boolean contains(Point point) {
+		point = point.toUnit(unit);
+		double longitude = point.getLongitude();
+		double latitude = point.getLatitude();
+		return longitude >= getWest() && longitude <= getEast()
+				&& latitude >= getSouth() && latitude <= getNorth();
+	}
+
+	/**
 	 * Get the western line
 	 * 
 	 * @return west line

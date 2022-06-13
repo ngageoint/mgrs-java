@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
@@ -502,8 +503,8 @@ public class MGRS {
 
 				Point point = mgrsValue.toPoint().toDegrees();
 				GridZone gridZone = mgrsValue.getGridZone();
-				Point gridSouthwest = gridZone.getBounds().getSouthwest()
-						.toDegrees();
+				Bounds gridBounds = gridZone.getBounds();
+				Point gridSouthwest = gridBounds.getSouthwest().toDegrees();
 
 				boolean westBounds = point.getLongitude() < gridSouthwest
 						.getLongitude();
@@ -513,8 +514,16 @@ public class MGRS {
 				if (westBounds || southBounds) {
 
 					if (westBounds && southBounds) {
-						mgrsValue = Point.degrees(gridSouthwest.getLongitude(),
-								gridSouthwest.getLatitude()).toMGRS();
+						Point northeast = MGRS.create(zone, band, column, row,
+								GridType.HUNDRED_KILOMETER.getPrecision(),
+								GridType.HUNDRED_KILOMETER.getPrecision())
+								.toPoint();
+						if (gridBounds.contains(northeast)) {
+							mgrsValue = Point
+									.degrees(gridSouthwest.getLongitude(),
+											gridSouthwest.getLatitude())
+									.toMGRS();
+						}
 					} else if (westBounds) {
 						Point east = MGRS
 								.create(zone, band, column, row,
@@ -522,17 +531,21 @@ public class MGRS {
 												.getPrecision(),
 										northing)
 								.toPoint();
-						Point intersection = getWesternBoundsPoint(gridZone,
-								point, east);
-						mgrsValue = intersection.toMGRS();
+						if (gridBounds.contains(east)) {
+							Point intersection = getWesternBoundsPoint(gridZone,
+									point, east);
+							mgrsValue = intersection.toMGRS();
+						}
 					} else if (southBounds) {
-						Point northwest = MGRS.create(zone, band, column, row,
+						Point north = MGRS.create(zone, band, column, row,
 								easting,
 								GridType.HUNDRED_KILOMETER.getPrecision())
 								.toPoint();
-						Point intersection = getSouthernBoundsPoint(gridZone,
-								point, northwest);
-						mgrsValue = intersection.toMGRS();
+						if (gridBounds.contains(north)) {
+							Point intersection = getSouthernBoundsPoint(
+									gridZone, point, north);
+							mgrsValue = intersection.toMGRS();
+						}
 					}
 
 				}
