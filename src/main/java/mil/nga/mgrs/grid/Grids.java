@@ -203,12 +203,66 @@ public class Grids {
 		}
 		grid.setWidth(width);
 
+		loadGridStyles(grid, gridKey);
+
 		if (labeler != null) {
 			loadLabeler(labeler, gridKey);
 		}
 		grid.setLabeler(labeler);
 
 		grids.put(type, grid);
+	}
+
+	/**
+	 * Load grid styles within a higher precision grid
+	 * 
+	 * @param grid
+	 *            grid
+	 * @param gridKey
+	 *            grid key
+	 */
+	private void loadGridStyles(Grid grid, String gridKey) {
+		loadGridStyle(grid, gridKey, GridType.HUNDRED_KILOMETER);
+		loadGridStyle(grid, gridKey, GridType.TEN_KILOMETER);
+		loadGridStyle(grid, gridKey, GridType.KILOMETER);
+		loadGridStyle(grid, gridKey, GridType.HUNDRED_METER);
+		loadGridStyle(grid, gridKey, GridType.TEN_METER);
+	}
+
+	/**
+	 * Load a grid style within a higher precision grid
+	 * 
+	 * @param grid
+	 *            grid
+	 * @param gridKey
+	 *            grid key
+	 * @param gridType
+	 *            style grid type
+	 */
+	private void loadGridStyle(Grid grid, String gridKey, GridType gridType) {
+
+		String gridKey2 = gridType.name().toLowerCase();
+
+		String colorProperty = MGRSProperties.getProperty(false,
+				PropertyConstants.GRIDS, gridKey, gridKey2,
+				PropertyConstants.COLOR);
+
+		Double width = MGRSProperties.getDoubleProperty(false,
+				PropertyConstants.GRIDS, gridKey, gridKey2,
+				PropertyConstants.WIDTH);
+
+		if (colorProperty != null || width != null) {
+
+			Color color = colorProperty != null ? Color.color(colorProperty)
+					: Color.black();
+
+			if (width == null) {
+				width = Grid.DEFAULT_WIDTH;
+			}
+
+			grid.setStyle(gridType, new GridStyle(color, width));
+		}
+
 	}
 
 	/**
@@ -794,18 +848,18 @@ public class Grids {
 	 *            grid types
 	 */
 	public void setColor(Color color, GridType... types) {
-		setColor(color, Arrays.asList(types));
+		setColor(Arrays.asList(types), color);
 	}
 
 	/**
 	 * Set the grid line color for the grid types
 	 * 
-	 * @param color
-	 *            grid line color
 	 * @param types
 	 *            grid types
+	 * @param color
+	 *            grid line color
 	 */
-	public void setColor(Color color, Collection<GridType> types) {
+	public void setColor(Collection<GridType> types, Color color) {
 		for (GridType type : types) {
 			setColor(type, color);
 		}
@@ -842,18 +896,18 @@ public class Grids {
 	 *            grid types
 	 */
 	public void setWidth(double width, GridType... types) {
-		setWidth(width, Arrays.asList(types));
+		setWidth(Arrays.asList(types), width);
 	}
 
 	/**
 	 * Set the grid line width for the grid types
 	 * 
-	 * @param width
-	 *            grid line width
 	 * @param types
 	 *            grid types
+	 * @param width
+	 *            grid line width
 	 */
-	public void setWidth(double width, Collection<GridType> types) {
+	public void setWidth(Collection<GridType> types, double width) {
 		for (GridType type : types) {
 			setWidth(type, width);
 		}
@@ -869,6 +923,132 @@ public class Grids {
 	 */
 	public void setWidth(GridType type, double width) {
 		getGrid(type).setWidth(width);
+	}
+
+	/**
+	 * Set the grid type precision line color for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 * @param precisionType
+	 *            precision grid type
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(Collection<GridType> types, GridType precisionType,
+			Color color) {
+		for (GridType type : types) {
+			setColor(type, precisionType, color);
+		}
+	}
+
+	/**
+	 * Set the grid type precision line colors for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param color
+	 *            grid line color
+	 * @param precisionTypes
+	 *            precision grid types
+	 */
+	public void setColor(GridType type, Color color,
+			GridType... precisionTypes) {
+		setColor(type, Arrays.asList(precisionTypes), color);
+	}
+
+	/**
+	 * Set the grid type precision line colors for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param precisionTypes
+	 *            precision grid types
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(GridType type, Collection<GridType> precisionTypes,
+			Color color) {
+		for (GridType precisionType : precisionTypes) {
+			setColor(type, precisionType, color);
+		}
+	}
+
+	/**
+	 * Set the grid type precision line color for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param precisionType
+	 *            precision grid type
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(GridType type, GridType precisionType, Color color) {
+		getGrid(type).setColor(precisionType, color);
+	}
+
+	/**
+	 * Set the grid type precision line width for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 * @param precisionType
+	 *            precision grid type
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(Collection<GridType> types, GridType precisionType,
+			double width) {
+		for (GridType type : types) {
+			setWidth(type, precisionType, width);
+		}
+	}
+
+	/**
+	 * Set the grid type precision line widths for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param width
+	 *            grid line width
+	 * @param precisionTypes
+	 *            precision grid types
+	 */
+	public void setWidth(GridType type, double width,
+			GridType... precisionTypes) {
+		setWidth(type, Arrays.asList(precisionTypes), width);
+	}
+
+	/**
+	 * Set the grid type precision line widths for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param precisionTypes
+	 *            precision grid types
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(GridType type, Collection<GridType> precisionTypes,
+			double width) {
+		for (GridType precisionType : precisionTypes) {
+			setWidth(type, precisionType, width);
+		}
+	}
+
+	/**
+	 * Set the grid type precision line width for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 * @param precisionType
+	 *            precision grid type
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(GridType type, GridType precisionType, double width) {
+		getGrid(type).setWidth(precisionType, width);
 	}
 
 	/**
@@ -1096,18 +1276,18 @@ public class Grids {
 	 *            grid types
 	 */
 	public void setLabelBuffer(double buffer, GridType... types) {
-		setLabelBuffer(buffer, Arrays.asList(types));
+		setLabelBuffer(Arrays.asList(types), buffer);
 	}
 
 	/**
 	 * Set the label grid zone edge buffer for the grid types
 	 * 
-	 * @param buffer
-	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
 	 * @param types
 	 *            grid types
+	 * @param buffer
+	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
 	 */
-	public void setLabelBuffer(double buffer, Collection<GridType> types) {
+	public void setLabelBuffer(Collection<GridType> types, double buffer) {
 		for (GridType type : types) {
 			setLabelBuffer(type, buffer);
 		}
@@ -1159,18 +1339,18 @@ public class Grids {
 	 *            grid types
 	 */
 	public void setLabelColor(Color color, GridType... types) {
-		setLabelColor(color, Arrays.asList(types));
+		setLabelColor(Arrays.asList(types), color);
 	}
 
 	/**
 	 * Set the label color for the grid types
 	 * 
-	 * @param color
-	 *            label color
 	 * @param types
 	 *            grid types
+	 * @param color
+	 *            label color
 	 */
-	public void setLabelColor(Color color, Collection<GridType> types) {
+	public void setLabelColor(Collection<GridType> types, Color color) {
 		for (GridType type : types) {
 			setLabelColor(type, color);
 		}
@@ -1211,18 +1391,18 @@ public class Grids {
 	 *            grid types
 	 */
 	public void setLabelTextSize(double textSize, GridType... types) {
-		setLabelTextSize(textSize, Arrays.asList(types));
+		setLabelTextSize(Arrays.asList(types), textSize);
 	}
 
 	/**
 	 * Set the label text size for the grid types
 	 * 
-	 * @param textSize
-	 *            label text size
 	 * @param types
 	 *            grid types
+	 * @param textSize
+	 *            label text size
 	 */
-	public void setLabelTextSize(double textSize, Collection<GridType> types) {
+	public void setLabelTextSize(Collection<GridType> types, double textSize) {
 		for (GridType type : types) {
 			setLabelTextSize(type, textSize);
 		}

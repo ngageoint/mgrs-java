@@ -1,6 +1,8 @@
 package mil.nga.mgrs.grid;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
@@ -55,14 +57,9 @@ public class Grid implements Comparable<Grid> {
 	private Integer linesMaxZoom;
 
 	/**
-	 * Grid line color
+	 * Grid line styles
 	 */
-	private Color color;
-
-	/**
-	 * Grid line width
-	 */
-	private double width;
+	private Map<GridType, GridStyle> styles = new HashMap<>();
 
 	/**
 	 * Grid labeler
@@ -77,6 +74,7 @@ public class Grid implements Comparable<Grid> {
 	 */
 	protected Grid(GridType type) {
 		this.type = type;
+		styles.put(type, new GridStyle());
 	}
 
 	/**
@@ -254,12 +252,34 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
+	 * Get the grid line style
+	 * 
+	 * @return grid line style
+	 */
+	public GridStyle getStyle() {
+		return styles.get(type);
+	}
+
+	/**
+	 * Set the grid line style
+	 * 
+	 * @param style
+	 *            grid line style
+	 */
+	public void setStyle(GridStyle style) {
+		if (style == null) {
+			style = new GridStyle();
+		}
+		styles.put(type, style);
+	}
+
+	/**
 	 * Get the grid line color
 	 * 
 	 * @return grid line color
 	 */
 	public Color getColor() {
-		return color;
+		return getStyle().getColor();
 	}
 
 	/**
@@ -269,7 +289,7 @@ public class Grid implements Comparable<Grid> {
 	 *            grid line color
 	 */
 	public void setColor(Color color) {
-		this.color = color;
+		getStyle().setColor(color);
 	}
 
 	/**
@@ -278,7 +298,7 @@ public class Grid implements Comparable<Grid> {
 	 * @return grid line width
 	 */
 	public double getWidth() {
-		return width;
+		return getStyle().getWidth();
 	}
 
 	/**
@@ -288,7 +308,116 @@ public class Grid implements Comparable<Grid> {
 	 *            grid line width
 	 */
 	public void setWidth(double width) {
-		this.width = width;
+		getStyle().setWidth(width);
+	}
+
+	/**
+	 * Get the grid type precision line style for the grid type
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @return grid type line style
+	 */
+	public GridStyle getStyle(GridType gridType) {
+		return styles.get(gridType);
+	}
+
+	/**
+	 * Get the grid type line style for the grid type or create it
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @return grid type line style
+	 */
+	private GridStyle getOrCreateStyle(GridType gridType) {
+		GridStyle style = getStyle(gridType);
+		if (style == null) {
+			style = new GridStyle();
+			setStyle(gridType, style);
+		}
+		return style;
+	}
+
+	/**
+	 * Set the grid type precision line style
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @param style
+	 *            grid line style
+	 */
+	public void setStyle(GridType gridType, GridStyle style) {
+		if (gridType.getPrecision() < getPrecision()) {
+			throw new IllegalArgumentException(
+					"Grid can not define a style for a higher precision grid type. Type: "
+							+ type + ", Style Type: " + gridType);
+		}
+		if (style == null) {
+			style = new GridStyle();
+		}
+		styles.put(gridType, style);
+	}
+
+	/**
+	 * Get the grid type precision line color
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @return grid type line color
+	 */
+	public Color getColor(GridType gridType) {
+		Color color = null;
+		GridStyle style = getStyle(gridType);
+		if (style != null) {
+			color = style.getColor();
+		}
+		if (color == null) {
+			color = getColor();
+		}
+		return color;
+	}
+
+	/**
+	 * Set the grid type precision line color
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @param color
+	 *            grid line color
+	 */
+	public void setColor(GridType gridType, Color color) {
+		getOrCreateStyle(gridType).setColor(color);
+	}
+
+	/**
+	 * Get the grid type precision line width
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @return grid type line width
+	 */
+	public double getWidth(GridType gridType) {
+		double width = 0;
+		GridStyle style = getStyle(gridType);
+		if (style != null) {
+			width = style.getWidth();
+		}
+		if (width == 0) {
+			width = getWidth();
+		}
+		return width;
+	}
+
+	/**
+	 * Set the grid type precision line width
+	 * 
+	 * @param gridType
+	 *            grid type
+	 * @param width
+	 *            grid line width
+	 */
+	public void setWidth(GridType gridType, double width) {
+		getOrCreateStyle(gridType).setWidth(width);
 	}
 
 	/**
