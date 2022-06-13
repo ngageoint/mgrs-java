@@ -7,6 +7,7 @@ import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Line;
 import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
@@ -138,12 +139,12 @@ public class GridZone {
 	/**
 	 * Get the grid zone lines
 	 * 
-	 * @param precision
-	 *            precision in meters
+	 * @param gridType
+	 *            grid type
 	 * @return lines
 	 */
-	public List<Line> getLines(int precision) {
-		return getLines(bounds, precision);
+	public List<Line> getLines(GridType gridType) {
+		return getLines(bounds, gridType);
 	}
 
 	/**
@@ -151,25 +152,26 @@ public class GridZone {
 	 * 
 	 * @param tileBounds
 	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
+	 * @param gridType
+	 *            grid type
 	 * @return lines
 	 */
-	public List<Line> getLines(Bounds tileBounds, int precision) {
+	public List<Line> getLines(Bounds tileBounds, GridType gridType) {
 
 		List<Line> lines = null;
 
-		if (precision == 0) {
+		if (gridType == GridType.GZD) {
 			// if precision is 0, draw the zone bounds
 			lines = bounds.getLines();
 		} else {
 
-			Bounds drawBounds = getDrawBounds(tileBounds, precision);
+			Bounds drawBounds = getDrawBounds(tileBounds, gridType);
 
 			if (drawBounds != null) {
 
 				lines = new ArrayList<>();
 
+				int precision = gridType.getPrecision();
 				int zoneNumber = getNumber();
 				Hemisphere hemisphere = getHemisphere();
 				double minLon = bounds.getMinLongitude();
@@ -178,9 +180,15 @@ public class GridZone {
 				for (double easting = drawBounds
 						.getMinLongitude(); easting < drawBounds
 								.getMaxLongitude(); easting += precision) {
+
+					GridType eastingPrecision = GridType.getPrecision(easting);
+
 					for (double northing = drawBounds
 							.getMinLatitude(); northing < drawBounds
 									.getMaxLatitude(); northing += precision) {
+
+						GridType northingPrecision = GridType
+								.getPrecision(northing);
 
 						Point southwest = Point.create(zoneNumber, hemisphere,
 								easting, northing);
@@ -201,8 +209,13 @@ public class GridZone {
 							}
 						}
 
-						lines.add(Line.line(southwest, northwest));
-						lines.add(Line.line(southwest, southeast));
+						// Vertical line
+						lines.add(Line.line(southwest, northwest,
+								eastingPrecision));
+
+						// Horizontal line
+						lines.add(Line.line(southwest, southeast,
+								northingPrecision));
 
 					}
 				}
@@ -308,11 +321,11 @@ public class GridZone {
 	 * 
 	 * @param tileBounds
 	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
+	 * @param gridType
+	 *            grid type
 	 * @return draw bounds or null
 	 */
-	public Bounds getDrawBounds(Bounds tileBounds, int precision) {
+	public Bounds getDrawBounds(Bounds tileBounds, GridType gridType) {
 
 		Bounds drawBounds = null;
 
@@ -332,6 +345,7 @@ public class GridZone {
 			UTM upperRightUTM = UTM.from(tileBounds.getNortheast(), zoneNumber,
 					hemisphere);
 
+			int precision = gridType.getPrecision();
 			double leftEasting = Math.floor(Math.min(upperLeftUTM.getEasting(),
 					lowerLeftUTM.getEasting()) / precision) * precision;
 			double lowerNorthing = Math

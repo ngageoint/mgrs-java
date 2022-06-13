@@ -1,5 +1,7 @@
 package mil.nga.mgrs.features;
 
+import mil.nga.mgrs.grid.GridType;
+
 /**
  * Line between two points in meters
  * 
@@ -19,6 +21,11 @@ public class Line {
 	private Point point2;
 
 	/**
+	 * Grid type the line represents if any
+	 */
+	private GridType gridType;
+
+	/**
 	 * Create a line
 	 * 
 	 * @param point1
@@ -32,6 +39,21 @@ public class Line {
 	}
 
 	/**
+	 * Create a line
+	 * 
+	 * @param point1
+	 *            first point
+	 * @param point2
+	 *            second point
+	 * @param gridType
+	 *            line grid type
+	 * @return line
+	 */
+	public static Line line(Point point1, Point point2, GridType gridType) {
+		return new Line(point1, point2, gridType);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param point1
@@ -41,6 +63,21 @@ public class Line {
 	 */
 	public Line(Point point1, Point point2) {
 		setPoints(point1, point2);
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param point1
+	 *            first point
+	 * @param point2
+	 *            second point
+	 * @param gridType
+	 *            line grid type
+	 */
+	public Line(Point point1, Point point2, GridType gridType) {
+		this(point1, point2);
+		this.gridType = gridType;
 	}
 
 	/**
@@ -147,7 +184,7 @@ public class Line {
 		if (isUnit(unit)) {
 			line = this;
 		} else {
-			line = new Line(point1.toUnit(unit), point2.toUnit(unit));
+			line = new Line(point1.toUnit(unit), point2.toUnit(unit), gridType);
 		}
 		return line;
 	}
@@ -168,6 +205,34 @@ public class Line {
 	 */
 	public Line toMeters() {
 		return toUnit(Unit.METER);
+	}
+
+	/**
+	 * Get the line grid type
+	 * 
+	 * @return grid type
+	 */
+	public GridType getGridType() {
+		return gridType;
+	}
+
+	/**
+	 * Check if the line has a grid type
+	 * 
+	 * @return true if has grid type
+	 */
+	public boolean hasGridType() {
+		return gridType != null;
+	}
+
+	/**
+	 * Set the line grid type
+	 * 
+	 * @param gridType
+	 *            grid type
+	 */
+	public void setGridType(GridType gridType) {
+		this.gridType = gridType;
 	}
 
 	/**

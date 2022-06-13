@@ -5,6 +5,7 @@ import java.util.List;
 
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
+import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.grid.Label;
 import mil.nga.mgrs.grid.Labeler;
 
@@ -179,7 +180,7 @@ public class GZDLabeler extends Labeler {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Label> getLabels(Bounds tileBounds, int precision,
+	public List<Label> getLabels(Bounds tileBounds, GridType gridType,
 			GridZone zone) {
 		List<Label> labels = new ArrayList<>();
 		Bounds bounds = zone.getBounds();

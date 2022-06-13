@@ -361,7 +361,7 @@ public class Grid implements Comparable<Grid> {
 	 * @return lines
 	 */
 	public List<Line> getLines(Bounds tileBounds, GridZone zone) {
-		return zone.getLines(tileBounds, getPrecision());
+		return zone.getLines(tileBounds, type);
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class Grid implements Comparable<Grid> {
 	public List<Label> getLabels(int zoom, Bounds tileBounds, GridZone zone) {
 		List<Label> labels = null;
 		if (hasLabeler() && labeler.isEnabled() && labeler.isWithin(zoom)) {
-			labels = labeler.getLabels(tileBounds, getPrecision(), zone);
+			labels = labeler.getLabels(tileBounds, type, zone);
 		}
 		return labels;
 	}

@@ -95,4 +95,29 @@ public enum GridType {
 		return values()[accuracy + 1];
 	}
 
+	/**
+	 * Get the precision of the value in meters based upon trailing 0's
+	 * 
+	 * @param value
+	 *            value in meters
+	 * @return precision grid type
+	 */
+	public static GridType getPrecision(double value) {
+		GridType precision = null;
+		if (value % HUNDRED_KILOMETER.precision == 0) {
+			precision = HUNDRED_KILOMETER;
+		} else if (value % TEN_KILOMETER.precision == 0) {
+			precision = TEN_KILOMETER;
+		} else if (value % KILOMETER.precision == 0) {
+			precision = KILOMETER;
+		} else if (value % HUNDRED_METER.precision == 0) {
+			precision = HUNDRED_METER;
+		} else if (value % TEN_METER.precision == 0) {
+			precision = TEN_METER;
+		} else {
+			precision = METER;
+		}
+		return precision;
+	}
+
 }

@@ -230,13 +230,13 @@ public abstract class Labeler {
 	 * 
 	 * @param tileBounds
 	 *            tile bounds
-	 * @param precision
-	 *            precision in meters
+	 * @param gridType
+	 *            grid type
 	 * @param zone
 	 *            grid zone
 	 * @return labels
 	 */
-	public abstract List<Label> getLabels(Bounds tileBounds, int precision,
+	public abstract List<Label> getLabels(Bounds tileBounds, GridType gridType,
 			GridZone zone);
 
 	/**

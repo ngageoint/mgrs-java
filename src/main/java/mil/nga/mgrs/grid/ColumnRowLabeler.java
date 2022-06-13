@@ -180,16 +180,18 @@ public class ColumnRowLabeler extends Labeler {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Label> getLabels(Bounds tileBounds, int precision,
+	public List<Label> getLabels(Bounds tileBounds, GridType gridType,
 			GridZone zone) {
 
 		List<Label> labels = null;
 
-		Bounds drawBounds = zone.getDrawBounds(tileBounds, precision);
+		Bounds drawBounds = zone.getDrawBounds(tileBounds, gridType);
 
 		if (drawBounds != null) {
 
 			labels = new ArrayList<>();
+
+			int precision = gridType.getPrecision();
 
 			for (double easting = drawBounds
 					.getMinLongitude(); easting <= drawBounds
