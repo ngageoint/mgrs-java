@@ -4,6 +4,6 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## [1.0.0](https://github.com/ngageoint/mgrs-java/releases/tag/1.0.0) (TBD)
+## [1.0.0](https://github.com/ngageoint/mgrs-java/releases/tag/1.0.0) (06-14-2022)
 
 * Initial Release
