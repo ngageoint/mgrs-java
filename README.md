@@ -99,6 +99,10 @@ if (zoomGrids.hasGrids()) {
 
 ```
 
+#### Properties ####
+
+Default grid properties including zoom ranges, styles, and labelers are defined in [mgrs.properties](https://github.com/ngageoint/mgrs-java/blob/master/src/main/resources/mgrs.properties). The defaults can be changed in code by modifying the [Grids](https://github.com/ngageoint/mgrs-java/blob/master/src/main/java/mil/nga/mgrs/grid/Grids.java).
+
 ### Installation ###
 
 Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga|mgrs|1.0.0|jar) (JAR, POM, Source, Javadoc)
