@@ -20,6 +20,19 @@ public class GridStyle {
 	private double width;
 
 	/**
+	 * Create a new style
+	 * 
+	 * @param color
+	 *            color
+	 * @param width
+	 *            width
+	 * @return style
+	 */
+	public static GridStyle style(Color color, double width) {
+		return new GridStyle(color, width);
+	}
+
+	/**
 	 * Constructor
 	 */
 	public GridStyle() {

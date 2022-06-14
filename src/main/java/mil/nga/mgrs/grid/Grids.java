@@ -121,13 +121,21 @@ public class Grids {
 	 */
 	private void createGrids(Boolean enabled) {
 
-		createGrid(GridType.GZD, enabled, new GZDLabeler());
-		createGrid(GridType.HUNDRED_KILOMETER, enabled, new ColumnRowLabeler());
-		createGrid(GridType.TEN_KILOMETER, enabled);
-		createGrid(GridType.KILOMETER, enabled);
-		createGrid(GridType.HUNDRED_METER, enabled);
-		createGrid(GridType.TEN_METER, enabled);
-		createGrid(GridType.METER, enabled);
+		Boolean propagate = MGRSProperties.getBooleanProperty(false,
+				PropertyConstants.GRIDS, PropertyConstants.PROPAGATE);
+		Map<GridType, GridStyle> styles = null;
+		if (propagate != null && propagate) {
+			styles = new HashMap<>();
+		}
+
+		createGrid(GridType.GZD, styles, enabled, new GZDLabeler());
+		createGrid(GridType.HUNDRED_KILOMETER, styles, enabled,
+				new ColumnRowLabeler());
+		createGrid(GridType.TEN_KILOMETER, styles, enabled);
+		createGrid(GridType.KILOMETER, styles, enabled);
+		createGrid(GridType.HUNDRED_METER, styles, enabled);
+		createGrid(GridType.TEN_METER, styles, enabled);
+		createGrid(GridType.METER, styles, enabled);
 
 	}
 
@@ -136,11 +144,14 @@ public class Grids {
 	 * 
 	 * @param type
 	 *            grid type
+	 * @param styles
+	 *            propagate grid styles
 	 * @param enabled
 	 *            enable created grids
 	 */
-	private void createGrid(GridType type, Boolean enabled) {
-		createGrid(type, enabled, null);
+	private void createGrid(GridType type, Map<GridType, GridStyle> styles,
+			Boolean enabled) {
+		createGrid(type, styles, enabled, null);
 	}
 
 	/**
@@ -148,12 +159,15 @@ public class Grids {
 	 * 
 	 * @param type
 	 *            grid type
+	 * @param styles
+	 *            propagate grid styles
 	 * @param enabled
 	 *            enable created grids
 	 * @param labeler
 	 *            grid labeler
 	 */
-	private void createGrid(GridType type, Boolean enabled, Labeler labeler) {
+	private void createGrid(GridType type, Map<GridType, GridStyle> styles,
+			Boolean enabled, Labeler labeler) {
 
 		Grid grid = newGrid(type);
 
@@ -203,7 +217,11 @@ public class Grids {
 		}
 		grid.setWidth(width);
 
-		loadGridStyles(grid, gridKey);
+		if (styles != null) {
+			styles.put(type, GridStyle.style(color, width));
+		}
+
+		loadGridStyles(grid, styles, gridKey);
 
 		if (labeler != null) {
 			loadLabeler(labeler, gridKey);
@@ -218,15 +236,29 @@ public class Grids {
 	 * 
 	 * @param grid
 	 *            grid
+	 * @param styles
+	 *            propagate grid styles
 	 * @param gridKey
 	 *            grid key
 	 */
-	private void loadGridStyles(Grid grid, String gridKey) {
-		loadGridStyle(grid, gridKey, GridType.HUNDRED_KILOMETER);
-		loadGridStyle(grid, gridKey, GridType.TEN_KILOMETER);
-		loadGridStyle(grid, gridKey, GridType.KILOMETER);
-		loadGridStyle(grid, gridKey, GridType.HUNDRED_METER);
-		loadGridStyle(grid, gridKey, GridType.TEN_METER);
+	private void loadGridStyles(Grid grid, Map<GridType, GridStyle> styles,
+			String gridKey) {
+		int precision = grid.getPrecision();
+		if (precision < GridType.HUNDRED_KILOMETER.getPrecision()) {
+			loadGridStyle(grid, styles, gridKey, GridType.HUNDRED_KILOMETER);
+		}
+		if (precision < GridType.TEN_KILOMETER.getPrecision()) {
+			loadGridStyle(grid, styles, gridKey, GridType.TEN_KILOMETER);
+		}
+		if (precision < GridType.KILOMETER.getPrecision()) {
+			loadGridStyle(grid, styles, gridKey, GridType.KILOMETER);
+		}
+		if (precision < GridType.HUNDRED_METER.getPrecision()) {
+			loadGridStyle(grid, styles, gridKey, GridType.HUNDRED_METER);
+		}
+		if (precision < GridType.TEN_METER.getPrecision()) {
+			loadGridStyle(grid, styles, gridKey, GridType.TEN_METER);
+		}
 	}
 
 	/**
@@ -234,33 +266,61 @@ public class Grids {
 	 * 
 	 * @param grid
 	 *            grid
+	 * @param styles
+	 *            propagate grid styles
 	 * @param gridKey
 	 *            grid key
 	 * @param gridType
 	 *            style grid type
 	 */
-	private void loadGridStyle(Grid grid, String gridKey, GridType gridType) {
+	private void loadGridStyle(Grid grid, Map<GridType, GridStyle> styles,
+			String gridKey, GridType gridType) {
 
 		String gridKey2 = gridType.name().toLowerCase();
 
 		String colorProperty = MGRSProperties.getProperty(false,
 				PropertyConstants.GRIDS, gridKey, gridKey2,
 				PropertyConstants.COLOR);
+		Color color = null;
+		if (colorProperty != null) {
+			color = Color.color(colorProperty);
+		}
 
 		Double width = MGRSProperties.getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, gridKey2,
 				PropertyConstants.WIDTH);
 
-		if (colorProperty != null || width != null) {
+		if ((color == null || width == null) && styles != null) {
+			GridStyle style = styles.get(gridType);
+			if (style != null) {
+				if (color == null) {
+					Color styleColor = style.getColor();
+					if (styleColor != null) {
+						color = styleColor.copy();
+					}
+				}
+				if (width == null) {
+					width = style.getWidth();
+				}
+			}
+		}
 
-			Color color = colorProperty != null ? Color.color(colorProperty)
-					: Color.black();
+		if (color != null || width != null) {
 
-			if (width == null) {
-				width = Grid.DEFAULT_WIDTH;
+			if (color == null) {
+				color = grid.getColor();
 			}
 
-			grid.setStyle(gridType, new GridStyle(color, width));
+			if (width == null || width == 0) {
+				width = grid.getWidth();
+			}
+
+			GridStyle style = GridStyle.style(color, width);
+			grid.setStyle(gridType, style);
+
+			if (styles != null) {
+				styles.put(gridType, style);
+			}
 		}
 
 	}

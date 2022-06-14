@@ -33,6 +33,11 @@ public class PropertyConstants {
 	public static final String GRIDS = "grids";
 
 	/**
+	 * Propagate
+	 */
+	public static final String PROPAGATE = "propagate";
+
+	/**
 	 * Width
 	 */
 	public static final String WIDTH = "width";
