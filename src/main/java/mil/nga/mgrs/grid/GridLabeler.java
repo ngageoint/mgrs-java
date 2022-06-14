@@ -3,6 +3,7 @@ package mil.nga.mgrs.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.features.Bounds;
 import mil.nga.mgrs.features.Point;
@@ -10,16 +11,16 @@ import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.utm.Hemisphere;
 
 /**
- * MGRS Column and Row labeler for 100 kilometer square
+ * MGRS grid labeler
  * 
  * @author osbornb
  */
-public class ColumnRowLabeler extends Labeler {
+public class GridLabeler extends Labeler {
 
 	/**
 	 * Default Constructor
 	 */
-	public ColumnRowLabeler() {
+	public GridLabeler() {
 		super();
 	}
 
@@ -31,7 +32,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param color
 	 *            label color
 	 */
-	public ColumnRowLabeler(int minZoom, Color color) {
+	public GridLabeler(int minZoom, Color color) {
 		super(minZoom, color);
 	}
 
@@ -45,7 +46,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param textSize
 	 *            label text size
 	 */
-	public ColumnRowLabeler(int minZoom, Color color, double textSize) {
+	public GridLabeler(int minZoom, Color color, double textSize) {
 		super(minZoom, color, textSize);
 	}
 
@@ -62,7 +63,7 @@ public class ColumnRowLabeler extends Labeler {
 	 *            grid zone edge buffer (greater than or equal to 0.0 and less
 	 *            than 0.5)
 	 */
-	public ColumnRowLabeler(int minZoom, Color color, double textSize,
+	public GridLabeler(int minZoom, Color color, double textSize,
 			double buffer) {
 		super(minZoom, color, textSize, buffer);
 	}
@@ -77,7 +78,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param color
 	 *            label color
 	 */
-	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color) {
+	public GridLabeler(int minZoom, Integer maxZoom, Color color) {
 		super(minZoom, maxZoom, color);
 	}
 
@@ -93,7 +94,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param textSize
 	 *            label text size
 	 */
-	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color,
+	public GridLabeler(int minZoom, Integer maxZoom, Color color,
 			double textSize) {
 		super(minZoom, maxZoom, color, textSize);
 	}
@@ -113,7 +114,7 @@ public class ColumnRowLabeler extends Labeler {
 	 *            grid zone edge buffer (greater than or equal to 0.0 and less
 	 *            than 0.5)
 	 */
-	public ColumnRowLabeler(int minZoom, Integer maxZoom, Color color,
+	public GridLabeler(int minZoom, Integer maxZoom, Color color,
 			double textSize, double buffer) {
 		super(minZoom, maxZoom, color, textSize, buffer);
 	}
@@ -130,7 +131,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param color
 	 *            label color
 	 */
-	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+	public GridLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color) {
 		super(enabled, minZoom, maxZoom, color);
 	}
@@ -149,7 +150,7 @@ public class ColumnRowLabeler extends Labeler {
 	 * @param textSize
 	 *            label text size
 	 */
-	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+	public GridLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color, double textSize) {
 		super(enabled, minZoom, maxZoom, color, textSize);
 	}
@@ -171,7 +172,7 @@ public class ColumnRowLabeler extends Labeler {
 	 *            grid zone edge buffer (greater than or equal to 0.0 and less
 	 *            than 0.5)
 	 */
-	public ColumnRowLabeler(boolean enabled, int minZoom, Integer maxZoom,
+	public GridLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color, double textSize, double buffer) {
 		super(enabled, minZoom, maxZoom, color, textSize, buffer);
 	}
@@ -200,7 +201,7 @@ public class ColumnRowLabeler extends Labeler {
 						.getMinLatitude(); northing <= drawBounds
 								.getMaxLatitude(); northing += precision) {
 
-					Label label = getLabel(precision, zone, easting, northing);
+					Label label = getLabel(gridType, zone, easting, northing);
 					if (label != null) {
 						labels.add(label);
 					}
@@ -216,19 +217,20 @@ public class ColumnRowLabeler extends Labeler {
 	/**
 	 * Get the grid zone label
 	 * 
-	 * @param precision
-	 *            precision in meters
+	 * @param gridType
+	 *            grid type
 	 * @param easting
 	 *            easting
 	 * @param northing
 	 *            northing
 	 * @return labels
 	 */
-	private Label getLabel(int precision, GridZone zone, double easting,
+	private Label getLabel(GridType gridType, GridZone zone, double easting,
 			double northing) {
 
 		Label label = null;
 
+		int precision = gridType.getPrecision();
 		Bounds bounds = zone.getBounds();
 		int zoneNumber = zone.getNumber();
 		Hemisphere hemisphere = zone.getHemisphere();
@@ -262,7 +264,13 @@ public class ColumnRowLabeler extends Labeler {
 					maxLongitude, maxLatitude);
 			Point center = labelBounds.getCenter();
 
-			String id = center.toMGRS().getColumnRowId();
+			MGRS mgrs = center.toMGRS();
+			String id = null;
+			if (gridType == GridType.HUNDRED_KILOMETER) {
+				id = mgrs.getColumnRowId();
+			} else {
+				id = mgrs.getEastingAndNorthing(gridType);
+			}
 
 			label = new Label(id, center, labelBounds, zoneNumber,
 					zone.getLetter());

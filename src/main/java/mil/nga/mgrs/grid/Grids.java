@@ -130,28 +130,13 @@ public class Grids {
 
 		createGrid(GridType.GZD, styles, enabled, new GZDLabeler());
 		createGrid(GridType.HUNDRED_KILOMETER, styles, enabled,
-				new ColumnRowLabeler());
-		createGrid(GridType.TEN_KILOMETER, styles, enabled);
-		createGrid(GridType.KILOMETER, styles, enabled);
-		createGrid(GridType.HUNDRED_METER, styles, enabled);
-		createGrid(GridType.TEN_METER, styles, enabled);
-		createGrid(GridType.METER, styles, enabled);
+				new GridLabeler());
+		createGrid(GridType.TEN_KILOMETER, styles, enabled, new GridLabeler());
+		createGrid(GridType.KILOMETER, styles, enabled, new GridLabeler());
+		createGrid(GridType.HUNDRED_METER, styles, enabled, new GridLabeler());
+		createGrid(GridType.TEN_METER, styles, enabled, new GridLabeler());
+		createGrid(GridType.METER, styles, enabled, new GridLabeler());
 
-	}
-
-	/**
-	 * Create the grid
-	 * 
-	 * @param type
-	 *            grid type
-	 * @param styles
-	 *            propagate grid styles
-	 * @param enabled
-	 *            enable created grids
-	 */
-	private void createGrid(GridType type, Map<GridType, GridStyle> styles,
-			Boolean enabled) {
-		createGrid(type, styles, enabled, null);
 	}
 
 	/**
@@ -338,9 +323,7 @@ public class Grids {
 		Boolean enabled = MGRSProperties.getBooleanProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.ENABLED);
-		if (enabled != null) {
-			labeler.setEnabled(enabled);
-		}
+		labeler.setEnabled(enabled != null && enabled);
 
 		Integer minZoom = MGRSProperties.getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,

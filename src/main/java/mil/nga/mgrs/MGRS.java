@@ -249,15 +249,8 @@ public class MGRS {
 
 				if (type != GridType.HUNDRED_KILOMETER) {
 
-					int accuracy = 5 - (int) Math.log10(type.getPrecision());
+					mgrs.append(getEastingAndNorthing(type));
 
-					String easting = String.format(Locale.getDefault(), "%05d",
-							this.easting);
-					String northing = String.format(Locale.getDefault(), "%05d",
-							this.northing);
-
-					mgrs.append(easting.substring(0, accuracy));
-					mgrs.append(northing.substring(0, accuracy));
 				}
 
 			}
@@ -265,6 +258,26 @@ public class MGRS {
 		}
 
 		return mgrs.toString();
+	}
+
+	/**
+	 * Get the easting and northing concatenated value in the grid type
+	 * precision
+	 * 
+	 * @param type
+	 *            grid type precision
+	 * @return easting and northing value
+	 */
+	public String getEastingAndNorthing(GridType type) {
+
+		int accuracy = 5 - (int) Math.log10(type.getPrecision());
+
+		String easting = String.format(Locale.getDefault(), "%05d",
+				this.easting);
+		String northing = String.format(Locale.getDefault(), "%05d",
+				this.northing);
+
+		return easting.substring(0, accuracy) + northing.substring(0, accuracy);
 	}
 
 	/**
