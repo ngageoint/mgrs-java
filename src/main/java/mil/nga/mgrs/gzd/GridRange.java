@@ -25,6 +25,14 @@ public class GridRange implements Iterable<GridZone> {
 	private BandLetterRange bandLetterRange;
 
 	/**
+	 * Constructor, full range
+	 */
+	public GridRange() {
+		this.zoneNumberRange = new ZoneNumberRange();
+		this.bandLetterRange = new BandLetterRange();
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param zoneNumberRange

@@ -1,7 +1,11 @@
 package mil.nga.mgrs;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 
@@ -9,6 +13,8 @@ import org.junit.Test;
 
 import mil.nga.mgrs.features.Point;
 import mil.nga.mgrs.grid.GridType;
+import mil.nga.mgrs.gzd.GridRange;
+import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.utm.UTM;
 
 /**
@@ -312,6 +318,114 @@ public class MGRSTest {
 
 		testCoordinate(17.3714337, 8.1258235, "33PYJ6132198972", false);
 		testCoordinateMeters(1933779.15, 907610.20, "33PYJ6132198972", false);
+
+	}
+
+	/**
+	 * Test parsing GZD coordinates
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testGZDParse() throws ParseException {
+
+		GridRange gridRange = new GridRange();
+
+		for (GridZone zone : gridRange) {
+
+			int zoneNumber = zone.getNumber();
+			char bandLetter = zone.getLetter();
+
+			String gzd = String.valueOf(zoneNumber) + bandLetter;
+			assertTrue(MGRS.isMGRS(gzd));
+			MGRS mgrs = MGRS.parse(gzd);
+			assertNotNull(mgrs);
+			assertEquals(zoneNumber, mgrs.getZone());
+			assertEquals(bandLetter, mgrs.getBand());
+
+			Point point = mgrs.toPoint();
+			Point southwest = zone.getBounds().getSouthwest();
+
+			assertEquals(point.getLongitude(), southwest.getLongitude(),
+					0.0001);
+			assertEquals(point.getLatitude(), southwest.getLatitude(), 0.0001);
+
+		}
+
+	}
+
+	/**
+	 * Test parsing a Svalbard MGRS string values
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testSvalbardParse() throws ParseException {
+
+		assertTrue(MGRS.isMGRS("31X"));
+		assertNotNull(MGRS.parse("31X"));
+		assertFalse(MGRS.isMGRS("32X"));
+		try {
+			assertNull(MGRS.parse("32X"));
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH"));
+		try {
+			MGRS.parse("32XMH");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH11"));
+		try {
+			MGRS.parse("32XMH11");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH1111"));
+		try {
+			MGRS.parse("32XMH1111");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH111111"));
+		try {
+			MGRS.parse("32XMH111111");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH11111111"));
+		try {
+			MGRS.parse("32XMH11111111");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertFalse(MGRS.isMGRS("32XMH111111111"));
+		try {
+			MGRS.parse("32XMH111111111");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertTrue(MGRS.isMGRS("33X"));
+		assertNotNull(MGRS.parse("33X"));
+		assertFalse(MGRS.isMGRS("34X"));
+		try {
+			assertNull(MGRS.parse("34X"));
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertTrue(MGRS.isMGRS("35X"));
+		assertNotNull(MGRS.parse("35X"));
+		assertFalse(MGRS.isMGRS("36X"));
+		try {
+			assertNull(MGRS.parse("36X"));
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+		}
+		assertTrue(MGRS.isMGRS("37X"));
+		assertNotNull(MGRS.parse("37X"));
 
 	}
 

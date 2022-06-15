@@ -4,9 +4,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.0.1 (TBD)
+## [1.0.1](https://github.com/ngageoint/mgrs-java/releases/tag/1.0.1) (06-15-2022)
 
-* TBD
+* Handle parsing invalid Svalbard zones (32X, 34X, 36X)
 
 ## [1.0.0](https://github.com/ngageoint/mgrs-java/releases/tag/1.0.0) (06-14-2022)
 

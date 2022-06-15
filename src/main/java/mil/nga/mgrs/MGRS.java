@@ -42,6 +42,12 @@ public class MGRS {
 			Pattern.CASE_INSENSITIVE);
 
 	/**
+	 * MGRS invalid string pattern (Svalbard)
+	 */
+	private static final Pattern mgrsInvalidPattern = Pattern
+			.compile("^3[246]X.*$", Pattern.CASE_INSENSITIVE);
+
+	/**
 	 * Zone number
 	 */
 	private int zone;
@@ -429,18 +435,20 @@ public class MGRS {
 	 * @return true if MGRS string is valid, false otherwise
 	 */
 	public static boolean isMGRS(String mgrs) {
-		return mgrsMatcher(mgrs).matches();
+		mgrs = removeSpaces(mgrs);
+		return mgrsPattern.matcher(mgrs).matches()
+				&& !mgrsInvalidPattern.matcher(mgrs).matches();
 	}
 
 	/**
-	 * Get a MGRS pattern matcher
+	 * Removed spaces from the value
 	 * 
-	 * @param mgrs
-	 *            MGRS string
-	 * @return matcher
+	 * @param value
+	 *            value string
+	 * @return value without spaces
 	 */
-	private static Matcher mgrsMatcher(String mgrs) {
-		return mgrsPattern.matcher(mgrs.replaceAll("\\s", ""));
+	private static String removeSpaces(String value) {
+		return value.replaceAll("\\s", "");
 	}
 
 	/**
@@ -480,13 +488,18 @@ public class MGRS {
 	 *             upon failure to parse the MGRS string
 	 */
 	public static MGRS parse(String mgrs) throws ParseException {
-		Matcher matcher = mgrsMatcher(mgrs);
+		Matcher matcher = mgrsPattern.matcher(removeSpaces(mgrs));
 		if (!matcher.matches()) {
 			throw new ParseException("Invalid MGRS: " + mgrs, 0);
 		}
 
 		int zone = Integer.parseInt(matcher.group(1));
 		char band = matcher.group(2).toUpperCase().charAt(0);
+
+		GridZone gridZone = GridZones.getGridZone(zone, band);
+		if (gridZone == null) {
+			throw new ParseException("Invalid MGRS: " + mgrs, 0);
+		}
 
 		MGRS mgrsValue = null;
 
@@ -515,7 +528,6 @@ public class MGRS {
 			if (location.isEmpty()) {
 
 				Point point = mgrsValue.toPoint().toDegrees();
-				GridZone gridZone = mgrsValue.getGridZone();
 				Bounds gridBounds = gridZone.getBounds();
 				Point gridSouthwest = gridBounds.getSouthwest().toDegrees();
 
@@ -566,8 +578,7 @@ public class MGRS {
 			}
 
 		} else {
-			mgrsValue = GridZones.getGridZone(zone, band).getBounds()
-					.getSouthwest().toMGRS();
+			mgrsValue = gridZone.getBounds().getSouthwest().toMGRS();
 		}
 
 		return mgrsValue;
@@ -667,7 +678,7 @@ public class MGRS {
 	 *             upon failure to parse the MGRS string
 	 */
 	public static GridType precision(String mgrs) throws ParseException {
-		Matcher matcher = mgrsMatcher(mgrs);
+		Matcher matcher = mgrsPattern.matcher(removeSpaces(mgrs));
 		if (!matcher.matches()) {
 			throw new ParseException("Invalid MGRS: " + mgrs, 0);
 		}
