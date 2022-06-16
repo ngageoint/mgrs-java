@@ -85,7 +85,7 @@ public class Bounds {
 	}
 
 	/**
-	 * Create bounds in degrees
+	 * Create bounds in meters
 	 * 
 	 * @param west
 	 *            western longitude
