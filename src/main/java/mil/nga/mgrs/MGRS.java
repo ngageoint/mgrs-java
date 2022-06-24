@@ -454,17 +454,17 @@ public class MGRS {
 	/**
 	 * Encodes a point as a MGRS string
 	 *
-	 * @param latLng
-	 *            LatLng An object literal latitude and longitude
+	 * @param point
+	 *            point
 	 * @return MGRS
 	 */
-	public static MGRS from(Point latLng) {
+	public static MGRS from(Point point) {
 
-		latLng = latLng.toDegrees();
+		point = point.toDegrees();
 
-		UTM utm = latLng.toUTM();
+		UTM utm = point.toUTM();
 
-		char bandLetter = latLng.getBandLetter();
+		char bandLetter = point.getBandLetter();
 
 		char columnLetter = getColumnLetter(utm);
 

@@ -307,17 +307,21 @@ public class MGRSTest {
 	@Test
 	public void testCoordinate() throws ParseException {
 
-		testCoordinate(29.06757, 63.98863, "35VPL0115697387");
-		testCoordinateMeters(3235787.09, 9346877.48, "35VPL0115697387");
+		String mgrs = "35VPL0115697387";
+		testCoordinate(29.06757, 63.98863, mgrs);
+		testCoordinateMeters(3235787.09, 9346877.48, mgrs);
 
-		testCoordinate(53.51, 12.40, "39PYP7290672069");
-		testCoordinateMeters(5956705.95, 1391265.16, "39PYP7290672069");
+		mgrs = "39PYP7290672069";
+		testCoordinate(53.51, 12.40, mgrs);
+		testCoordinateMeters(5956705.95, 1391265.16, mgrs);
 
-		testCoordinate(-157.916861, 21.309444, "4QFJ1234056781");
-		testCoordinateMeters(-17579224.55, 2428814.96, "4QFJ1234056781");
+		mgrs = "4QFJ1234056781";
+		testCoordinate(-157.916861, 21.309444, mgrs);
+		testCoordinateMeters(-17579224.55, 2428814.96, mgrs);
 
-		testCoordinate(17.3714337, 8.1258235, "33PYJ6132198972", false);
-		testCoordinateMeters(1933779.15, 907610.20, "33PYJ6132198972", false);
+		mgrs = "33PYJ6132198972";
+		testCoordinate(17.3714337, 8.1258235, mgrs, false);
+		testCoordinateMeters(1933779.15, 907610.20, mgrs, false);
 
 	}
 

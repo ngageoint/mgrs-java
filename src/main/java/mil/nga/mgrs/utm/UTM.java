@@ -202,33 +202,33 @@ public class UTM {
 	}
 
 	/**
-	 * Create from a coordinate
+	 * Create from a point
 	 * 
-	 * @param latLng
-	 *            coordinate
+	 * @param point
+	 *            point
 	 * @return UTM
 	 */
-	public static UTM from(Point latLng) {
-		return from(latLng, latLng.getZoneNumber());
+	public static UTM from(Point point) {
+		return from(point, point.getZoneNumber());
 	}
 
 	/**
-	 * Create from a coordinate and zone number
+	 * Create from a point and zone number
 	 * 
-	 * @param latLng
-	 *            coordinate
+	 * @param point
+	 *            point
 	 * @param zone
 	 *            zone number
 	 * @return UTM
 	 */
-	public static UTM from(Point latLng, int zone) {
-		return from(latLng, zone, latLng.getHemisphere());
+	public static UTM from(Point point, int zone) {
+		return from(point, zone, point.getHemisphere());
 	}
 
 	/**
 	 * Create from a coordinate, zone number, and hemisphere
 	 * 
-	 * @param latLng
+	 * @param point
 	 *            coordinate
 	 * @param zone
 	 *            zone number
@@ -236,12 +236,12 @@ public class UTM {
 	 *            hemisphere
 	 * @return UTM
 	 */
-	public static UTM from(Point latLng, int zone, Hemisphere hemisphere) {
+	public static UTM from(Point point, int zone, Hemisphere hemisphere) {
 
-		latLng = latLng.toDegrees();
+		point = point.toDegrees();
 
-		double latitude = latLng.getLatitude();
-		double longitude = latLng.getLongitude();
+		double latitude = point.getLatitude();
+		double longitude = point.getLongitude();
 
 		// @formatter:off
         double easting = 0.5 * Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))*0.9996*6399593.62/Math.pow((1+Math.pow(0.0820944379, 2)*Math.pow(Math.cos(latitude*Math.PI/180), 2)), 0.5)*(1+ Math.pow(0.0820944379,2)/2*Math.pow((0.5*Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))),2)*Math.pow(Math.cos(latitude*Math.PI/180),2)/3)+500000;
