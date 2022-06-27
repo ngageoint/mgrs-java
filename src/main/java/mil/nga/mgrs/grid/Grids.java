@@ -969,6 +969,45 @@ public class Grids {
 	}
 
 	/**
+	 * Delete propagated styles
+	 */
+	public void deletePropagatedStyles() {
+		deletePropagatedStyles(GridType.values());
+	}
+
+	/**
+	 * Delete propagated styles for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void deletePropagatedStyles(GridType... types) {
+		deletePropagatedStyles(Arrays.asList(types));
+	}
+
+	/**
+	 * Delete propagated styles for the grid types
+	 * 
+	 * @param types
+	 *            grid types
+	 */
+	public void deletePropagatedStyles(Collection<GridType> types) {
+		for (GridType type : types) {
+			deletePropagatedStyles(type);
+		}
+	}
+
+	/**
+	 * Delete propagated styles for the grid type
+	 * 
+	 * @param type
+	 *            grid type
+	 */
+	public void deletePropagatedStyles(GridType type) {
+		getGrid(type).clearPrecisionStyles();
+	}
+
+	/**
 	 * Set the grid type precision line color for the grid types
 	 * 
 	 * @param types

@@ -359,6 +359,15 @@ public class Grid implements Comparable<Grid> {
 	}
 
 	/**
+	 * Clear the propagated grid type precision styles
+	 */
+	public void clearPrecisionStyles() {
+		GridStyle style = getStyle();
+		styles.clear();
+		setStyle(style);
+	}
+
+	/**
 	 * Get the grid type precision line color
 	 * 
 	 * @param gridType

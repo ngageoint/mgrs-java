@@ -1,5 +1,9 @@
 package mil.nga.mgrs.grid;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * Grid type enumeration
  * 
@@ -118,6 +122,33 @@ public enum GridType {
 			precision = METER;
 		}
 		return precision;
+	}
+
+	/**
+	 * Get the less precise (larger precision value) grid types
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return grid types less precise
+	 */
+	public static Set<GridType> lessPrecise(GridType type) {
+		GridType[] types = Arrays.copyOfRange(GridType.values(), 0,
+				type.ordinal());
+		return new LinkedHashSet<>(Arrays.asList(types));
+	}
+
+	/**
+	 * Get the more precise (smaller precision value) grid types
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return grid types more precise
+	 */
+	public static Set<GridType> morePrecise(GridType type) {
+		GridType[] values = GridType.values();
+		GridType[] types = Arrays.copyOfRange(values, type.ordinal() + 1,
+				values.length);
+		return new LinkedHashSet<>(Arrays.asList(types));
 	}
 
 }
