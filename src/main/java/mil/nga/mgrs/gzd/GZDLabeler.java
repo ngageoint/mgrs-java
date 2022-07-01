@@ -3,18 +3,18 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.features.Bounds;
+import mil.nga.grid.color.Color;
+import mil.nga.grid.features.Bounds;
 import mil.nga.mgrs.grid.GridType;
-import mil.nga.mgrs.grid.Label;
-import mil.nga.mgrs.grid.Labeler;
+import mil.nga.mgrs.grid.GridLabel;
+import mil.nga.mgrs.grid.GridLabeler;
 
 /**
  * Grid Zone Designator labeler
  * 
  * @author osbornb
  */
-public class GZDLabeler extends Labeler {
+public class GZDLabeler extends GridLabeler {
 
 	/**
 	 * Default Constructor
@@ -180,11 +180,11 @@ public class GZDLabeler extends Labeler {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Label> getLabels(Bounds tileBounds, GridType gridType,
+	public List<GridLabel> getLabels(Bounds tileBounds, GridType gridType,
 			GridZone zone) {
-		List<Label> labels = new ArrayList<>();
+		List<GridLabel> labels = new ArrayList<>();
 		Bounds bounds = zone.getBounds();
-		labels.add(new Label(zone.getName(), bounds.getCenter(), bounds,
+		labels.add(new GridLabel(zone.getName(), bounds.getCenter(), bounds,
 				zone.getNumber(), zone.getLetter()));
 		return labels;
 	}

@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Line;
+import mil.nga.grid.GridStyle;
+import mil.nga.grid.color.Color;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.property.PropertyConstants;
+import mil.nga.grid.tile.GridTile;
+import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.property.MGRSProperties;
-import mil.nga.mgrs.property.PropertyConstants;
-import mil.nga.mgrs.tile.MGRSTile;
 
 /**
  * Grid
@@ -23,7 +24,7 @@ public class Grid implements Comparable<Grid> {
 	/**
 	 * Default line width
 	 */
-	public static final double DEFAULT_WIDTH = MGRSProperties
+	public static final double DEFAULT_WIDTH = MGRSProperties.getInstance()
 			.getDoubleProperty(PropertyConstants.GRID, PropertyConstants.WIDTH);
 
 	/**
@@ -64,7 +65,7 @@ public class Grid implements Comparable<Grid> {
 	/**
 	 * Grid labeler
 	 */
-	private Labeler labeler;
+	private GridLabeler labeler;
 
 	/**
 	 * Constructor
@@ -434,7 +435,7 @@ public class Grid implements Comparable<Grid> {
 	 * 
 	 * @return grid labeler
 	 */
-	public Labeler getLabeler() {
+	public GridLabeler getLabeler() {
 		return labeler;
 	}
 
@@ -453,7 +454,7 @@ public class Grid implements Comparable<Grid> {
 	 * @param labeler
 	 *            grid labeler
 	 */
-	protected void setLabeler(Labeler labeler) {
+	protected void setLabeler(GridLabeler labeler) {
 		this.labeler = labeler;
 	}
 
@@ -466,7 +467,7 @@ public class Grid implements Comparable<Grid> {
 	 *            grid zone
 	 * @return lines
 	 */
-	public List<Line> getLines(MGRSTile tile, GridZone zone) {
+	public List<GridLine> getLines(GridTile tile, GridZone zone) {
 		return getLines(tile.getZoom(), tile.getBounds(), zone);
 	}
 
@@ -481,8 +482,8 @@ public class Grid implements Comparable<Grid> {
 	 *            grid zone
 	 * @return lines
 	 */
-	public List<Line> getLines(int zoom, Bounds tileBounds, GridZone zone) {
-		List<Line> lines = null;
+	public List<GridLine> getLines(int zoom, Bounds tileBounds, GridZone zone) {
+		List<GridLine> lines = null;
 		if (isLinesWithin(zoom)) {
 			lines = getLines(tileBounds, zone);
 		}
@@ -498,7 +499,7 @@ public class Grid implements Comparable<Grid> {
 	 *            grid zone
 	 * @return lines
 	 */
-	public List<Line> getLines(Bounds tileBounds, GridZone zone) {
+	public List<GridLine> getLines(Bounds tileBounds, GridZone zone) {
 		return zone.getLines(tileBounds, type);
 	}
 
@@ -511,7 +512,7 @@ public class Grid implements Comparable<Grid> {
 	 *            grid zone
 	 * @return labels
 	 */
-	public List<Label> getLabels(MGRSTile tile, GridZone zone) {
+	public List<GridLabel> getLabels(GridTile tile, GridZone zone) {
 		return getLabels(tile.getZoom(), tile.getBounds(), zone);
 	}
 
@@ -526,8 +527,9 @@ public class Grid implements Comparable<Grid> {
 	 *            grid zone
 	 * @return labels
 	 */
-	public List<Label> getLabels(int zoom, Bounds tileBounds, GridZone zone) {
-		List<Label> labels = null;
+	public List<GridLabel> getLabels(int zoom, Bounds tileBounds,
+			GridZone zone) {
+		List<GridLabel> labels = null;
 		if (hasLabeler() && labeler.isEnabled() && labeler.isWithin(zoom)) {
 			labels = labeler.getLabels(tileBounds, type, zone);
 		}

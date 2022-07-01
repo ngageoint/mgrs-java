@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import mil.nga.grid.features.Bounds;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.features.Bounds;
 
 /**
  * Grid Range

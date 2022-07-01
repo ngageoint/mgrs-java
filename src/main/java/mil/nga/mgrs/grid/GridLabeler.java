@@ -1,27 +1,40 @@
 package mil.nga.mgrs.grid;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.mgrs.MGRS;
-import mil.nga.mgrs.color.Color;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Point;
+import mil.nga.grid.Labeler;
+import mil.nga.grid.color.Color;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.property.PropertyConstants;
 import mil.nga.mgrs.gzd.GridZone;
-import mil.nga.mgrs.utm.Hemisphere;
+import mil.nga.mgrs.property.MGRSProperties;
 
 /**
- * MGRS grid labeler
+ * Grid Labeler
  * 
  * @author osbornb
  */
-public class GridLabeler extends Labeler {
+public abstract class GridLabeler extends Labeler {
+
+	/**
+	 * Default text size
+	 */
+	public static final double DEFAULT_TEXT_SIZE = MGRSProperties.getInstance()
+			.getDoubleProperty(PropertyConstants.LABELER,
+					PropertyConstants.TEXT_SIZE);
+
+	/**
+	 * Default buffer size
+	 */
+	public static final double DEFAULT_BUFFER = MGRSProperties.getInstance()
+			.getDoubleProperty(PropertyConstants.LABELER,
+					PropertyConstants.BUFFER);
 
 	/**
 	 * Default Constructor
 	 */
 	public GridLabeler() {
-		super();
+		super(true, 0, null, Color.black(), DEFAULT_TEXT_SIZE, DEFAULT_BUFFER);
 	}
 
 	/**
@@ -33,7 +46,7 @@ public class GridLabeler extends Labeler {
 	 *            label color
 	 */
 	public GridLabeler(int minZoom, Color color) {
-		super(minZoom, color);
+		this(minZoom, color, DEFAULT_TEXT_SIZE);
 	}
 
 	/**
@@ -47,7 +60,7 @@ public class GridLabeler extends Labeler {
 	 *            label text size
 	 */
 	public GridLabeler(int minZoom, Color color, double textSize) {
-		super(minZoom, color, textSize);
+		super(minZoom, color, textSize, DEFAULT_BUFFER);
 	}
 
 	/**
@@ -65,7 +78,7 @@ public class GridLabeler extends Labeler {
 	 */
 	public GridLabeler(int minZoom, Color color, double textSize,
 			double buffer) {
-		super(minZoom, color, textSize, buffer);
+		super(minZoom, null, color, textSize, buffer);
 	}
 
 	/**
@@ -79,7 +92,7 @@ public class GridLabeler extends Labeler {
 	 *            label color
 	 */
 	public GridLabeler(int minZoom, Integer maxZoom, Color color) {
-		super(minZoom, maxZoom, color);
+		this(minZoom, maxZoom, color, DEFAULT_TEXT_SIZE);
 	}
 
 	/**
@@ -96,7 +109,7 @@ public class GridLabeler extends Labeler {
 	 */
 	public GridLabeler(int minZoom, Integer maxZoom, Color color,
 			double textSize) {
-		super(minZoom, maxZoom, color, textSize);
+		super(minZoom, maxZoom, color, textSize, DEFAULT_BUFFER);
 	}
 
 	/**
@@ -116,7 +129,7 @@ public class GridLabeler extends Labeler {
 	 */
 	public GridLabeler(int minZoom, Integer maxZoom, Color color,
 			double textSize, double buffer) {
-		super(minZoom, maxZoom, color, textSize, buffer);
+		super(true, minZoom, maxZoom, color, textSize, buffer);
 	}
 
 	/**
@@ -133,7 +146,7 @@ public class GridLabeler extends Labeler {
 	 */
 	public GridLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color) {
-		super(enabled, minZoom, maxZoom, color);
+		this(enabled, minZoom, maxZoom, color, DEFAULT_TEXT_SIZE);
 	}
 
 	/**
@@ -152,7 +165,7 @@ public class GridLabeler extends Labeler {
 	 */
 	public GridLabeler(boolean enabled, int minZoom, Integer maxZoom,
 			Color color, double textSize) {
-		super(enabled, minZoom, maxZoom, color, textSize);
+		super(enabled, minZoom, maxZoom, color, textSize, DEFAULT_BUFFER);
 	}
 
 	/**
@@ -178,105 +191,17 @@ public class GridLabeler extends Labeler {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<Label> getLabels(Bounds tileBounds, GridType gridType,
-			GridZone zone) {
-
-		List<Label> labels = null;
-
-		Bounds drawBounds = zone.getDrawBounds(tileBounds, gridType);
-
-		if (drawBounds != null) {
-
-			labels = new ArrayList<>();
-
-			int precision = gridType.getPrecision();
-
-			for (double easting = drawBounds
-					.getMinLongitude(); easting <= drawBounds
-							.getMaxLongitude(); easting += precision) {
-				for (double northing = drawBounds
-						.getMinLatitude(); northing <= drawBounds
-								.getMaxLatitude(); northing += precision) {
-
-					Label label = getLabel(gridType, zone, easting, northing);
-					if (label != null) {
-						labels.add(label);
-					}
-
-				}
-			}
-
-		}
-
-		return labels;
-	}
-
-	/**
-	 * Get the grid zone label
+	 * Get labels for the bounds
 	 * 
+	 * @param tileBounds
+	 *            tile bounds
 	 * @param gridType
 	 *            grid type
-	 * @param easting
-	 *            easting
-	 * @param northing
-	 *            northing
+	 * @param zone
+	 *            grid zone
 	 * @return labels
 	 */
-	private Label getLabel(GridType gridType, GridZone zone, double easting,
-			double northing) {
-
-		Label label = null;
-
-		int precision = gridType.getPrecision();
-		Bounds bounds = zone.getBounds();
-		int zoneNumber = zone.getNumber();
-		Hemisphere hemisphere = zone.getHemisphere();
-
-		Point northwest = Point.create(zoneNumber, hemisphere, easting,
-				northing + precision);
-		Point southwest = Point.create(zoneNumber, hemisphere, easting,
-				northing);
-		Point southeast = Point.create(zoneNumber, hemisphere,
-				easting + precision, northing);
-		Point northeast = Point.create(zoneNumber, hemisphere,
-				easting + precision, northing + precision);
-
-		double minLatitude = Math.max(southwest.getLatitude(),
-				southeast.getLatitude());
-		minLatitude = Math.max(minLatitude, bounds.getMinLatitude());
-		double maxLatitude = Math.min(northwest.getLatitude(),
-				northeast.getLatitude());
-		maxLatitude = Math.min(maxLatitude, bounds.getMaxLatitude());
-
-		double minLongitude = Math.max(southwest.getLongitude(),
-				northwest.getLongitude());
-		minLongitude = Math.max(minLongitude, bounds.getMinLongitude());
-		double maxLongitude = Math.min(southeast.getLongitude(),
-				northeast.getLongitude());
-		maxLongitude = Math.min(maxLongitude, bounds.getMaxLongitude());
-
-		if (minLongitude <= maxLongitude && minLatitude <= maxLatitude) {
-
-			Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
-					maxLongitude, maxLatitude);
-			Point center = labelBounds.getCenter();
-
-			MGRS mgrs = center.toMGRS();
-			String id = null;
-			if (gridType == GridType.HUNDRED_KILOMETER) {
-				id = mgrs.getColumnRowId();
-			} else {
-				id = mgrs.getEastingAndNorthing(gridType);
-			}
-
-			label = new Label(id, center, labelBounds, zoneNumber,
-					zone.getLetter());
-		}
-
-		return label;
-	}
+	public abstract List<GridLabel> getLabels(Bounds tileBounds, GridType gridType,
+			GridZone zone);
 
 }

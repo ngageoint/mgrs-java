@@ -11,7 +11,7 @@ import java.text.ParseException;
 
 import org.junit.Test;
 
-import mil.nga.mgrs.features.Point;
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridRange;
 import mil.nga.mgrs.gzd.GridZone;
@@ -466,7 +466,7 @@ public class MGRSTest {
 	 */
 	private void testCoordinate(double longitude, double latitude, String value,
 			boolean test100k) throws ParseException {
-		Point point = Point.create(longitude, latitude);
+		Point point = Point.point(longitude, latitude);
 		testCoordinate(point, value, test100k);
 		testCoordinate(point.toMeters(), value, test100k);
 	}
@@ -524,7 +524,7 @@ public class MGRSTest {
 	private void testCoordinate(Point point, String value, boolean test100k)
 			throws ParseException {
 
-		MGRS mgrs = point.toMGRS();
+		MGRS mgrs = MGRS.from(point);
 		assertEquals(value, mgrs.toString());
 		assertEquals(value, mgrs.coordinate());
 

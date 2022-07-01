@@ -1,5 +1,6 @@
 package mil.nga.mgrs.utm;
 
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRSConstants;
 
 /**
@@ -41,6 +42,17 @@ public enum Hemisphere {
 	 */
 	public static Hemisphere fromLatitude(double latitude) {
 		return latitude >= 0 ? Hemisphere.NORTH : Hemisphere.SOUTH;
+	}
+
+	/**
+	 * Get the hemisphere for the point
+	 * 
+	 * @param point
+	 *            point
+	 * @return hemisphere
+	 */
+	public static Hemisphere from(Point point) {
+		return fromLatitude(point.getLatitude());
 	}
 
 }

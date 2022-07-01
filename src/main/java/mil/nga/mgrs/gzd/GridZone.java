@@ -3,10 +3,12 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.grid.GridUtils;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.features.Line;
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Point;
+import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
@@ -45,7 +47,8 @@ public class GridZone {
 	public GridZone(LongitudinalStrip strip, LatitudeBand band) {
 		this.strip = strip;
 		this.band = band;
-		this.bounds = Bounds.bounds(strip, band);
+		this.bounds = Bounds.degrees(strip.getWest(), band.getSouth(),
+				strip.getEast(), band.getNorth());
 	}
 
 	/**
@@ -143,7 +146,7 @@ public class GridZone {
 	 *            grid type
 	 * @return lines
 	 */
-	public List<Line> getLines(GridType gridType) {
+	public List<GridLine> getLines(GridType gridType) {
 		return getLines(bounds, gridType);
 	}
 
@@ -156,13 +159,16 @@ public class GridZone {
 	 *            grid type
 	 * @return lines
 	 */
-	public List<Line> getLines(Bounds tileBounds, GridType gridType) {
+	public List<GridLine> getLines(Bounds tileBounds, GridType gridType) {
 
-		List<Line> lines = null;
+		List<GridLine> lines = null;
 
 		if (gridType == GridType.GZD) {
 			// if precision is 0, draw the zone bounds
-			lines = bounds.getLines();
+			lines = new ArrayList<>();
+			for (Line line : bounds.getLines()) {
+				lines.add(GridLine.line(line, GridType.GZD));
+			}
 		} else {
 
 			Bounds drawBounds = getDrawBounds(tileBounds, gridType);
@@ -190,11 +196,11 @@ public class GridZone {
 						GridType northingPrecision = GridType
 								.getPrecision(northing);
 
-						Point southwest = Point.create(zoneNumber, hemisphere,
+						Point southwest = UTM.point(zoneNumber, hemisphere,
 								easting, northing);
-						Point northwest = Point.create(zoneNumber, hemisphere,
+						Point northwest = UTM.point(zoneNumber, hemisphere,
 								easting, northing + precision);
-						Point southeast = Point.create(zoneNumber, hemisphere,
+						Point southeast = UTM.point(zoneNumber, hemisphere,
 								easting + precision, northing);
 
 						// For points outside the tile grid longitude bounds,
@@ -210,11 +216,11 @@ public class GridZone {
 						}
 
 						// Vertical line
-						lines.add(Line.line(southwest, northwest,
+						lines.add(GridLine.line(southwest, northwest,
 								eastingPrecision));
 
 						// Horizontal line
-						lines.add(Line.line(southwest, southeast,
+						lines.add(GridLine.line(southwest, southeast,
 								northingPrecision));
 
 					}
@@ -282,7 +288,7 @@ public class GridZone {
 	private Point getBoundsPoint(double easting, double northing, Point west,
 			Point east, boolean eastern) {
 
-		Line line = Line.line(west, east);
+		Line line = GridLine.line(west, east);
 
 		Line boundsLine;
 		if (eastern) {
@@ -295,7 +301,7 @@ public class GridZone {
 		Hemisphere hemisphere = getHemisphere();
 
 		// Intersection between the horizontal line and vertical bounds line
-		Point intersection = MGRSUtils.intersection(line, boundsLine);
+		Point intersection = GridUtils.intersection(line, boundsLine);
 
 		// Intersection easting
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
@@ -310,7 +316,7 @@ public class GridZone {
 		}
 
 		// Higher precision point just outside of the bounds
-		Point boundsPoint = Point.create(zoneNumber, hemisphere,
+		Point boundsPoint = UTM.point(zoneNumber, hemisphere,
 				easting + boundsEasting, northing);
 
 		return boundsPoint;

@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Point;
 
 /**
  * Grid Zones, Longitudinal Strips, and Latitude Bands

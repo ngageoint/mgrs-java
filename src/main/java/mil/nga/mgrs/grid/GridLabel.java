@@ -1,31 +1,17 @@
 package mil.nga.mgrs.grid;
 
+import mil.nga.grid.Label;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRSUtils;
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Point;
 
 /**
- * MGRS Label
+ * MGRS Grid Label
  * 
  * @author wnewman
  * @author osbornb
  */
-public class Label {
-
-	/**
-	 * Name
-	 */
-	private String name;
-
-	/**
-	 * Center point
-	 */
-	private Point center;
-
-	/**
-	 * Bounds
-	 */
-	private Bounds bounds;
+public class GridLabel extends Label {
 
 	/**
 	 * Zone number
@@ -49,7 +35,8 @@ public class Label {
 	 * @param bandLetter
 	 *            band letter
 	 */
-	public Label(Point center, Bounds bounds, int zoneNumber, char bandLetter) {
+	public GridLabel(Point center, Bounds bounds, int zoneNumber,
+			char bandLetter) {
 		this(MGRSUtils.getLabelName(zoneNumber, bandLetter), center, bounds,
 				zoneNumber, bandLetter);
 	}
@@ -68,70 +55,11 @@ public class Label {
 	 * @param bandLetter
 	 *            band letter
 	 */
-	public Label(String name, Point center, Bounds bounds, int zoneNumber,
+	public GridLabel(String name, Point center, Bounds bounds, int zoneNumber,
 			char bandLetter) {
-		this.name = name;
-		this.center = center;
-		this.bounds = bounds;
+		super(name, center, bounds);
 		this.zoneNumber = zoneNumber;
 		this.bandLetter = bandLetter;
-	}
-
-	/**
-	 * Get the name
-	 * 
-	 * @return name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Set the name
-	 * 
-	 * @param name
-	 *            name
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Get the center point
-	 * 
-	 * @return center point
-	 */
-	public Point getCenter() {
-		return center;
-	}
-
-	/**
-	 * Set the center point
-	 * 
-	 * @param center
-	 *            center point
-	 */
-	public void setCenter(Point center) {
-		this.center = center;
-	}
-
-	/**
-	 * Get the bounds
-	 * 
-	 * @return bounds
-	 */
-	public Bounds getBounds() {
-		return bounds;
-	}
-
-	/**
-	 * Set the bounds
-	 * 
-	 * @param bounds
-	 *            bounds
-	 */
-	public void setBounds(Bounds bounds) {
-		this.bounds = bounds;
 	}
 
 	/**

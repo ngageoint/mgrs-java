@@ -5,9 +5,11 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mil.nga.mgrs.features.Bounds;
-import mil.nga.mgrs.features.Line;
-import mil.nga.mgrs.features.Point;
+import mil.nga.grid.GridUtils;
+import mil.nga.grid.features.Bounds;
+import mil.nga.grid.features.Line;
+import mil.nga.grid.features.Point;
+import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
@@ -351,7 +353,7 @@ public class MGRS {
 	 * @return point
 	 */
 	public Point toPoint() {
-		return Point.from(this);
+		return toUTM().toPoint();
 	}
 
 	/**
@@ -404,7 +406,7 @@ public class MGRS {
 		// (100km square boundaries are aligned with 100km UTM northing
 		// intervals)
 
-		double latBandNorthing = Point.degrees(0, latBand).toUTM()
+		double latBandNorthing = UTM.from(Point.degrees(0, latBand))
 				.getNorthing();
 		double nBand = Math.floor(latBandNorthing / 100000) * 100000;
 
@@ -462,9 +464,9 @@ public class MGRS {
 
 		point = point.toDegrees();
 
-		UTM utm = point.toUTM();
+		UTM utm = UTM.from(point);
 
-		char bandLetter = point.getBandLetter();
+		char bandLetter = GridZones.getBandLetter(point.getLatitude());
 
 		char columnLetter = getColumnLetter(utm);
 
@@ -544,10 +546,9 @@ public class MGRS {
 								GridType.HUNDRED_KILOMETER.getPrecision())
 								.toPoint();
 						if (gridBounds.contains(northeast)) {
-							mgrsValue = Point
-									.degrees(gridSouthwest.getLongitude(),
-											gridSouthwest.getLatitude())
-									.toMGRS();
+							mgrsValue = from(
+									Point.degrees(gridSouthwest.getLongitude(),
+											gridSouthwest.getLatitude()));
 						}
 					} else if (westBounds) {
 						Point east = MGRS
@@ -559,7 +560,7 @@ public class MGRS {
 						if (gridBounds.contains(east)) {
 							Point intersection = getWesternBoundsPoint(gridZone,
 									point, east);
-							mgrsValue = intersection.toMGRS();
+							mgrsValue = from(intersection);
 						}
 					} else if (southBounds) {
 						Point north = MGRS.create(zone, band, column, row,
@@ -569,7 +570,7 @@ public class MGRS {
 						if (gridBounds.contains(north)) {
 							Point intersection = getSouthernBoundsPoint(
 									gridZone, point, north);
-							mgrsValue = intersection.toMGRS();
+							mgrsValue = from(intersection);
 						}
 					}
 
@@ -578,7 +579,7 @@ public class MGRS {
 			}
 
 		} else {
-			mgrsValue = gridZone.getBounds().getSouthwest().toMGRS();
+			mgrsValue = from(gridZone.getBounds().getSouthwest());
 		}
 
 		return mgrsValue;
@@ -599,16 +600,16 @@ public class MGRS {
 	private static Point getWesternBoundsPoint(GridZone gridZone, Point west,
 			Point east) {
 
-		UTM eastUTM = east.toUTM();
+		UTM eastUTM = UTM.from(east);
 		double northing = eastUTM.getNorthing();
 
 		int zoneNumber = gridZone.getNumber();
 		Hemisphere hemisphere = gridZone.getHemisphere();
 
-		Line line = Line.line(west, east);
+		Line line = GridLine.line(west, east);
 		Line boundsLine = gridZone.getBounds().getWestLine();
 
-		Point intersection = MGRSUtils.intersection(line, boundsLine);
+		Point intersection = GridUtils.intersection(line, boundsLine);
 
 		// Intersection easting
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
@@ -618,7 +619,7 @@ public class MGRS {
 		double boundsEasting = Math.ceil(intersectionEasting);
 
 		// Higher precision point just inside of the bounds
-		Point boundsPoint = Point.create(zoneNumber, hemisphere, boundsEasting,
+		Point boundsPoint = UTM.point(zoneNumber, hemisphere, boundsEasting,
 				northing);
 
 		boundsPoint.setLongitude(boundsLine.getPoint1().getLongitude());
@@ -641,16 +642,16 @@ public class MGRS {
 	private static Point getSouthernBoundsPoint(GridZone gridZone, Point south,
 			Point north) {
 
-		UTM northUTM = north.toUTM();
+		UTM northUTM = UTM.from(north);
 		double easting = northUTM.getEasting();
 
 		int zoneNumber = gridZone.getNumber();
 		Hemisphere hemisphere = gridZone.getHemisphere();
 
-		Line line = Line.line(south, north);
+		Line line = GridLine.line(south, north);
 		Line boundsLine = gridZone.getBounds().getSouthLine();
 
-		Point intersection = MGRSUtils.intersection(line, boundsLine);
+		Point intersection = GridUtils.intersection(line, boundsLine);
 
 		// Intersection northing
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
@@ -660,7 +661,7 @@ public class MGRS {
 		double boundsNorthing = Math.ceil(intersectionNorthing);
 
 		// Higher precision point just inside of the bounds
-		Point boundsPoint = Point.create(zoneNumber, hemisphere, easting,
+		Point boundsPoint = UTM.point(zoneNumber, hemisphere, easting,
 				boundsNorthing);
 
 		boundsPoint.setLatitude(boundsLine.getPoint1().getLatitude());

@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import mil.nga.grid.GridStyle;
+import mil.nga.grid.color.Color;
+import mil.nga.grid.property.PropertyConstants;
 import mil.nga.mgrs.MGRSConstants;
-import mil.nga.mgrs.color.Color;
 import mil.nga.mgrs.gzd.GZDLabeler;
 import mil.nga.mgrs.property.MGRSProperties;
-import mil.nga.mgrs.property.PropertyConstants;
 
 /**
  * Grids
@@ -121,8 +122,8 @@ public class Grids {
 	 */
 	private void createGrids(Boolean enabled) {
 
-		Boolean propagate = MGRSProperties.getBooleanProperty(false,
-				PropertyConstants.GRIDS, PropertyConstants.PROPAGATE);
+		Boolean propagate = MGRSProperties.getInstance().getBooleanProperty(
+				false, PropertyConstants.GRIDS, PropertyConstants.PROPAGATE);
 		Map<GridType, GridStyle> styles = null;
 		if (propagate != null && propagate) {
 			styles = new HashMap<>();
@@ -130,12 +131,12 @@ public class Grids {
 
 		createGrid(GridType.GZD, styles, enabled, new GZDLabeler());
 		createGrid(GridType.HUNDRED_KILOMETER, styles, enabled,
-				new GridLabeler());
-		createGrid(GridType.TEN_KILOMETER, styles, enabled, new GridLabeler());
-		createGrid(GridType.KILOMETER, styles, enabled, new GridLabeler());
-		createGrid(GridType.HUNDRED_METER, styles, enabled, new GridLabeler());
-		createGrid(GridType.TEN_METER, styles, enabled, new GridLabeler());
-		createGrid(GridType.METER, styles, enabled, new GridLabeler());
+				new MGRSLabeler());
+		createGrid(GridType.TEN_KILOMETER, styles, enabled, new MGRSLabeler());
+		createGrid(GridType.KILOMETER, styles, enabled, new MGRSLabeler());
+		createGrid(GridType.HUNDRED_METER, styles, enabled, new MGRSLabeler());
+		createGrid(GridType.TEN_METER, styles, enabled, new MGRSLabeler());
+		createGrid(GridType.METER, styles, enabled, new MGRSLabeler());
 
 	}
 
@@ -152,14 +153,14 @@ public class Grids {
 	 *            grid labeler
 	 */
 	private void createGrid(GridType type, Map<GridType, GridStyle> styles,
-			Boolean enabled, Labeler labeler) {
+			Boolean enabled, GridLabeler labeler) {
 
 		Grid grid = newGrid(type);
 
 		String gridKey = type.name().toLowerCase();
 
 		if (enabled == null) {
-			enabled = MGRSProperties.getBooleanProperty(false,
+			enabled = MGRSProperties.getInstance().getBooleanProperty(false,
 					PropertyConstants.GRIDS, gridKey,
 					PropertyConstants.ENABLED);
 			if (enabled == null) {
@@ -168,34 +169,34 @@ public class Grids {
 		}
 		grid.setEnabled(enabled);
 
-		Integer minZoom = MGRSProperties.getIntegerProperty(false,
+		Integer minZoom = MGRSProperties.getInstance().getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.MIN_ZOOM);
 		if (minZoom == null) {
 			minZoom = 0;
 		}
 		grid.setMinZoom(minZoom);
 
-		Integer maxZoom = MGRSProperties.getIntegerProperty(false,
+		Integer maxZoom = MGRSProperties.getInstance().getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.MAX_ZOOM);
 		grid.setMaxZoom(maxZoom);
 
-		Integer linesMinZoom = MGRSProperties.getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
-				PropertyConstants.MIN_ZOOM);
+		Integer linesMinZoom = MGRSProperties.getInstance().getIntegerProperty(
+				false, PropertyConstants.GRIDS, gridKey,
+				PropertyConstants.LINES, PropertyConstants.MIN_ZOOM);
 		grid.setLinesMinZoom(linesMinZoom);
 
-		Integer linesMaxZoom = MGRSProperties.getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LINES,
-				PropertyConstants.MAX_ZOOM);
+		Integer linesMaxZoom = MGRSProperties.getInstance().getIntegerProperty(
+				false, PropertyConstants.GRIDS, gridKey,
+				PropertyConstants.LINES, PropertyConstants.MAX_ZOOM);
 		grid.setLinesMaxZoom(linesMaxZoom);
 
-		String colorProperty = MGRSProperties.getProperty(false,
+		String colorProperty = MGRSProperties.getInstance().getProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.COLOR);
 		Color color = colorProperty != null ? Color.color(colorProperty)
 				: Color.black();
 		grid.setColor(color);
 
-		Double width = MGRSProperties.getDoubleProperty(false,
+		Double width = MGRSProperties.getInstance().getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.WIDTH);
 		if (width == null) {
 			width = Grid.DEFAULT_WIDTH;
@@ -263,7 +264,7 @@ public class Grids {
 
 		String gridKey2 = gridType.name().toLowerCase();
 
-		String colorProperty = MGRSProperties.getProperty(false,
+		String colorProperty = MGRSProperties.getInstance().getProperty(false,
 				PropertyConstants.GRIDS, gridKey, gridKey2,
 				PropertyConstants.COLOR);
 		Color color = null;
@@ -271,7 +272,7 @@ public class Grids {
 			color = Color.color(colorProperty);
 		}
 
-		Double width = MGRSProperties.getDoubleProperty(false,
+		Double width = MGRSProperties.getInstance().getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, gridKey2,
 				PropertyConstants.WIDTH);
 
@@ -318,42 +319,42 @@ public class Grids {
 	 * @param gridKey
 	 *            grid property key
 	 */
-	private void loadLabeler(Labeler labeler, String gridKey) {
+	private void loadLabeler(GridLabeler labeler, String gridKey) {
 
-		Boolean enabled = MGRSProperties.getBooleanProperty(false,
+		Boolean enabled = MGRSProperties.getInstance().getBooleanProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.ENABLED);
 		labeler.setEnabled(enabled != null && enabled);
 
-		Integer minZoom = MGRSProperties.getIntegerProperty(false,
+		Integer minZoom = MGRSProperties.getInstance().getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.MIN_ZOOM);
 		if (minZoom != null) {
 			labeler.setMinZoom(minZoom);
 		}
 
-		Integer maxZoom = MGRSProperties.getIntegerProperty(false,
+		Integer maxZoom = MGRSProperties.getInstance().getIntegerProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.MAX_ZOOM);
 		if (maxZoom != null) {
 			labeler.setMaxZoom(maxZoom);
 		}
 
-		String color = MGRSProperties.getProperty(false,
+		String color = MGRSProperties.getInstance().getProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.COLOR);
 		if (color != null) {
 			labeler.setColor(Color.color(color));
 		}
 
-		Double textSize = MGRSProperties.getDoubleProperty(false,
+		Double textSize = MGRSProperties.getInstance().getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.TEXT_SIZE);
 		if (textSize != null) {
 			labeler.setTextSize(textSize);
 		}
 
-		Double buffer = MGRSProperties.getDoubleProperty(false,
+		Double buffer = MGRSProperties.getInstance().getDoubleProperty(false,
 				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
 				PropertyConstants.BUFFER);
 		if (buffer != null) {
@@ -1140,7 +1141,7 @@ public class Grids {
 	 *            grid type
 	 * @return labeler or null
 	 */
-	public Labeler getLabeler(GridType type) {
+	public GridLabeler getLabeler(GridType type) {
 		return getGrid(type).getLabeler();
 	}
 
@@ -1163,7 +1164,7 @@ public class Grids {
 	 * @param labeler
 	 *            labeler
 	 */
-	public void setLabeler(GridType type, Labeler labeler) {
+	public void setLabeler(GridType type, GridLabeler labeler) {
 		getGrid(type).setLabeler(labeler);
 	}
 
@@ -1172,7 +1173,7 @@ public class Grids {
 	 */
 	public void enableAllLabelers() {
 		for (Grid grid : grids.values()) {
-			Labeler labeler = grid.getLabeler();
+			GridLabeler labeler = grid.getLabeler();
 			if (labeler != null) {
 				labeler.setEnabled(true);
 			}
@@ -1238,7 +1239,7 @@ public class Grids {
 	 * @return true if labeler enabled
 	 */
 	public boolean isLabelerEnabled(GridType type) {
-		Labeler labeler = getLabeler(type);
+		GridLabeler labeler = getLabeler(type);
 		return labeler != null && labeler.isEnabled();
 	}
 
@@ -1259,7 +1260,7 @@ public class Grids {
 	 *            grid type
 	 */
 	public void disableLabeler(GridType type) {
-		Labeler labeler = getLabeler(type);
+		GridLabeler labeler = getLabeler(type);
 		if (labeler != null) {
 			labeler.setEnabled(false);
 		}
@@ -1272,8 +1273,8 @@ public class Grids {
 	 *            grid type
 	 * @return labeler or null
 	 */
-	private Labeler getRequiredLabeler(GridType type) {
-		Labeler labeler = getLabeler(type);
+	private GridLabeler getRequiredLabeler(GridType type) {
+		GridLabeler labeler = getLabeler(type);
 		if (labeler == null) {
 			throw new IllegalStateException(
 					"Grid type does not have a labeler: " + type);
@@ -1290,7 +1291,7 @@ public class Grids {
 	 *            minimum zoom
 	 */
 	public void setLabelMinZoom(GridType type, int minZoom) {
-		Labeler labeler = getRequiredLabeler(type);
+		GridLabeler labeler = getRequiredLabeler(type);
 		labeler.setMinZoom(minZoom);
 		Integer maxZoom = labeler.getMaxZoom();
 		if (maxZoom != null && maxZoom < minZoom) {
@@ -1307,7 +1308,7 @@ public class Grids {
 	 *            maximum zoom
 	 */
 	public void setLabelMaxZoom(GridType type, Integer maxZoom) {
-		Labeler labeler = getRequiredLabeler(type);
+		GridLabeler labeler = getRequiredLabeler(type);
 		labeler.setMaxZoom(maxZoom);
 		if (maxZoom != null && labeler.getMinZoom() > maxZoom) {
 			labeler.setMinZoom(maxZoom);
@@ -1325,7 +1326,7 @@ public class Grids {
 	 *            maximum zoom
 	 */
 	public void setLabelZoomRange(GridType type, int minZoom, Integer maxZoom) {
-		Labeler labeler = getRequiredLabeler(type);
+		GridLabeler labeler = getRequiredLabeler(type);
 		if (maxZoom != null && maxZoom < minZoom) {
 			throw new IllegalArgumentException("Min zoom '" + minZoom
 					+ "' can not be larger than max zoom '" + maxZoom + "'");
@@ -1342,7 +1343,7 @@ public class Grids {
 	 */
 	public void setAllLabelBuffers(double buffer) {
 		for (Grid grid : grids.values()) {
-			Labeler labeler = grid.getLabeler();
+			GridLabeler labeler = grid.getLabeler();
 			if (labeler != null) {
 				labeler.setBuffer(buffer);
 			}

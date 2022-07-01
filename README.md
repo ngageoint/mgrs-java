@@ -32,8 +32,8 @@ MGRS mgrs2 = MGRS.parse("33X VG 74596 43594");
 
 double latitude = 63.98862388;
 double longitude = 29.06755082;
-Point point3 = Point.create(longitude, latitude);
-MGRS mgrs3 = point3.toMGRS();
+Point point3 = Point.point(longitude, latitude);
+MGRS mgrs3 = MGRS.from(point3);
 String mgrsCoordinate = mgrs3.toString();
 String mgrsGZD = mgrs3.coordinate(GridType.GZD);
 String mgrs100k = mgrs3.coordinate(GridType.HUNDRED_KILOMETER);
@@ -43,7 +43,7 @@ String mgrs100m = mgrs3.coordinate(GridType.HUNDRED_METER);
 String mgrs10m = mgrs3.coordinate(GridType.TEN_METER);
 String mgrs1m = mgrs3.coordinate(GridType.METER);
 
-UTM utm2 = point3.toUTM();
+UTM utm2 = UTM.from(point3);
 MGRS mgrs4 = utm2.toMGRS();
 
 UTM utm3 = UTM.parse("18 N 585628 4511322");
@@ -57,7 +57,7 @@ See [mgrs-android](https://github.com/ngageoint/mgrs-android) for a concrete exa
 
 ```java
 
-// MGRSTile tile = ...;
+// GridTile tile = ...;
 
 Grids grids = Grids.create();
 
@@ -71,20 +71,20 @@ if (zoomGrids.hasGrids()) {
     // draw this grid for each zone
     for (GridZone zone : gridRange) {
 
-      List<Line> lines = grid.getLines(tile, zone);
+      List<GridLine> lines = grid.getLines(tile, zone);
       if (lines != null) {
         PixelRange pixelRange = zone.getBounds()
             .getPixelRange(tile);
-        for (Line line : lines) {
+        for (GridLine line : lines) {
           Pixel pixel1 = line.getPoint1().getPixel(tile);
           Pixel pixel2 = line.getPoint2().getPixel(tile);
           // Draw line
         }
       }
 
-      List<Label> labels = grid.getLabels(tile, zone);
+      List<GridLabel> labels = grid.getLabels(tile, zone);
       if (labels != null) {
-        for (Label label : labels) {
+        for (GridLabel label : labels) {
           PixelRange pixelRange = label.getBounds()
               .getPixelRange(tile);
           Pixel centerPixel = label.getCenter()
@@ -120,3 +120,7 @@ Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetail
 Build this repository using Eclipse and/or Maven:
 
     mvn clean install
+
+### Remote Dependencies ###
+
+* [Grid Java](https://github.com/ngageoint/grid-java) (The MIT License (MIT)) - Grid Library
