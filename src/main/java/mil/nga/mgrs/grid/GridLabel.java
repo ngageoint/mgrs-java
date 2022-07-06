@@ -3,7 +3,7 @@ package mil.nga.mgrs.grid;
 import mil.nga.grid.Label;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Point;
-import mil.nga.mgrs.MGRSUtils;
+import mil.nga.mgrs.MGRS;
 
 /**
  * MGRS Grid Label
@@ -14,32 +14,14 @@ import mil.nga.mgrs.MGRSUtils;
 public class GridLabel extends Label {
 
 	/**
-	 * Zone number
+	 * Grid type
 	 */
-	private int zoneNumber;
+	private GridType gridType;
 
 	/**
-	 * Band letter
+	 * MGRS coordinate
 	 */
-	private char bandLetter;
-
-	/**
-	 * Constructor
-	 * 
-	 * @param center
-	 *            center point
-	 * @param bounds
-	 *            bounds
-	 * @param zoneNumber
-	 *            zone number
-	 * @param bandLetter
-	 *            band letter
-	 */
-	public GridLabel(Point center, Bounds bounds, int zoneNumber,
-			char bandLetter) {
-		this(MGRSUtils.getLabelName(zoneNumber, bandLetter), center, bounds,
-				zoneNumber, bandLetter);
-	}
+	private MGRS coordinate;
 
 	/**
 	 * Constructor
@@ -50,54 +32,54 @@ public class GridLabel extends Label {
 	 *            center point
 	 * @param bounds
 	 *            bounds
-	 * @param zoneNumber
-	 *            zone number
-	 * @param bandLetter
-	 *            band letter
+	 * @param gridType
+	 *            grid type
+	 * @param coordinate
+	 *            MGRS coordinate
 	 */
-	public GridLabel(String name, Point center, Bounds bounds, int zoneNumber,
-			char bandLetter) {
+	public GridLabel(String name, Point center, Bounds bounds,
+			GridType gridType, MGRS coordinate) {
 		super(name, center, bounds);
-		this.zoneNumber = zoneNumber;
-		this.bandLetter = bandLetter;
+		this.gridType = gridType;
+		this.coordinate = coordinate;
 	}
 
 	/**
-	 * Get the zone number
+	 * Get the grid type
 	 * 
-	 * @return zone number
+	 * @return grid type
 	 */
-	public int getZoneNumber() {
-		return zoneNumber;
+	public GridType getGridType() {
+		return gridType;
 	}
 
 	/**
-	 * Set the zone number
+	 * Set the grid type
 	 * 
-	 * @param zoneNumber
-	 *            zone number
+	 * @param gridType
+	 *            grid type
 	 */
-	public void setZoneNumber(int zoneNumber) {
-		this.zoneNumber = zoneNumber;
+	public void setGridType(GridType gridType) {
+		this.gridType = gridType;
 	}
 
 	/**
-	 * Get the band letter
+	 * Get the MGRS coordinate
 	 * 
-	 * @return band letter
+	 * @return MGRS coordinate
 	 */
-	public char getBandLetter() {
-		return bandLetter;
+	public MGRS getCoordinate() {
+		return coordinate;
 	}
 
 	/**
-	 * Set the band letter
+	 * Set the MGRS coordinate
 	 * 
-	 * @param bandLetter
-	 *            band letter
+	 * @param coordinate
+	 *            MGRS coordinate
 	 */
-	public void setBandLetter(char bandLetter) {
-		this.bandLetter = bandLetter;
+	public void setCoordinate(MGRS coordinate) {
+		this.coordinate = coordinate;
 	}
 
 }

@@ -1,6 +1,7 @@
 package mil.nga.mgrs;
 
 import mil.nga.grid.GridUtils;
+import mil.nga.grid.Hemisphere;
 
 /**
  * Military Grid Reference System utilities
@@ -85,6 +86,18 @@ public class MGRSUtils {
 	 */
 	public static String getLabelName(int zoneNumber, char bandLetter) {
 		return String.valueOf(zoneNumber) + bandLetter;
+	}
+
+	/**
+	 * Get the hemisphere from the band letter
+	 * 
+	 * @param bandLetter
+	 *            band letter
+	 * @return hemisphere
+	 */
+	public static Hemisphere getHemisphere(char bandLetter) {
+		return bandLetter < MGRSConstants.BAND_LETTER_NORTH ? Hemisphere.SOUTH
+				: Hemisphere.NORTH;
 	}
 
 }

@@ -5,6 +5,8 @@ import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mil.nga.grid.GridConstants;
+import mil.nga.grid.Hemisphere;
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.gzd.GridZones;
@@ -186,7 +188,8 @@ public class UTM {
 
 		value.append(String.format("%02d", zone));
 		value.append(" ");
-		value.append(hemisphere == Hemisphere.NORTH ? "N" : "S");
+		value.append(hemisphere == Hemisphere.NORTH ? GridConstants.NORTH_CHAR
+				: GridConstants.SOUTH_CHAR);
 		value.append(" ");
 		value.append(formatter.format(easting));
 		value.append(" ");
@@ -230,9 +233,8 @@ public class UTM {
 		}
 
 		int zone = Integer.parseInt(matcher.group(1));
-		Hemisphere hemisphere = matcher.group(2).equalsIgnoreCase("N")
-				? Hemisphere.NORTH
-				: Hemisphere.SOUTH;
+		Hemisphere hemisphere = matcher.group(2).equalsIgnoreCase(
+				GridConstants.NORTH_CHAR) ? Hemisphere.NORTH : Hemisphere.SOUTH;
 		double easting = Double.parseDouble(matcher.group(3));
 		double northing = Double.parseDouble(matcher.group(4));
 

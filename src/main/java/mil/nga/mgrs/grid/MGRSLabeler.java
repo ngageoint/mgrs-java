@@ -3,12 +3,12 @@ package mil.nga.mgrs.grid;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.grid.Hemisphere;
 import mil.nga.grid.color.Color;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.gzd.GridZone;
-import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
 /**
@@ -273,8 +273,7 @@ public class MGRSLabeler extends GridLabeler {
 				id = mgrs.getEastingAndNorthing(gridType);
 			}
 
-			label = new GridLabel(id, center, labelBounds, zoneNumber,
-					zone.getLetter());
+			label = new GridLabel(id, center, labelBounds, gridType, mgrs);
 		}
 
 		return label;

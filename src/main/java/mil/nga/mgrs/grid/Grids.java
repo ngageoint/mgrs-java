@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
+import mil.nga.grid.BaseGrids;
 import mil.nga.grid.GridStyle;
 import mil.nga.grid.color.Color;
 import mil.nga.grid.property.PropertyConstants;
-import mil.nga.mgrs.MGRSConstants;
 import mil.nga.mgrs.gzd.GZDLabeler;
 import mil.nga.mgrs.property.MGRSProperties;
 
@@ -20,17 +19,12 @@ import mil.nga.mgrs.property.MGRSProperties;
  * 
  * @author osbornb
  */
-public class Grids {
+public class Grids extends BaseGrids<Grid, ZoomGrids> {
 
 	/**
 	 * Grids
 	 */
 	private Map<GridType, Grid> grids = new HashMap<>();
-
-	/**
-	 * Map between zoom levels and grids
-	 */
-	private TreeMap<Integer, ZoomGrids> zoomGrids = new TreeMap<>();
 
 	/**
 	 * Create with all grid types enabled
@@ -76,6 +70,7 @@ public class Grids {
 	 * Constructor, all grid types enabled per property configurations
 	 */
 	public Grids() {
+		super(MGRSProperties.getInstance());
 		createGrids();
 		createZoomGrids();
 	}
@@ -97,6 +92,7 @@ public class Grids {
 	 *            grid types to enable
 	 */
 	public Grids(Collection<GridType> types) {
+		super(MGRSProperties.getInstance());
 
 		createGrids(false);
 
@@ -105,6 +101,41 @@ public class Grids {
 		}
 
 		createZoomGrids();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getDefaultWidth() {
+		return Grid.DEFAULT_WIDTH;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Collection<Grid> grids() {
+		return grids.values();
+	}
+
+	/**
+	 * Create a new grid, override to create a specialized grid
+	 * 
+	 * @param type
+	 *            grid type
+	 * @return grid
+	 */
+	protected Grid newGrid(GridType type) {
+		return new Grid(type);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected ZoomGrids newZoomGrids(int zoom) {
+		return new ZoomGrids(zoom);
 	}
 
 	/**
@@ -122,8 +153,8 @@ public class Grids {
 	 */
 	private void createGrids(Boolean enabled) {
 
-		Boolean propagate = MGRSProperties.getInstance().getBooleanProperty(
-				false, PropertyConstants.GRIDS, PropertyConstants.PROPAGATE);
+		Boolean propagate = properties.getBooleanProperty(false,
+				PropertyConstants.GRIDS, PropertyConstants.PROPAGATE);
 		Map<GridType, GridStyle> styles = null;
 		if (propagate != null && propagate) {
 			styles = new HashMap<>();
@@ -159,60 +190,13 @@ public class Grids {
 
 		String gridKey = type.name().toLowerCase();
 
-		if (enabled == null) {
-			enabled = MGRSProperties.getInstance().getBooleanProperty(false,
-					PropertyConstants.GRIDS, gridKey,
-					PropertyConstants.ENABLED);
-			if (enabled == null) {
-				enabled = true;
-			}
-		}
-		grid.setEnabled(enabled);
-
-		Integer minZoom = MGRSProperties.getInstance().getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.MIN_ZOOM);
-		if (minZoom == null) {
-			minZoom = 0;
-		}
-		grid.setMinZoom(minZoom);
-
-		Integer maxZoom = MGRSProperties.getInstance().getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.MAX_ZOOM);
-		grid.setMaxZoom(maxZoom);
-
-		Integer linesMinZoom = MGRSProperties.getInstance().getIntegerProperty(
-				false, PropertyConstants.GRIDS, gridKey,
-				PropertyConstants.LINES, PropertyConstants.MIN_ZOOM);
-		grid.setLinesMinZoom(linesMinZoom);
-
-		Integer linesMaxZoom = MGRSProperties.getInstance().getIntegerProperty(
-				false, PropertyConstants.GRIDS, gridKey,
-				PropertyConstants.LINES, PropertyConstants.MAX_ZOOM);
-		grid.setLinesMaxZoom(linesMaxZoom);
-
-		String colorProperty = MGRSProperties.getInstance().getProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.COLOR);
-		Color color = colorProperty != null ? Color.color(colorProperty)
-				: Color.black();
-		grid.setColor(color);
-
-		Double width = MGRSProperties.getInstance().getDoubleProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.WIDTH);
-		if (width == null) {
-			width = Grid.DEFAULT_WIDTH;
-		}
-		grid.setWidth(width);
+		loadGrid(grid, gridKey, enabled, labeler);
 
 		if (styles != null) {
-			styles.put(type, GridStyle.style(color, width));
+			styles.put(type, GridStyle.style(grid.getColor(), grid.getWidth()));
 		}
 
 		loadGridStyles(grid, styles, gridKey);
-
-		if (labeler != null) {
-			loadLabeler(labeler, gridKey);
-		}
-		grid.setLabeler(labeler);
 
 		grids.put(type, grid);
 	}
@@ -264,17 +248,8 @@ public class Grids {
 
 		String gridKey2 = gridType.name().toLowerCase();
 
-		String colorProperty = MGRSProperties.getInstance().getProperty(false,
-				PropertyConstants.GRIDS, gridKey, gridKey2,
-				PropertyConstants.COLOR);
-		Color color = null;
-		if (colorProperty != null) {
-			color = Color.color(colorProperty);
-		}
-
-		Double width = MGRSProperties.getInstance().getDoubleProperty(false,
-				PropertyConstants.GRIDS, gridKey, gridKey2,
-				PropertyConstants.WIDTH);
+		Color color = loadGridStyleColor(gridKey, gridKey2);
+		Double width = loadGridStyleWidth(gridKey, gridKey2);
 
 		if ((color == null || width == null) && styles != null) {
 			GridStyle style = styles.get(gridType);
@@ -293,15 +268,7 @@ public class Grids {
 
 		if (color != null || width != null) {
 
-			if (color == null) {
-				color = grid.getColor();
-			}
-
-			if (width == null || width == 0) {
-				width = grid.getWidth();
-			}
-
-			GridStyle style = GridStyle.style(color, width);
+			GridStyle style = getGridStyle(color, width, grid);
 			grid.setStyle(gridType, style);
 
 			if (styles != null) {
@@ -309,78 +276,6 @@ public class Grids {
 			}
 		}
 
-	}
-
-	/**
-	 * Load the labeler from properties for the grid type
-	 * 
-	 * @param labeler
-	 *            labeler
-	 * @param gridKey
-	 *            grid property key
-	 */
-	private void loadLabeler(GridLabeler labeler, String gridKey) {
-
-		Boolean enabled = MGRSProperties.getInstance().getBooleanProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.ENABLED);
-		labeler.setEnabled(enabled != null && enabled);
-
-		Integer minZoom = MGRSProperties.getInstance().getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.MIN_ZOOM);
-		if (minZoom != null) {
-			labeler.setMinZoom(minZoom);
-		}
-
-		Integer maxZoom = MGRSProperties.getInstance().getIntegerProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.MAX_ZOOM);
-		if (maxZoom != null) {
-			labeler.setMaxZoom(maxZoom);
-		}
-
-		String color = MGRSProperties.getInstance().getProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.COLOR);
-		if (color != null) {
-			labeler.setColor(Color.color(color));
-		}
-
-		Double textSize = MGRSProperties.getInstance().getDoubleProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.TEXT_SIZE);
-		if (textSize != null) {
-			labeler.setTextSize(textSize);
-		}
-
-		Double buffer = MGRSProperties.getInstance().getDoubleProperty(false,
-				PropertyConstants.GRIDS, gridKey, PropertyConstants.LABELER,
-				PropertyConstants.BUFFER);
-		if (buffer != null) {
-			labeler.setBuffer(buffer);
-		}
-
-	}
-
-	/**
-	 * Create a new grid, override to create a specialized grid
-	 * 
-	 * @param type
-	 *            grid type
-	 * @return grid
-	 */
-	protected Grid newGrid(GridType type) {
-		return new Grid(type);
-	}
-
-	/**
-	 * Create the zoom level grids
-	 */
-	private void createZoomGrids() {
-		for (int zoom = 0; zoom <= MGRSConstants.MAX_MAP_ZOOM_LEVEL; zoom++) {
-			createZoomGrids(zoom);
-		}
 	}
 
 	/**
@@ -392,50 +287,6 @@ public class Grids {
 	 */
 	public Grid getGrid(GridType type) {
 		return grids.get(type);
-	}
-
-	/**
-	 * Get the grids for the zoom level
-	 * 
-	 * @param zoom
-	 *            zoom level
-	 * @return grids
-	 */
-	public ZoomGrids getGrids(int zoom) {
-		ZoomGrids grids = zoomGrids.get(zoom);
-		if (grids == null) {
-			grids = createZoomGrids(zoom);
-		}
-		return grids;
-	}
-
-	/**
-	 * Create grids for the zoom level
-	 * 
-	 * @param zoom
-	 *            zoom level
-	 * @return grids
-	 */
-	private ZoomGrids createZoomGrids(int zoom) {
-		ZoomGrids zoomLevelGrids = newZoomGrids(zoom);
-		for (Grid grid : grids.values()) {
-			if (grid.isEnabled() && grid.isWithin(zoom)) {
-				zoomLevelGrids.addGrid(grid);
-			}
-		}
-		zoomGrids.put(zoom, zoomLevelGrids);
-		return zoomLevelGrids;
-	}
-
-	/**
-	 * Create a new zoom grids, override for specialized grids
-	 * 
-	 * @param zoom
-	 *            zoom level
-	 * @return zoom grids
-	 */
-	protected ZoomGrids newZoomGrids(int zoom) {
-		return new ZoomGrids(zoom);
 	}
 
 	/**
@@ -512,16 +363,6 @@ public class Grids {
 	}
 
 	/**
-	 * Enable grids
-	 * 
-	 * @param grids
-	 *            grids
-	 */
-	public void enableGrids(Grid... grids) {
-		enableGrids(Arrays.asList(grids));
-	}
-
-	/**
 	 * Enable grid types
 	 * 
 	 * @param types
@@ -530,18 +371,6 @@ public class Grids {
 	public void enableTypes(Collection<GridType> types) {
 		for (GridType type : types) {
 			enable(type);
-		}
-	}
-
-	/**
-	 * Enable grids
-	 * 
-	 * @param grids
-	 *            grids
-	 */
-	public void enableGrids(Collection<Grid> grids) {
-		for (Grid grid : grids) {
-			enable(grid);
 		}
 	}
 
@@ -556,16 +385,6 @@ public class Grids {
 	}
 
 	/**
-	 * Disable grids
-	 * 
-	 * @param grids
-	 *            grids
-	 */
-	public void disableGrids(Grid... grids) {
-		disableGrids(Arrays.asList(grids));
-	}
-
-	/**
 	 * Disable grid types
 	 * 
 	 * @param types
@@ -574,18 +393,6 @@ public class Grids {
 	public void disableTypes(Collection<GridType> types) {
 		for (GridType type : types) {
 			disable(type);
-		}
-	}
-
-	/**
-	 * Disable grids
-	 * 
-	 * @param grids
-	 *            grids
-	 */
-	public void disableGrids(Collection<Grid> grids) {
-		for (Grid grid : grids) {
-			disable(grid);
 		}
 	}
 
@@ -611,32 +418,6 @@ public class Grids {
 	}
 
 	/**
-	 * Enable the grid
-	 * 
-	 * @param grid
-	 *            grid
-	 */
-	public void enable(Grid grid) {
-
-		if (!grid.isEnabled()) {
-
-			grid.setEnabled(true);
-
-			int minZoom = grid.getMinZoom();
-			Integer maxZoom = grid.getMaxZoom();
-			if (maxZoom == null) {
-				maxZoom = zoomGrids.lastKey();
-			}
-
-			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-				addGrid(grid, zoom);
-			}
-
-		}
-
-	}
-
-	/**
 	 * Disable the grid type
 	 * 
 	 * @param type
@@ -644,32 +425,6 @@ public class Grids {
 	 */
 	public void disable(GridType type) {
 		disable(getGrid(type));
-	}
-
-	/**
-	 * Disable the grid
-	 * 
-	 * @param grid
-	 *            grid
-	 */
-	public void disable(Grid grid) {
-
-		if (grid.isEnabled()) {
-
-			grid.setEnabled(false);
-
-			int minZoom = grid.getMinZoom();
-			Integer maxZoom = grid.getMaxZoom();
-			if (maxZoom == null) {
-				maxZoom = zoomGrids.lastKey();
-			}
-
-			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-				removeGrid(grid, zoom);
-			}
-
-		}
-
 	}
 
 	/**
@@ -685,22 +440,6 @@ public class Grids {
 	}
 
 	/**
-	 * Set the grid minimum zoom
-	 * 
-	 * @param grid
-	 *            grid
-	 * @param minZoom
-	 *            minimum zoom
-	 */
-	public void setMinZoom(Grid grid, int minZoom) {
-		Integer maxZoom = grid.getMaxZoom();
-		if (maxZoom != null && maxZoom < minZoom) {
-			maxZoom = minZoom;
-		}
-		setZoomRange(grid, minZoom, maxZoom);
-	}
-
-	/**
 	 * Set the grid maximum zoom
 	 * 
 	 * @param type
@@ -710,22 +449,6 @@ public class Grids {
 	 */
 	public void setMaxZoom(GridType type, Integer maxZoom) {
 		setMaxZoom(getGrid(type), maxZoom);
-	}
-
-	/**
-	 * Set the grid maximum zoom
-	 * 
-	 * @param grid
-	 *            grid
-	 * @param maxZoom
-	 *            maximum zoom
-	 */
-	public void setMaxZoom(Grid grid, Integer maxZoom) {
-		int minZoom = grid.getMinZoom();
-		if (maxZoom != null && minZoom > maxZoom) {
-			minZoom = maxZoom;
-		}
-		setZoomRange(grid, minZoom, maxZoom);
 	}
 
 	/**
@@ -740,113 +463,6 @@ public class Grids {
 	 */
 	public void setZoomRange(GridType type, int minZoom, Integer maxZoom) {
 		setZoomRange(getGrid(type), minZoom, maxZoom);
-	}
-
-	/**
-	 * Set the grid zoom range
-	 * 
-	 * @param grid
-	 *            grid
-	 * @param minZoom
-	 *            minimum zoom
-	 * @param maxZoom
-	 *            maximum zoom
-	 */
-	public void setZoomRange(Grid grid, int minZoom, Integer maxZoom) {
-
-		if (maxZoom != null && maxZoom < minZoom) {
-			throw new IllegalArgumentException("Min zoom '" + minZoom
-					+ "' can not be larger than max zoom '" + maxZoom + "'");
-		}
-
-		// All grids zoom range
-		final int allGridsMin = zoomGrids.firstKey();
-		final int allGridsMax = zoomGrids.lastKey();
-
-		// Existing grid zoom range
-		int gridMinZoom = grid.getMinZoom();
-		Integer gridMaxZoom = grid.getMaxZoom();
-		if (gridMaxZoom == null) {
-			gridMaxZoom = allGridsMax;
-		} else {
-			gridMaxZoom = Math.min(gridMaxZoom, allGridsMax);
-		}
-
-		grid.setMinZoom(minZoom);
-		grid.setMaxZoom(maxZoom);
-
-		minZoom = Math.max(minZoom, allGridsMin);
-		if (maxZoom == null) {
-			maxZoom = allGridsMax;
-		} else {
-			maxZoom = Math.min(maxZoom, allGridsMax);
-		}
-
-		int minOverlap = Math.max(minZoom, gridMinZoom);
-		int maxOverlap = Math.min(maxZoom, gridMaxZoom);
-
-		boolean overlaps = minOverlap <= maxOverlap;
-
-		if (overlaps) {
-
-			int min = Math.min(minZoom, gridMinZoom);
-			int max = Math.max(maxZoom, gridMaxZoom);
-
-			for (int zoom = min; zoom <= max; zoom++) {
-
-				if (zoom < minOverlap || zoom > maxOverlap) {
-
-					if (zoom >= minZoom && zoom <= maxZoom) {
-						addGrid(grid, zoom);
-					} else {
-						removeGrid(grid, zoom);
-					}
-
-				}
-
-			}
-		} else {
-
-			for (int zoom = gridMinZoom; zoom <= gridMaxZoom; zoom++) {
-				removeGrid(grid, zoom);
-			}
-
-			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-				addGrid(grid, zoom);
-			}
-
-		}
-
-	}
-
-	/**
-	 * Add a grid to the zoom level
-	 * 
-	 * @param grid
-	 *            grid
-	 * @param zoom
-	 *            zoom level
-	 */
-	private void addGrid(Grid grid, int zoom) {
-		ZoomGrids grids = zoomGrids.get(zoom);
-		if (grids != null) {
-			grids.addGrid(grid);
-		}
-	}
-
-	/**
-	 * Remove a grid from the zoom level
-	 * 
-	 * @param grid
-	 *            grid
-	 * @param zoom
-	 *            zoom level
-	 */
-	private void removeGrid(Grid grid, int zoom) {
-		ZoomGrids grids = zoomGrids.get(zoom);
-		if (grids != null) {
-			grids.removeGrid(grid);
-		}
 	}
 
 	/**
@@ -1169,18 +785,6 @@ public class Grids {
 	}
 
 	/**
-	 * Enable all grid labelers
-	 */
-	public void enableAllLabelers() {
-		for (Grid grid : grids.values()) {
-			GridLabeler labeler = grid.getLabeler();
-			if (labeler != null) {
-				labeler.setEnabled(true);
-			}
-		}
-	}
-
-	/**
 	 * Disable all grid labelers
 	 */
 	public void disableAllLabelers() {
@@ -1333,21 +937,6 @@ public class Grids {
 		}
 		labeler.setMinZoom(minZoom);
 		labeler.setMaxZoom(maxZoom);
-	}
-
-	/**
-	 * Set all label grid zone edge buffers
-	 * 
-	 * @param buffer
-	 *            label buffer (greater than or equal to 0.0 and less than 0.5)
-	 */
-	public void setAllLabelBuffers(double buffer) {
-		for (Grid grid : grids.values()) {
-			GridLabeler labeler = grid.getLabeler();
-			if (labeler != null) {
-				labeler.setBuffer(buffer);
-			}
-		}
 	}
 
 	/**

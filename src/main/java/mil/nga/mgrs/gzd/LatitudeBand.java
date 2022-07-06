@@ -1,6 +1,7 @@
 package mil.nga.mgrs.gzd;
 
-import mil.nga.mgrs.utm.Hemisphere;
+import mil.nga.grid.Hemisphere;
+import mil.nga.mgrs.MGRSUtils;
 
 /**
  * Latitude (horizontal) band
@@ -40,10 +41,9 @@ public class LatitudeBand {
 	 *            northern latitude
 	 */
 	public LatitudeBand(char letter, double south, double north) {
-		this.letter = letter;
+		setLetter(letter);
 		this.south = south;
 		this.north = north;
-		this.hemisphere = Hemisphere.fromBandLetter(letter);
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class LatitudeBand {
 	 */
 	public void setLetter(char letter) {
 		this.letter = letter;
-		this.hemisphere = Hemisphere.fromBandLetter(letter);
+		this.hemisphere = MGRSUtils.getHemisphere(letter);
 	}
 
 	/**

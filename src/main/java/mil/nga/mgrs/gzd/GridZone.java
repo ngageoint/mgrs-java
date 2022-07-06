@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.grid.GridUtils;
+import mil.nga.grid.Hemisphere;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Line;
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRSUtils;
 import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.grid.GridType;
-import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
 /**

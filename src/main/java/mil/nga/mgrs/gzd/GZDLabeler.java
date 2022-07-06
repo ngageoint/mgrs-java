@@ -5,9 +5,11 @@ import java.util.List;
 
 import mil.nga.grid.color.Color;
 import mil.nga.grid.features.Bounds;
-import mil.nga.mgrs.grid.GridType;
+import mil.nga.grid.features.Point;
+import mil.nga.mgrs.MGRS;
 import mil.nga.mgrs.grid.GridLabel;
 import mil.nga.mgrs.grid.GridLabeler;
+import mil.nga.mgrs.grid.GridType;
 
 /**
  * Grid Zone Designator labeler
@@ -184,8 +186,9 @@ public class GZDLabeler extends GridLabeler {
 			GridZone zone) {
 		List<GridLabel> labels = new ArrayList<>();
 		Bounds bounds = zone.getBounds();
-		labels.add(new GridLabel(zone.getName(), bounds.getCenter(), bounds,
-				zone.getNumber(), zone.getLetter()));
+		Point center = bounds.getCenter();
+		labels.add(new GridLabel(zone.getName(), center, bounds, gridType,
+				MGRS.from(center)));
 		return labels;
 	}
 

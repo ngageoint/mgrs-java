@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mil.nga.grid.GridUtils;
+import mil.nga.grid.Hemisphere;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Line;
 import mil.nga.grid.features.Point;
@@ -13,7 +14,6 @@ import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
-import mil.nga.mgrs.utm.Hemisphere;
 import mil.nga.mgrs.utm.UTM;
 
 /**
@@ -222,7 +222,7 @@ public class MGRS {
 	 * @return hemisphere
 	 */
 	public Hemisphere getHemisphere() {
-		return Hemisphere.fromBandLetter(band);
+		return MGRSUtils.getHemisphere(band);
 	}
 
 	/**
