@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.color.Color;
 import mil.nga.grid.BaseGrid;
 import mil.nga.grid.GridStyle;
-import mil.nga.grid.color.Color;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.property.PropertyConstants;
 import mil.nga.grid.tile.GridTile;

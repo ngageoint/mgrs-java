@@ -3,7 +3,7 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.grid.color.Color;
+import mil.nga.color.Color;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Point;
 import mil.nga.mgrs.MGRS;

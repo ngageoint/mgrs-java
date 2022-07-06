@@ -3,7 +3,6 @@ package mil.nga.mgrs.gzd;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.nga.grid.GridUtils;
 import mil.nga.grid.Hemisphere;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Line;
@@ -288,7 +287,7 @@ public class GridZone {
 	private Point getBoundsPoint(double easting, double northing, Point west,
 			Point east, boolean eastern) {
 
-		Line line = GridLine.line(west, east);
+		Line line = Line.line(west, east);
 
 		Line boundsLine;
 		if (eastern) {
@@ -301,7 +300,7 @@ public class GridZone {
 		Hemisphere hemisphere = getHemisphere();
 
 		// Intersection between the horizontal line and vertical bounds line
-		Point intersection = GridUtils.intersection(line, boundsLine);
+		Point intersection = line.intersection(boundsLine);
 
 		// Intersection easting
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);

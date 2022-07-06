@@ -5,12 +5,10 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import mil.nga.grid.GridUtils;
 import mil.nga.grid.Hemisphere;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.features.Line;
 import mil.nga.grid.features.Point;
-import mil.nga.mgrs.features.GridLine;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
@@ -606,10 +604,10 @@ public class MGRS {
 		int zoneNumber = gridZone.getNumber();
 		Hemisphere hemisphere = gridZone.getHemisphere();
 
-		Line line = GridLine.line(west, east);
+		Line line = Line.line(west, east);
 		Line boundsLine = gridZone.getBounds().getWestLine();
 
-		Point intersection = GridUtils.intersection(line, boundsLine);
+		Point intersection = line.intersection(boundsLine);
 
 		// Intersection easting
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);
@@ -648,10 +646,10 @@ public class MGRS {
 		int zoneNumber = gridZone.getNumber();
 		Hemisphere hemisphere = gridZone.getHemisphere();
 
-		Line line = GridLine.line(south, north);
+		Line line = Line.line(south, north);
 		Line boundsLine = gridZone.getBounds().getSouthLine();
 
-		Point intersection = GridUtils.intersection(line, boundsLine);
+		Point intersection = line.intersection(boundsLine);
 
 		// Intersection northing
 		UTM intersectionUTM = UTM.from(intersection, zoneNumber, hemisphere);

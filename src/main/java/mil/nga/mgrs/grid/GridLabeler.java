@@ -2,8 +2,8 @@ package mil.nga.mgrs.grid;
 
 import java.util.List;
 
+import mil.nga.color.Color;
 import mil.nga.grid.Labeler;
-import mil.nga.grid.color.Color;
 import mil.nga.grid.features.Bounds;
 import mil.nga.grid.property.PropertyConstants;
 import mil.nga.mgrs.gzd.GridZone;
@@ -201,7 +201,7 @@ public abstract class GridLabeler extends Labeler {
 	 *            grid zone
 	 * @return labels
 	 */
-	public abstract List<GridLabel> getLabels(Bounds tileBounds, GridType gridType,
-			GridZone zone);
+	public abstract List<GridLabel> getLabels(Bounds tileBounds,
+			GridType gridType, GridZone zone);
 
 }

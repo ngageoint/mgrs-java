@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import mil.nga.color.Color;
 import mil.nga.grid.BaseGrids;
 import mil.nga.grid.GridStyle;
-import mil.nga.grid.color.Color;
 import mil.nga.grid.property.PropertyConstants;
 import mil.nga.mgrs.gzd.GZDLabeler;
 import mil.nga.mgrs.property.MGRSProperties;

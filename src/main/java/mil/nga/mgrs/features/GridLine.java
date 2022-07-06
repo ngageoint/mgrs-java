@@ -13,6 +13,11 @@ import mil.nga.mgrs.grid.GridType;
 public class GridLine extends Line {
 
 	/**
+	 * Serial Version UID
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Grid type the line represents if any
 	 */
 	private GridType gridType;
@@ -175,6 +180,35 @@ public class GridLine extends Line {
 	 */
 	public GridLine copy() {
 		return new GridLine(this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((gridType == null) ? 0 : gridType.hashCode());
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GridLine other = (GridLine) obj;
+		if (gridType != other.gridType)
+			return false;
+		return true;
 	}
 
 }
