@@ -263,7 +263,7 @@ public class MGRSLabeler extends GridLabeler {
 
 			Bounds labelBounds = Bounds.degrees(minLongitude, minLatitude,
 					maxLongitude, maxLatitude);
-			Point center = labelBounds.getCenter();
+			Point center = labelBounds.getCentroid();
 
 			MGRS mgrs = MGRS.from(center);
 			String id = null;

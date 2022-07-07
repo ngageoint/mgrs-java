@@ -186,7 +186,7 @@ public class GZDLabeler extends GridLabeler {
 			GridZone zone) {
 		List<GridLabel> labels = new ArrayList<>();
 		Bounds bounds = zone.getBounds();
-		Point center = bounds.getCenter();
+		Point center = bounds.getCentroid();
 		labels.add(new GridLabel(zone.getName(), center, bounds, gridType,
 				MGRS.from(center)));
 		return labels;
