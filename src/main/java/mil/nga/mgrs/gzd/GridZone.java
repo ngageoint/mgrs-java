@@ -336,7 +336,7 @@ public class GridZone {
 
 		tileBounds = tileBounds.toDegrees().overlap(bounds);
 
-		if (!tileBounds.isEmpty()) {
+		if (tileBounds != null && !tileBounds.isEmpty()) {
 
 			int zoneNumber = getNumber();
 			Hemisphere hemisphere = getHemisphere();
