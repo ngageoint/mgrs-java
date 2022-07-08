@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 2.0.1 (TBD)
+
+* TBD
+
 ## [2.0.0](https://github.com/ngageoint/mgrs-java/releases/tag/2.0.0) (07-08-2022)
 
 * grid-java common grid library dependency and refactor
