@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"mil.nga.mgrs"},{"l":"mil.nga.mgrs.color"},{"l":"mil.nga.mgrs.features"},{"l":"mil.nga.mgrs.grid"},{"l":"mil.nga.mgrs.gzd"},{"l":"mil.nga.mgrs.property"},{"l":"mil.nga.mgrs.tile"},{"l":"mil.nga.mgrs.utm"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"mil.nga.mgrs"},{"l":"mil.nga.mgrs.features"},{"l":"mil.nga.mgrs.grid"},{"l":"mil.nga.mgrs.gzd"},{"l":"mil.nga.mgrs.property"},{"l":"mil.nga.mgrs.utm"}]
