@@ -22,22 +22,22 @@ public class UTM {
 	/**
 	 * Zone number
 	 */
-	private int zone;
+	private final int zone;
 
 	/**
 	 * Hemisphere
 	 */
-	private Hemisphere hemisphere;
+	private final Hemisphere hemisphere;
 
 	/**
 	 * Easting
 	 */
-	private double easting;
+	private final double easting;
 
 	/**
 	 * Northing
 	 */
-	private double northing;
+	private final double northing;
 
 	/**
 	 * UTM string pattern

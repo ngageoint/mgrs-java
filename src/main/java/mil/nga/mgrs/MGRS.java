@@ -50,32 +50,32 @@ public class MGRS {
 	/**
 	 * Zone number
 	 */
-	private int zone;
+	private final int zone;
 
 	/**
 	 * Band letter
 	 */
-	private char band;
+	private final char band;
 
 	/**
 	 * Column letter
 	 */
-	private char column;
+	private final char column;
 
 	/**
 	 * Row letter
 	 */
-	private char row;
+	private final char row;
 
 	/**
 	 * Easting
 	 */
-	private long easting;
+	private final long easting;
 
 	/**
 	 * Northing
 	 */
-	private long northing;
+	private final long northing;
 
 	/**
 	 * Create

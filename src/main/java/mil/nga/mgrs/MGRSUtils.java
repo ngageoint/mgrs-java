@@ -50,7 +50,7 @@ public class MGRSUtils {
 	 *         if no next bands
 	 */
 	public static char nextBandLetter(char letter) {
-		MGRSUtils.validateBandLetter(letter);
+		validateBandLetter(letter);
 		letter++;
 		if (GridUtils.isOmittedBandLetter(letter)) {
 			letter++;
@@ -67,7 +67,7 @@ public class MGRSUtils {
 	 *         - 1) if no previous bands
 	 */
 	public static char previousBandLetter(char letter) {
-		MGRSUtils.validateBandLetter(letter);
+		validateBandLetter(letter);
 		letter--;
 		if (GridUtils.isOmittedBandLetter(letter)) {
 			letter--;
