@@ -13,6 +13,7 @@ import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
 import mil.nga.mgrs.utm.UTM;
+import mil.nga.sf.util.GeometryUtils;
 
 /**
  * Military Grid Reference System Coordinate
@@ -460,7 +461,17 @@ public class MGRS {
 	 */
 	public static MGRS from(Point point) {
 
-		point = point.toDegrees();
+		point = point.copy().toDegrees();
+
+		// Bound the latitude if needed
+		if (point.getLatitude() < MGRSConstants.MIN_LAT) {
+			point.setLatitude(MGRSConstants.MIN_LAT);
+		} else if (point.getLatitude() > MGRSConstants.MAX_LAT) {
+			point.setLatitude(MGRSConstants.MAX_LAT);
+		}
+
+		// Normalize the longitude if needed
+		GeometryUtils.normalizeWGS84(point);
 
 		UTM utm = UTM.from(point);
 
@@ -476,6 +487,20 @@ public class MGRS {
 
 		return MGRS.create(utm.getZone(), bandLetter, columnLetter, rowLetter,
 				easting, northing);
+	}
+
+	/**
+	 * Convert the coordinate to MGRS
+	 *
+	 * @param longitude
+	 *            longitude
+	 * @param latitude
+	 *            latitude
+	 * @return MGRS
+	 * @since 2.1.1
+	 */
+	public static MGRS from(double longitude, double latitude) {
+		return from(Point.degrees(longitude, latitude));
 	}
 
 	/**
@@ -544,9 +569,7 @@ public class MGRS {
 								GridType.HUNDRED_KILOMETER.getPrecision())
 								.toPoint();
 						if (gridBounds.contains(northeast)) {
-							mgrsValue = from(
-									Point.degrees(gridSouthwest.getLongitude(),
-											gridSouthwest.getLatitude()));
+							mgrsValue = from(gridSouthwest);
 						}
 					} else if (westBounds) {
 						Point east = MGRS
