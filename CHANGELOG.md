@@ -6,7 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.1.3 (TBD)
 
-* TBD
+* grid version 1.1.2
 
 ## [2.1.2](https://github.com/ngageoint/mgrs-java/releases/tag/2.1.2) (01-23-2023)
 
