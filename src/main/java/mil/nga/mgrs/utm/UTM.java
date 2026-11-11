@@ -151,17 +151,38 @@ public class UTM {
 			north -= 10000000.0;
 		}
 
-		// @formatter:off
-		double latitude = (north/6366197.724/0.9996+(1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)-0.006739496742*Math.sin(north/6366197.724/0.9996)*Math.cos(north/6366197.724/0.9996)*(Math.atan(Math.cos(Math.atan(( Math.exp((easting - 500000) / (0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting - 500000) / (0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3))-Math.exp(-(easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*( 1 -  0.006739496742*Math.pow((easting - 500000) / (0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3)))/2/Math.cos((north-0.9996*6399593.625*(north/6366197.724/0.9996-0.006739496742*3/4*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.pow(0.006739496742*3/4,2)*5/3*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996 )/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4-Math.pow(0.006739496742*3/4,3)*35/27*(5*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/3))/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2))+north/6366197.724/0.9996)))*Math.tan((north-0.9996*6399593.625*(north/6366197.724/0.9996 - 0.006739496742*3/4*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.pow(0.006739496742*3/4,2)*5/3*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996 )*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4-Math.pow(0.006739496742*3/4,3)*35/27*(5*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/3))/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2))+north/6366197.724/0.9996))-north/6366197.724/0.9996)*3/2)*(Math.atan(Math.cos(Math.atan((Math.exp((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3))-Math.exp(-(easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3)))/2/Math.cos((north-0.9996*6399593.625*(north/6366197.724/0.9996-0.006739496742*3/4*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.pow(0.006739496742*3/4,2)*5/3*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4-Math.pow(0.006739496742*3/4,3)*35/27*(5*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/3))/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2))+north/6366197.724/0.9996)))*Math.tan((north-0.9996*6399593.625*(north/6366197.724/0.9996-0.006739496742*3/4*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.pow(0.006739496742*3/4,2)*5/3*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4-Math.pow(0.006739496742*3/4,3)*35/27*(5*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/3))/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2))+north/6366197.724/0.9996))-north/6366197.724/0.9996))*180/Math.PI;
-		// @formatter:on
-		latitude = Math.round(latitude * 10000000);
-		latitude = latitude / 10000000;
+		// Karney (2011), "Transverse Mercator with an accuracy of a few
+		// nanometers", eqs 15-22: Krueger series to order n^6
+		double eta = (easting - 500000) / (K0 * A);
+		double xi = north / (K0 * A);
 
-		// @formatter:off
-		double longitude = Math.atan((Math.exp((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3))-Math.exp(-(easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2)/3)))/2/Math.cos((north-0.9996*6399593.625*( north/6366197.724/0.9996-0.006739496742*3/4*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.pow(0.006739496742*3/4,2)*5/3*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2* north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4-Math.pow(0.006739496742*3/4,3)*35/27*(5*(3*(north/6366197.724/0.9996+Math.sin(2*north/6366197.724/0.9996)/2)+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/4+Math.sin(2*north/6366197.724/0.9996)*Math.pow(Math.cos(north/6366197.724/0.9996),2)*Math.pow(Math.cos(north/6366197.724/0.9996),2))/3)) / (0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2))))*(1-0.006739496742*Math.pow((easting-500000)/(0.9996*6399593.625/Math.sqrt((1+0.006739496742*Math.pow(Math.cos(north/6366197.724/0.9996),2)))),2)/2*Math.pow(Math.cos(north/6366197.724/0.9996),2))+north/6366197.724/0.9996))*180/Math.PI+zone*6-183;
-		// @formatter:on
-		longitude = Math.round(longitude * 10000000);
-		longitude = longitude / 10000000;
+		final double[] dXiEta = kruegerSum(BETA, xi, eta);
+		final double xiPrime = xi - dXiEta[0];
+		final double etaPrime = eta - dXiEta[1];
+
+		double sinhEtaPrime = Math.sinh(etaPrime);
+		double sinXiPrime = Math.sin(xiPrime);
+		double cosXiPrime = Math.cos(xiPrime);
+		double tauPrime = sinXiPrime / Math.sqrt(
+				sinhEtaPrime * sinhEtaPrime + cosXiPrime * cosXiPrime);
+
+		// Newton iteration for tau = tan(latitude)
+		double tau = tauPrime / (1 - E * E);
+		for (int i = 0; i < 10; i++) {
+			double tauIPrime = conformalTau(tau);
+			double delta = (tauPrime - tauIPrime)
+					/ Math.sqrt(1 + tauIPrime * tauIPrime)
+					* (1 + (1 - E * E) * tau * tau)
+					/ ((1 - E * E) * Math.sqrt(1 + tau * tau));
+			tau += delta;
+			if (!(Math.abs(delta) > 1e-12 * Math.max(1, Math.abs(tau)))) {
+				break;
+			}
+		}
+
+		double latitude = Math.toDegrees(Math.atan(tau));
+		double longitude = Math.toDegrees(Math.atan2(sinhEtaPrime, cosXiPrime))
+				+ zone * 6 - 183;
 
 		return Point.degrees(longitude, latitude);
 	}
@@ -281,24 +302,183 @@ public class UTM {
 		point = point.toDegrees();
 
 		double latitude = point.getLatitude();
-		double longitude = point.getLongitude();
+		double lambda = point.getLongitude() - (zone * 6 - 183);
+		if (lambda < -180 || lambda >= 180) {
+			lambda = ((lambda + 180) % 360 + 360) % 360 - 180;
+		}
 
-		// @formatter:off
-        double easting = 0.5 * Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))*0.9996*6399593.62/Math.pow((1+Math.pow(0.0820944379, 2)*Math.pow(Math.cos(latitude*Math.PI/180), 2)), 0.5)*(1+ Math.pow(0.0820944379,2)/2*Math.pow((0.5*Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180))/(1-Math.cos(latitude*Math.PI/180)*Math.sin(longitude*Math.PI/180-(6*zone-183)*Math.PI/180)))),2)*Math.pow(Math.cos(latitude*Math.PI/180),2)/3)+500000;
-		// @formatter:on
-		easting = Math.round(easting * 100) * 0.01;
+		// Karney (2011), "Transverse Mercator with an accuracy of a few
+		// nanometers", eqs 7-14: Krueger series to order n^6
+		double phi = Math.toRadians(latitude);
+		double lam = Math.toRadians(lambda);
 
-		// @formatter:off
-        double northing = (Math.atan(Math.tan(latitude*Math.PI/180)/Math.cos((longitude*Math.PI/180-(6*zone -183)*Math.PI/180)))-latitude*Math.PI/180)*0.9996*6399593.625/Math.sqrt(1+0.006739496742*Math.pow(Math.cos(latitude*Math.PI/180),2))*(1+0.006739496742/2*Math.pow(0.5*Math.log((1+Math.cos(latitude*Math.PI/180)*Math.sin((longitude*Math.PI/180-(6*zone -183)*Math.PI/180)))/(1-Math.cos(latitude*Math.PI/180)*Math.sin((longitude*Math.PI/180-(6*zone -183)*Math.PI/180)))),2)*Math.pow(Math.cos(latitude*Math.PI/180),2))+0.9996*6399593.625*(latitude*Math.PI/180-0.005054622556*(latitude*Math.PI/180+Math.sin(2*latitude*Math.PI/180)/2)+4.258201531e-05*(3*(latitude*Math.PI/180+Math.sin(2*latitude*Math.PI/180)/2)+Math.sin(2*latitude*Math.PI/180)*Math.pow(Math.cos(latitude*Math.PI/180),2))/4-1.674057895e-07*(5*(3*(latitude*Math.PI/180+Math.sin(2*latitude*Math.PI/180)/2)+Math.sin(2*latitude*Math.PI/180)*Math.pow(Math.cos(latitude*Math.PI/180),2))/4+Math.sin(2*latitude*Math.PI/180)*Math.pow(Math.cos(latitude*Math.PI/180),2)*Math.pow(Math.cos(latitude*Math.PI/180),2))/3);
-		// @formatter:on
+		double tauPrime = conformalTau(Math.tan(phi));
+		double cosLambda = Math.cos(lam);
+		double xiPrime = Math.atan2(tauPrime, cosLambda);
+		double etaPrime = asinh(Math.sin(lam)
+				/ Math.sqrt(tauPrime * tauPrime + cosLambda * cosLambda));
+
+		final double[] dXiEta = kruegerSum(ALPHA, xiPrime, etaPrime);
+		final double xi = xiPrime + dXiEta[0];
+		final double eta = etaPrime + dXiEta[1];
+
+		double easting = K0 * A * eta + 500000;
+		double northing = K0 * A * xi;
 
 		if (hemisphere == Hemisphere.SOUTH) {
 			northing = northing + 10000000;
 		}
 
-		northing = Math.round(northing * 100) * 0.01;
+		// Round to 1 micrometer so exact grid values survive a round trip
+		// through latitude and longitude (floating point noise is ~1e-9 m)
+		// before MGRS truncates them.
+		return UTM.create(zone, hemisphere, roundMicrometer(easting),
+				roundMicrometer(northing));
+	}
 
-		return UTM.create(zone, hemisphere, easting, northing);
+	/**
+	 * Round a meter value to the nearest micrometer
+	 *
+	 * @param value
+	 *            meters
+	 * @return rounded meters
+	 */
+	private static double roundMicrometer(double value) {
+		return Math.round(value * 1e6) / 1e6;
+	}
+
+	/**
+	 * UTM central meridian scale factor
+	 */
+	private static final double K0 = 0.9996;
+
+	/**
+	 * WGS84 flattening
+	 */
+	private static final double F = 1 / 298.257223563;
+
+	/**
+	 * WGS84 third flattening
+	 */
+	private static final double N = F / (2 - F);
+
+	/**
+	 * WGS84 eccentricity
+	 */
+	private static final double E = Math.sqrt(F * (2 - F));
+
+	/**
+	 * WGS84 rectifying radius, Karney (2011) eq 14
+	 */
+	private static final double A = 6378137.0 / (1 + N)
+			* (1 + N * N / 4 + Math.pow(N, 4) / 64 + Math.pow(N, 6) / 256);
+
+	/**
+	 * Krueger series coefficients (one based), Karney (2011) eq 35
+	 */
+	private static final double[] ALPHA = { 0,
+			N / 2 - 2. / 3 * Math.pow(N, 2) + 5. / 16 * Math.pow(N, 3)
+					+ 41. / 180 * Math.pow(N, 4) - 127. / 288 * Math.pow(N, 5)
+					+ 7891. / 37800 * Math.pow(N, 6),
+			13. / 48 * Math.pow(N, 2) - 3. / 5 * Math.pow(N, 3)
+					+ 557. / 1440 * Math.pow(N, 4) + 281. / 630 * Math.pow(N, 5)
+					- 1983433. / 1935360 * Math.pow(N, 6),
+			61. / 240 * Math.pow(N, 3) - 103. / 140 * Math.pow(N, 4)
+					+ 15061. / 26880 * Math.pow(N, 5)
+					+ 167603. / 181440 * Math.pow(N, 6),
+			49561. / 161280 * Math.pow(N, 4) - 179. / 168 * Math.pow(N, 5)
+					+ 6601661. / 7257600 * Math.pow(N, 6),
+			34729. / 80640 * Math.pow(N, 5)
+					- 3418889. / 1995840 * Math.pow(N, 6),
+			212378941. / 319334400 * Math.pow(N, 6) };
+
+	/**
+	 * Inverse Krueger series coefficients (one based), Karney (2011) eq 36
+	 */
+	private static final double[] BETA = { 0,
+			N / 2 - 2. / 3 * Math.pow(N, 2) + 37. / 96 * Math.pow(N, 3)
+					- 1. / 360 * Math.pow(N, 4) - 81. / 512 * Math.pow(N, 5)
+					+ 96199. / 604800 * Math.pow(N, 6),
+			1. / 48 * Math.pow(N, 2) + 1. / 15 * Math.pow(N, 3)
+					- 437. / 1440 * Math.pow(N, 4) + 46. / 105 * Math.pow(N, 5)
+					- 1118711. / 3870720 * Math.pow(N, 6),
+			17. / 480 * Math.pow(N, 3) - 37. / 840 * Math.pow(N, 4)
+					- 209. / 4480 * Math.pow(N, 5)
+					+ 5569. / 90720 * Math.pow(N, 6),
+			4397. / 161280 * Math.pow(N, 4) - 11. / 504 * Math.pow(N, 5)
+					- 830251. / 7257600 * Math.pow(N, 6),
+			4583. / 161280 * Math.pow(N, 5)
+					- 108847. / 3991680 * Math.pow(N, 6),
+			20648693. / 638668800 * Math.pow(N, 6) };
+
+	/**
+	 * Sum of c[j] sin(2 j zeta) for j = 1..6, zeta = xi + i eta, by Clenshaw
+	 * summation (Karney 2011, section 8), so only one sin, cos, sinh and
+	 * cosh are evaluated
+	 *
+	 * @return { sum of c[j] sin(2 j xi) cosh(2 j eta), sum of c[j] cos(2 j
+	 *         xi) sinh(2 j eta) }
+	 */
+	private static double[] kruegerSum(double[] c, double xi, double eta) {
+		final double sin2 = Math.sin(2 * xi);
+		final double cos2 = Math.cos(2 * xi);
+		final double sinh2 = Math.sinh(2 * eta);
+		final double cosh2 = Math.cosh(2 * eta);
+		// a = 2 cos(2 zeta)
+		final double ar = 2 * cos2 * cosh2;
+		final double ai = -2 * sin2 * sinh2;
+		double y1r = 0, y1i = 0, y2r = 0, y2i = 0;
+		for (int j = c.length - 1; j >= 1; j--) {
+			final double y0r = ar * y1r - ai * y1i - y2r + c[j];
+			final double y0i = ar * y1i + ai * y1r - y2i;
+			y2r = y1r;
+			y2i = y1i;
+			y1r = y0r;
+			y1i = y0i;
+		}
+		// sum = y1 sin(2 zeta)
+		final double sr = sin2 * cosh2;
+		final double si = cos2 * sinh2;
+		return new double[] { y1r * sr - y1i * si, y1r * si + y1i * sr };
+	}
+
+	/**
+	 * Tangent of the conformal latitude, Karney (2011) eqs 7 and 9
+	 *
+	 * @param tau
+	 *            tangent of the latitude
+	 * @return tangent of the conformal latitude
+	 */
+	private static double conformalTau(double tau) {
+		double sigma = Math.sinh(E * atanh(E * tau / Math.sqrt(1 + tau * tau)));
+		return tau * Math.sqrt(1 + sigma * sigma)
+				- sigma * Math.sqrt(1 + tau * tau);
+	}
+
+	/**
+	 * Inverse hyperbolic sine
+	 *
+	 * @param x
+	 *            value
+	 * @return asinh(x)
+	 */
+	private static double asinh(double x) {
+		double y = Math.abs(x);
+		y = Math.log1p(y + y * y / (1 + Math.sqrt(1 + y * y)));
+		return x < 0 ? -y : y;
+	}
+
+	/**
+	 * Inverse hyperbolic tangent
+	 *
+	 * @param x
+	 *            value
+	 * @return atanh(x)
+	 */
+	private static double atanh(double x) {
+		double y = Math.abs(x);
+		y = Math.log1p(2 * y / (1 - y)) / 2;
+		return x < 0 ? -y : y;
 	}
 
 }

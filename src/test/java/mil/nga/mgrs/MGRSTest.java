@@ -327,6 +327,41 @@ public class MGRSTest {
 	}
 
 	/**
+	 * Test points within a few centimeters of a grid line truncate into the
+	 * square that contains them, and UTM values agree with GeographicLib
+	 * GeoConvert (exact to a few nanometers)
+	 */
+	@Test
+	public void testGridLineTruncation() {
+
+		double[][] points = { { 63.344656283826, 4.32988630647 },
+				{ -32.000001, -180 }, { 45.649119337983, -120.001701963978 },
+				{ -80, 2.999999999 } };
+		String[] values = { "32VKR6639432505", "1HBE1657655629",
+				"10TGR3362559436", "31CDM9999918414" };
+		double[][] utm = { { 266394.732062, 7032505.999214 },
+				{ 216576.776555, 6455629.979552 },
+				{ 733625.999997, 5059436.556351 } };
+
+		for (int i = 0; i < points.length; i++) {
+			double lat = points[i][0];
+			double lon = points[i][1];
+			Point point = Point.degrees(lon, lat);
+			assertEquals(values[i], MGRS.from(point).coordinate());
+			if (i < utm.length) {
+				UTM from = UTM.from(point);
+				assertEquals(utm[i][0], from.getEasting(), 2e-6);
+				assertEquals(utm[i][1], from.getNorthing(), 2e-6);
+				Point back = UTM.create(from.getZone(), from.getHemisphere(),
+						utm[i][0], utm[i][1]).toPoint().toDegrees();
+				assertEquals(lat, back.getLatitude(), 1e-10);
+				assertEquals(lon, back.getLongitude(), 1e-10);
+			}
+		}
+
+	}
+
+	/**
 	 * Test parsing point bounds
 	 */
 	@Test
