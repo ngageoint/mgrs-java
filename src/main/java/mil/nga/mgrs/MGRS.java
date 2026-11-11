@@ -12,6 +12,7 @@ import mil.nga.grid.features.Point;
 import mil.nga.mgrs.grid.GridType;
 import mil.nga.mgrs.gzd.GridZone;
 import mil.nga.mgrs.gzd.GridZones;
+import mil.nga.mgrs.ups.UPS;
 import mil.nga.mgrs.utm.UTM;
 import mil.nga.sf.util.GeometryUtils;
 
@@ -47,6 +48,13 @@ public class MGRS {
 	 */
 	private static final Pattern mgrsInvalidPattern = Pattern
 			.compile("^3[246]X.*$", Pattern.CASE_INSENSITIVE);
+
+	/**
+	 * MGRS polar (UPS) string pattern: band A, B, Y or Z with no zone number
+	 */
+	private static final Pattern mgrsPolarPattern = Pattern.compile(
+			"^([ABYZ])(?:([A-HJ-NP-Z][A-HJ-NP-Z])((\\d{2}){0,5}))?$",
+			Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Zone number
@@ -246,7 +254,10 @@ public class MGRS {
 
 		if (type != null) {
 
-			mgrs.append(zone);
+			if (zone != 0) {
+				// polar (UPS) references have no zone number
+				mgrs.append(zone);
+			}
 			mgrs.append(band);
 
 			if (type != GridType.GZD) {
@@ -352,7 +363,20 @@ public class MGRS {
 	 * @return point
 	 */
 	public Point toPoint() {
+		if (isPolar()) {
+			return UPS.toPoint(band, column, row, easting, northing);
+		}
 		return toUTM().toPoint();
+	}
+
+	/**
+	 * Check if this is a polar (UPS) coordinate: zone 0 and band A, B, Y or Z
+	 * 
+	 * @return true if polar
+	 * @since 2.2.0
+	 */
+	public boolean isPolar() {
+		return zone == 0;
 	}
 
 	/**
@@ -437,6 +461,14 @@ public class MGRS {
 	 */
 	public static boolean isMGRS(String mgrs) {
 		mgrs = removeSpaces(mgrs);
+		Matcher polar = mgrsPolarPattern.matcher(mgrs);
+		if (polar.matches()) {
+			String columnRow = polar.group(2);
+			return columnRow == null || UPS.isColumnRow(
+					polar.group(1).toUpperCase().charAt(0),
+					Character.toUpperCase(columnRow.charAt(0)),
+					Character.toUpperCase(columnRow.charAt(1)));
+		}
 		Matcher matcher = mgrsPattern.matcher(mgrs);
 		if (!matcher.matches() || mgrsInvalidPattern.matcher(mgrs).matches()) {
 			return false;
@@ -468,6 +500,46 @@ public class MGRS {
 	}
 
 	/**
+	 * Parse a polar (UPS) MGRS string
+	 * 
+	 * @param mgrs
+	 *            MGRS string
+	 * @param matcher
+	 *            polar pattern matcher
+	 * @return MGRS
+	 * @throws ParseException
+	 *             upon failure to parse the MGRS string
+	 */
+	private static MGRS parsePolar(String mgrs, Matcher matcher)
+			throws ParseException {
+		char band = matcher.group(1).toUpperCase().charAt(0);
+		String columnRow = matcher.group(2);
+		if (columnRow == null) {
+			// grid zone only: the pole
+			return from(Point.degrees(band == 'A' || band == 'Y' ? -1e-9 : 0,
+					band < 'N' ? -90 : 90));
+		}
+		columnRow = columnRow.toUpperCase();
+		char column = columnRow.charAt(0);
+		char row = columnRow.charAt(1);
+		if (!UPS.isColumnRow(band, column, row)) {
+			throw new ParseException("Invalid MGRS: " + mgrs, 0);
+		}
+		long easting = 0;
+		long northing = 0;
+		String location = matcher.group(3);
+		if (!location.isEmpty()) {
+			int precision = location.length() / 2;
+			double multiplier = Math.pow(10.0, 5 - precision);
+			easting = (long) (Double.parseDouble(location.substring(0, precision))
+					* multiplier);
+			northing = (long) (Double.parseDouble(location.substring(precision))
+					* multiplier);
+		}
+		return new MGRS(0, band, column, row, easting, northing);
+	}
+
+	/**
 	 * Removed spaces from the value
 	 * 
 	 * @param value
@@ -489,15 +561,18 @@ public class MGRS {
 
 		point = point.copy().toDegrees();
 
-		// Bound the latitude if needed
-		if (point.getLatitude() < MGRSConstants.MIN_LAT) {
-			point.setLatitude(MGRSConstants.MIN_LAT);
-		} else if (point.getLatitude() > MGRSConstants.MAX_LAT) {
-			point.setLatitude(MGRSConstants.MAX_LAT);
-		}
-
 		// Normalize the longitude if needed
 		GeometryUtils.normalizeWGS84(point);
+
+		// north of 84 N and south of 80 S MGRS uses UPS (bands A, B, Y, Z);
+		// the latitude used to be clamped to 84 / -80 here, moving polar
+		// points up to 670 km
+		if (UPS.isPolar(point.getLatitude())) {
+			double latitude = Math.max(-90, Math.min(90, point.getLatitude()));
+			long[] ups = UPS.toMGRS(latitude, point.getLongitude());
+			return new MGRS(0, (char) ups[0], (char) ups[1], (char) ups[2],
+					ups[3], ups[4]);
+		}
 
 		UTM utm = UTM.from(point);
 
@@ -539,6 +614,10 @@ public class MGRS {
 	 *             upon failure to parse the MGRS string
 	 */
 	public static MGRS parse(String mgrs) throws ParseException {
+		Matcher polar = mgrsPolarPattern.matcher(removeSpaces(mgrs));
+		if (polar.matches()) {
+			return parsePolar(mgrs, polar);
+		}
 		Matcher matcher = mgrsPattern.matcher(removeSpaces(mgrs));
 		if (!matcher.matches()) {
 			throw new ParseException("Invalid MGRS: " + mgrs, 0);

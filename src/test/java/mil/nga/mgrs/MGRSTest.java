@@ -332,139 +332,57 @@ public class MGRSTest {
 	@Test
 	public void testPointBounds() {
 
-		// Max latitude tests
+		// North of 84 N (and at 84 N) MGRS uses UPS; latitudes past 90 are
+		// bounded to the pole. References from GeographicLib GeoConvert.
 
-		String mgrs = "39XVP9907028094";
-		String mgrs2 = "39XVN9902494603";
 		double longitude = 50.920338;
-		double latitudeBelow = 83.7;
-		double latitudeAbove = 100.0;
+		for (int i = 0; i < 3; i++) {
 
-		Point point = Point.degrees(longitude, MGRSConstants.MAX_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
+			assertEquals("ZHC1756079694", MGRS
+					.from(Point.degrees(longitude, MGRSConstants.MAX_LAT))
+					.coordinate());
+			assertEquals("39XVN9902494603",
+					MGRS.from(Point.degrees(longitude, 83.7)).coordinate());
+			assertEquals("ZGD2677053424",
+					MGRS.from(Point.degrees(longitude,
+							GeometryConstants.WEB_MERCATOR_MAX_LAT_RANGE))
+							.coordinate());
+			assertEquals("ZAH0000000000",
+					MGRS.from(Point.degrees(longitude,
+							GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT))
+							.coordinate());
+			assertEquals("ZAH0000000000",
+					MGRS.from(Point.degrees(longitude, 100.0)).coordinate());
 
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
+			// same at the longitude plus and minus 360
+			longitude += (i == 0 ? 2 : -4)
+					* GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH;
+		}
 
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
+		// 80 S is still UTM band C; south of it MGRS uses UPS
 
-		point = Point.degrees(longitude,
-				GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		// Max latitude and max longitude tests
-
-		longitude += (2 * GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH);
-
-		point = Point.degrees(longitude, MGRSConstants.MAX_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		// Max latitude and min longitude tests
-
-		longitude -= (4 * GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH);
-
-		point = Point.degrees(longitude, MGRSConstants.MAX_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		// Min latitude tests
-
-		mgrs = "52CDS8938618364";
-		mgrs2 = "52CDT8854707650";
 		longitude = 128.4525;
-		latitudeAbove = -79.2;
-		latitudeBelow = -100.0;
+		for (int i = 0; i < 3; i++) {
 
-		point = Point.degrees(longitude, MGRSConstants.MIN_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
+			assertEquals("52CDS8938618364", MGRS
+					.from(Point.degrees(longitude, MGRSConstants.MIN_LAT))
+					.coordinate());
+			assertEquals("52CDT8854707650",
+					MGRS.from(Point.degrees(longitude, -79.2)).coordinate());
+			assertEquals("BGJ3053858116",
+					MGRS.from(Point.degrees(longitude,
+							GeometryConstants.WEB_MERCATOR_MIN_LAT_RANGE))
+							.coordinate());
+			assertEquals("BAN0000000000",
+					MGRS.from(Point.degrees(longitude,
+							-GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT))
+							.coordinate());
+			assertEquals("BAN0000000000",
+					MGRS.from(Point.degrees(longitude, -100.0)).coordinate());
 
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MIN_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				-GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		// Min latitude and max longitude tests
-
-		longitude += (2 * GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH);
-
-		point = Point.degrees(longitude, MGRSConstants.MIN_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MIN_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				-GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		// Min latitude and min longitude tests
-
-		longitude -= (4 * GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH);
-
-		point = Point.degrees(longitude, MGRSConstants.MIN_LAT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeAbove);
-		assertEquals(mgrs2, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				GeometryConstants.WEB_MERCATOR_MIN_LAT_RANGE);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude,
-				-GeometryConstants.WGS84_HALF_WORLD_LAT_HEIGHT);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
-
-		point = Point.degrees(longitude, latitudeBelow);
-		assertEquals(mgrs, MGRS.from(point).coordinate());
+			longitude += (i == 0 ? 2 : -4)
+					* GeometryConstants.WGS84_HALF_WORLD_LON_WIDTH;
+		}
 
 	}
 
@@ -526,6 +444,51 @@ public class MGRSTest {
 				"03CVM4186716915" }) {
 			assertTrue(MGRS.isMGRS(value));
 			assertNotNull(MGRS.parse(value));
+		}
+	}
+
+	/**
+	 * Test polar (UPS) coordinates north of 84 N and south of 80 S.
+	 * References from GeographicLib GeoConvert.
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testPolar() throws ParseException {
+		double[][] points = { { 88.389186782401, 149.062244586389 },
+				{ -89.626700543677, -178.41905096312 },
+				{ 89.960700839522, -65.333389789462 }, { 84, 0 },
+				{ 84, -0.0000001 }, { 90, 0 }, { -90, 0 },
+				{ -80.0000001, 0 }, { 85.5, -120 }, { -85.5, 120 } };
+		String[] values = { "ZAJ9194753404", "AZM9885658570", "YZG9603498179",
+				"ZAA0000033272", "YZA9999933272", "ZAH0000000000",
+				"BAN0000000000", "BAZ0000012951", "YTK6711349926",
+				"BGK3288650073" };
+		for (int i = 0; i < values.length; i++) {
+			double lat = points[i][0];
+			double lon = points[i][1];
+			MGRS mgrs = MGRS.from(Point.degrees(lon, lat));
+			assertEquals(values[i], mgrs.coordinate());
+			assertTrue(mgrs.isPolar());
+			assertTrue(MGRS.isMGRS(values[i]));
+			Point point = MGRS.parse(values[i]).toPoint().toDegrees();
+			assertEquals(lat, point.getLatitude(), 2e-5);
+			if (Math.abs(lat) < 89.99 && (lat > 84.01 || lat < -80.01)) {
+				assertEquals(values[i], MGRS.from(point).coordinate());
+			}
+		}
+		// 80 S itself is still UTM band C
+		assertEquals("31CDM4186716915",
+				MGRS.from(Point.degrees(0, -80)).coordinate());
+		// letters not used in the band are rejected
+		assertFalse(MGRS.isMGRS("ZRJ9194753404"));
+		assertFalse(MGRS.isMGRS("YAG9603498179"));
+		try {
+			MGRS.parse("ZRJ9194753404");
+			fail("Expected parse exception");
+		} catch (ParseException e) {
+			// expected
 		}
 	}
 
