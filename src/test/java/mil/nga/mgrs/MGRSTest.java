@@ -503,6 +503,33 @@ public class MGRSTest {
 	}
 
 	/**
+	 * Test 100km column letters that are not used in the zone are rejected
+	 * (each zone uses 8 of the 24 letters)
+	 * 
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testColumnLetterNotInZone() throws ParseException {
+		// zone 1 uses A-H; K belongs to zones 2, 5, ...
+		for (String value : new String[] { "01CKM4186716915", "1CKM4186716915",
+				"02CAM4186716915", "03CJM4186716915", "00NAA6602100000" }) {
+			assertFalse(MGRS.isMGRS(value));
+			try {
+				MGRS.parse(value);
+				fail("Expected parse exception: " + value);
+			} catch (ParseException e) {
+				// expected
+			}
+		}
+		for (String value : new String[] { "01CDM4186716915", "02CMS4186716915",
+				"03CVM4186716915" }) {
+			assertTrue(MGRS.isMGRS(value));
+			assertNotNull(MGRS.parse(value));
+		}
+	}
+
+	/**
 	 * Test parsing a Svalbard MGRS string values
 	 * 
 	 * @throws ParseException
