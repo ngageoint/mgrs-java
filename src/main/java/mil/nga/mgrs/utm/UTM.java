@@ -156,12 +156,9 @@ public class UTM {
 		double eta = (easting - 500000) / (K0 * A);
 		double xi = north / (K0 * A);
 
-		double xiPrime = xi;
-		double etaPrime = eta;
-		for (int j = 1; j <= 6; j++) {
-			xiPrime -= BETA[j] * Math.sin(2 * j * xi) * Math.cosh(2 * j * eta);
-			etaPrime -= BETA[j] * Math.cos(2 * j * xi) * Math.sinh(2 * j * eta);
-		}
+		final double[] dXiEta = kruegerSum(BETA, xi, eta);
+		final double xiPrime = xi - dXiEta[0];
+		final double etaPrime = eta - dXiEta[1];
 
 		double sinhEtaPrime = Math.sinh(etaPrime);
 		double sinXiPrime = Math.sin(xiPrime);
@@ -170,7 +167,7 @@ public class UTM {
 				sinhEtaPrime * sinhEtaPrime + cosXiPrime * cosXiPrime);
 
 		// Newton iteration for tau = tan(latitude)
-		double tau = tauPrime;
+		double tau = tauPrime / (1 - E * E);
 		for (int i = 0; i < 10; i++) {
 			double tauIPrime = conformalTau(tau);
 			double delta = (tauPrime - tauIPrime)
@@ -321,14 +318,9 @@ public class UTM {
 		double etaPrime = asinh(Math.sin(lam)
 				/ Math.sqrt(tauPrime * tauPrime + cosLambda * cosLambda));
 
-		double xi = xiPrime;
-		double eta = etaPrime;
-		for (int j = 1; j <= 6; j++) {
-			xi += ALPHA[j] * Math.sin(2 * j * xiPrime)
-					* Math.cosh(2 * j * etaPrime);
-			eta += ALPHA[j] * Math.cos(2 * j * xiPrime)
-					* Math.sinh(2 * j * etaPrime);
-		}
+		final double[] dXiEta = kruegerSum(ALPHA, xiPrime, etaPrime);
+		final double xi = xiPrime + dXiEta[0];
+		final double eta = etaPrime + dXiEta[1];
 
 		double easting = K0 * A * eta + 500000;
 		double northing = K0 * A * xi;
@@ -418,6 +410,37 @@ public class UTM {
 			4583. / 161280 * Math.pow(N, 5)
 					- 108847. / 3991680 * Math.pow(N, 6),
 			20648693. / 638668800 * Math.pow(N, 6) };
+
+	/**
+	 * Sum of c[j] sin(2 j zeta) for j = 1..6, zeta = xi + i eta, by Clenshaw
+	 * summation (Karney 2011, section 8), so only one sin, cos, sinh and
+	 * cosh are evaluated
+	 *
+	 * @return { sum of c[j] sin(2 j xi) cosh(2 j eta), sum of c[j] cos(2 j
+	 *         xi) sinh(2 j eta) }
+	 */
+	private static double[] kruegerSum(double[] c, double xi, double eta) {
+		final double sin2 = Math.sin(2 * xi);
+		final double cos2 = Math.cos(2 * xi);
+		final double sinh2 = Math.sinh(2 * eta);
+		final double cosh2 = Math.cosh(2 * eta);
+		// a = 2 cos(2 zeta)
+		final double ar = 2 * cos2 * cosh2;
+		final double ai = -2 * sin2 * sinh2;
+		double y1r = 0, y1i = 0, y2r = 0, y2i = 0;
+		for (int j = c.length - 1; j >= 1; j--) {
+			final double y0r = ar * y1r - ai * y1i - y2r + c[j];
+			final double y0i = ar * y1i + ai * y1r - y2i;
+			y2r = y1r;
+			y2i = y1i;
+			y1r = y0r;
+			y1i = y0i;
+		}
+		// sum = y1 sin(2 zeta)
+		final double sr = sin2 * cosh2;
+		final double si = cos2 * sinh2;
+		return new double[] { y1r * sr - y1i * si, y1r * si + y1i * sr };
+	}
 
 	/**
 	 * Tangent of the conformal latitude, Karney (2011) eqs 7 and 9
