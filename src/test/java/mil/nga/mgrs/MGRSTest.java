@@ -822,6 +822,34 @@ public class MGRSTest {
 	}
 
 	/**
+	 * Test points just north of a band's southern edge decode into that band.
+	 * References from GeographicLib GeoConvert. The band bottom northing used
+	 * to be evaluated at longitude 0 instead of on this zone's central
+	 * meridian, which sent these points one 2,000 km cycle too far north.
+	 *
+	 * @throws ParseException
+	 *             upon failure to parse
+	 */
+	@Test
+	public void testBandEdgeNorthing() throws ParseException {
+		String[] values = { "31WEL0000097014", "41WNL2005597524",
+				"49WDL8121398731", "25WDL9754198864" };
+		double[][] points = { { 64.0, 3.0 }, { 64.004, 63.4101 },
+				{ 64.0149, 110.6157 }, { 64.0166, -33.0503 } };
+		for (int i = 0; i < values.length; i++) {
+			double lat = points[i][0];
+			double lon = points[i][1];
+			Point point = MGRS.parse(values[i]).toPoint().toDegrees();
+			assertEquals(lat, point.getLatitude(), 1e-4);
+			assertEquals(lon, point.getLongitude(), 1e-4);
+			assertEquals(lat, MGRS.from(Point.degrees(lon, lat)).toPoint()
+					.toDegrees().getLatitude(), 1e-4);
+		}
+		assertEquals(7097014,
+				MGRS.parse("31WEL0000097014").toUTM().getNorthing(), 0);
+	}
+
+	/**
 	 * Get the northing of the MGRS value in the accuracy
 	 * 
 	 * @param value
