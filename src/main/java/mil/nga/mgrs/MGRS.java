@@ -437,8 +437,34 @@ public class MGRS {
 	 */
 	public static boolean isMGRS(String mgrs) {
 		mgrs = removeSpaces(mgrs);
-		return mgrsPattern.matcher(mgrs).matches()
-				&& !mgrsInvalidPattern.matcher(mgrs).matches();
+		Matcher matcher = mgrsPattern.matcher(mgrs);
+		if (!matcher.matches() || mgrsInvalidPattern.matcher(mgrs).matches()) {
+			return false;
+		}
+		String columnRow = matcher.group(3);
+		if (columnRow == null) {
+			return true;
+		}
+		columnRow = columnRow.toUpperCase();
+		return isColumnRow(Integer.parseInt(matcher.group(1)),
+				columnRow.charAt(0), columnRow.charAt(1));
+	}
+
+	/**
+	 * Check the 100km column and row letters are used in the zone
+	 * 
+	 * @param zone
+	 *            zone number
+	 * @param column
+	 *            column letter
+	 * @param row
+	 *            row letter
+	 * @return true if both letters are used in the zone
+	 */
+	private static boolean isColumnRow(int zone, char column, char row) {
+		return zone >= 1 && zone <= 60
+				&& getColumnLetters(zone).indexOf(column) >= 0
+				&& getRowLetters(zone).indexOf(row) >= 0;
 	}
 
 	/**
@@ -520,6 +546,9 @@ public class MGRS {
 
 		int zone = Integer.parseInt(matcher.group(1));
 		char band = matcher.group(2).toUpperCase().charAt(0);
+		if (zone < 1 || zone > 60) {
+			throw new ParseException("Invalid MGRS: " + mgrs, 0);
+		}
 
 		GridZone gridZone = GridZones.getGridZone(zone, band);
 		if (gridZone == null) {
@@ -534,6 +563,12 @@ public class MGRS {
 			columnRow = columnRow.toUpperCase();
 			char column = columnRow.charAt(0);
 			char row = columnRow.charAt(1);
+
+			// each zone uses 8 of the 24 column letters; a letter from another
+			// zone used to decode to a point outside the zone (or past -180)
+			if (!isColumnRow(zone, column, row)) {
+				throw new ParseException("Invalid MGRS: " + mgrs, 0);
+			}
 
 			// parse easting & northing
 			long easting = 0;
